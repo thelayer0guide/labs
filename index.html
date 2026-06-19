@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Labs — TheLayer0Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
@@ -65,6 +66,20 @@
   .card-arrow{color:var(--ac)}
   .tag{background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
 
+  /* UNDER CONSTRUCTION */
+  .card.wip{pointer-events:none;opacity:0.72}
+  .card.wip:hover{transform:none;box-shadow:none}
+  .wip-banner{
+    position:absolute;top:14px;right:-28px;
+    background:#f0883e;color:#0d1117;
+    font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+    letter-spacing:1.5px;text-transform:uppercase;
+    padding:3px 36px;
+    transform:rotate(35deg);
+    pointer-events:none;
+    z-index:10;
+  }
+
   /* DIFFICULTY LEGEND */
   .diff-legend{margin-top:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px}
   .diff-legend-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
@@ -90,7 +105,8 @@
 <main>
   <div class="grid">
 
-    <a href="uconsole/catalog.html" class="card c-uc">
+    <a href="uconsole/catalog.html" class="card c-uc wip">
+      <div class="wip-banner">In Arbeit</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -117,7 +133,8 @@
       </div>
     </a>
 
-    <a href="python-jahreskurs/catalog.html" class="card c-py">
+    <a href="python-jahreskurs/catalog.html" class="card c-py wip">
+      <div class="wip-banner">In Arbeit</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -144,7 +161,8 @@
       </div>
     </a>
 
-    <a href="python-anfaenger/catalog.html" class="card c-pa">
+    <a href="python-anfaenger/catalog.html" class="card c-pa wip">
+      <div class="wip-banner">In Arbeit</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
