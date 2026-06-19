@@ -20,8 +20,8 @@
   /* HEADER */
   header{background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);border-bottom:1px solid var(--border);padding:48px 48px 40px;position:relative;overflow:hidden;text-align:center}
   header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(88,166,255,0.04),transparent)}
-  .header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;position:relative}
-  h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--text);margin-bottom:14px;position:relative}
+  h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--text);margin-bottom:8px;position:relative}
+  .header-brand{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--muted);margin-bottom:18px;position:relative;letter-spacing:0.5px}
   .header-sub{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);max-width:500px;margin:0 auto;line-height:1.6;position:relative}
   .header-sub code{color:#58a6ff;background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.2);padding:1px 5px;border-radius:3px;font-size:.9em}
   .header-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:20px;position:relative}
@@ -96,8 +96,8 @@
 </nav>
 
 <header>
-  <div class="header-eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide · Security Lab</div>
   <h1>Python Security Labs</h1>
+  <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide · Security Lab</div>
   <p class="header-sub">19 Labs, 7 Phasen. Jedes Tool eigenständig nutzbar — am Ende vereint als <code>uctl</code> auf der uConsole (ARM64, RK3566).</p>
   <div class="header-chips">
     <span class="chip"><span>19</span> Labs</span>

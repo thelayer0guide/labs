@@ -13,8 +13,8 @@
   /* HEADER */
   header{background:linear-gradient(135deg,#0d1117 0%,#111820 60%,#0d1117 100%);border-bottom:1px solid var(--border);padding:56px 48px 48px;position:relative;overflow:hidden;text-align:center}
   header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(255,255,255,0.02),transparent)}
-  .header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
-  h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);margin-bottom:16px}
+  h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);margin-bottom:10px}
+  .header-brand{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--muted);margin-bottom:20px;letter-spacing:0.5px}
   .header-sub{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
   .header-count{display:inline-block;margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:5px 16px;color:var(--muted)}
   .header-count span{color:var(--text);font-weight:700}
@@ -78,8 +78,8 @@
 <body>
 
 <header>
-  <div class="header-eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
   <h1>Labs</h1>
+  <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
   <p class="header-sub">Zwei Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
   <div class="header-count"><span>2</span> Curricula &nbsp;·&nbsp; <span>31</span> Labs &amp; Module &nbsp;·&nbsp; <span>70–125 h</span></div>
 </header>
