@@ -58,6 +58,8 @@
   .c-py{--ac:#e3b341;--acs:rgba(227,179,65,0.12);--acb:rgba(227,179,65,0.25)}
   /* Python für Anfänger card */
   .c-pa{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
+  /* Python Forensik card */
+  .c-pf{--ac:#f0883e;--acs:rgba(240,136,62,0.12);--acb:rgba(240,136,62,0.25)}
 
   .card .card-accent{background:var(--ac)}
   .card:hover{border-color:var(--ac)}
@@ -66,15 +68,28 @@
   .card-arrow{color:var(--ac)}
   .tag{background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
 
-  /* UNDER CONSTRUCTION */
+  /* UNDER CONSTRUCTION — blockiert Klicks */
   .card.wip{pointer-events:none;opacity:0.72}
   .card.wip:hover{transform:none;box-shadow:none}
+  /* IN ARBEIT — nur Hinweis, Klicks erlaubt */
+  .card.wip-hint{opacity:0.88}
   .wip-banner{
     position:absolute;top:14px;right:-28px;
     background:#f0883e;color:#0d1117;
     font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
     letter-spacing:1.5px;text-transform:uppercase;
     padding:3px 36px;
+    transform:rotate(35deg);
+    pointer-events:none;
+    z-index:10;
+  }
+  /* ALPHA */
+  .alpha-banner{
+    position:absolute;top:14px;right:-32px;
+    background:#a371f7;color:#0d1117;
+    font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
+    letter-spacing:1.5px;text-transform:uppercase;
+    padding:3px 40px;
     transform:rotate(35deg);
     pointer-events:none;
     z-index:10;
@@ -98,8 +113,8 @@
 <header>
   <h1>Labs</h1>
   <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
-  <p class="header-sub">Drei Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
-  <div class="header-count"><span>3</span> Curricula &nbsp;·&nbsp; <span>45</span> Labs &amp; Module &nbsp;·&nbsp; <span>120–215 h</span></div>
+  <p class="header-sub">Vier Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
+  <div class="header-count"><span>4</span> Curricula &nbsp;·&nbsp; <span>55</span> Labs &amp; Module &nbsp;·&nbsp; <span>145–260 h</span></div>
 </header>
 
 <main>
@@ -161,8 +176,8 @@
       </div>
     </a>
 
-    <a href="python-anfaenger/catalog.html" class="card c-pa wip">
-      <div class="wip-banner">In Arbeit</div>
+    <a href="python-anfaenger/catalog.html" class="card c-pa">
+      <div class="alpha-banner">Alpha</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -184,6 +199,33 @@
           <span class="tag">Logging</span>
           <span class="tag">Pandas</span>
           <span class="tag">CLI-Tools</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="python-forensik/catalog.html" class="card c-pf wip-hint">
+      <div class="wip-banner">In Arbeit</div>
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">🔍</div>
+          <div class="card-name">Python Forensik<br>&amp; Datenanalyse</div>
+        </div>
+        <p class="card-tagline">10 eigenständige CLI-Tools für Log-Analyse, Dateiintegrität, Netzwerkforensik, Fehlerkorrelation und Incident-Reporting. Stdlib-first, sofort im Arbeitsalltag einsetzbar.</p>
+        <div class="card-stats">
+          <span class="stat"><strong>10</strong> Module</span>
+          <span class="stat"><strong>10</strong> Tools</span>
+          <span class="stat"><strong>25–45 h</strong></span>
+          <span class="stat"><strong>stdlib-first</strong></span>
+        </div>
+        <div class="card-tags">
+          <span class="tag">IT-Forensik</span>
+          <span class="tag">Log-Analyse</span>
+          <span class="tag">Integrität</span>
+          <span class="tag">Netzwerk</span>
+          <span class="tag">Datenprofilierung</span>
+          <span class="tag">Incident Response</span>
         </div>
         <span class="card-arrow">→</span>
       </div>

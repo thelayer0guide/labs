@@ -95,6 +95,30 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;l
 .kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
 @media(max-width:768px){.topnav{padding:0 16px}.page-header{padding:24px 16px}.page-content{padding:0 16px 60px}}
 
+
+  /* ── ENHANCEMENT SECTIONS ── */
+  .info-section{margin:32px 0 0;padding:22px 24px;background:var(--bg-card);border:1px solid var(--border-s);border-left:3px solid var(--ac,#58a6ff);border-radius:0 var(--rl) var(--rl) 0}
+  .info-section h3{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--ac,#58a6ff);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06)}
+  .info-section p{font-size:12.5px;color:var(--tx-sec);line-height:1.75;margin-bottom:8px}
+  .info-section p:last-child{margin-bottom:0}
+  .info-section code{font-family:var(--fm);font-size:11px;background:var(--bg-code);border:1px solid var(--border-s);padding:1px 5px;border-radius:3px;color:var(--tx)}
+  .project-section{margin:28px 0 0;background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);overflow:hidden}
+  .project-hdr{padding:16px 24px 14px;border-bottom:1px solid var(--border-s);display:flex;align-items:center;gap:12px}
+  .project-label{font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ac,#58a6ff);background:color-mix(in srgb,var(--ac,#58a6ff) 10%,transparent);border:1px solid color-mix(in srgb,var(--ac,#58a6ff) 25%,transparent);border-radius:3px;padding:2px 8px}
+  .project-title{font-family:var(--fd);font-size:15px;font-weight:800;color:var(--tx)}
+  .project-body{padding:20px 24px}
+  .project-body p{font-size:12.5px;color:var(--tx-sec);line-height:1.75;margin-bottom:10px}
+  .project-body p:last-child{margin-bottom:0}
+  .project-body code{font-family:var(--fm);font-size:11px;background:var(--bg-code);border:1px solid var(--border-s);padding:1px 5px;border-radius:3px;color:var(--tx)}
+  .project-body a{color:var(--ac,#58a6ff);text-decoration:none}
+  .project-body a:hover{text-decoration:underline}
+  .req-list{list-style:none;margin:18px 0 0;display:flex;flex-direction:column;gap:8px}
+  .req-list li{font-size:12.5px;color:var(--tx-sec);display:flex;align-items:flex-start;gap:10px;line-height:1.6}
+  .req-chk{width:14px;height:14px;border:1.5px solid rgba(255,255,255,.15);border-radius:3px;background:rgba(255,255,255,.03);flex-shrink:0;margin-top:3px}
+  .req-list code{font-family:var(--fm);font-size:11px;background:var(--bg-code);border:1px solid var(--border-s);padding:1px 5px;border-radius:3px;color:var(--tx)}
+  .accept-section{margin:22px 0 0}
+  .accept-label{font-family:var(--fm);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tx-muted);margin-bottom:8px}
+  .accept-block{background:var(--bg-code);border:1px solid var(--border-s);border-left:3px solid var(--ac,#58a6ff);border-radius:0 var(--r) var(--r) 0;padding:14px 18px;font-family:var(--fm);font-size:11.5px;line-height:1.75;overflow-x:auto;color:var(--tx-sec);white-space:pre}
 </style>
 </head>
 <body>
@@ -132,12 +156,18 @@ body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;l
   </div>
 </div>
 
-<div class="page-content">
+<div class="page-content" style="--ac:#3fb950">
   <div class="month-section">
 <div class="month-hdr">
     <span class="month-badge" style="color:var(--m3);border-color:var(--m3);background:rgba(63,185,80,.07)">Monat 03</span>
     <h2 class="month-title">Dateiarbeit &amp; Stdlib</h2>
     <span class="month-sub">File I/O · pathlib · json · csv · datetime · Module</span>
+  </div>
+
+  
+  <div class="info-section">
+    <h3>Hintergrund</h3>
+    <p>Dateien sind das universelle Interface: Logdateien, Konfigurationen, Daten-Exporte — fast jedes Admin-Skript liest oder schreibt Dateien. <code>pathlib.Path</code> macht das plattformubergreifend und ausdrucksstark. Der wichtigste Grundsatz: immer den Context Manager (<code>with open(...)</code>) verwenden — er schliesst Dateien auch bei Exceptions zuverlaessig.</p><p><code>json</code> und <code>csv</code> aus der Standardbibliothek decken 90 % aller strukturierten Datenformate ab, ohne ein einziges Drittpaket. <code>datetime</code> liefert Zeitstempel fuer Logs und Reports.</p>
   </div>
 
   <div class="week-grid">
@@ -250,6 +280,33 @@ Path(<span class="str">"log.json"</span>).write_text(
     <span class="skills-lbl">M03 Skills</span>
     <span class="tag">File I/O</span><span class="tag">with-Statement</span><span class="tag">pathlib</span><span class="tag">json/csv</span><span class="tag">datetime</span><span class="tag">eigene Module</span><span class="tag">re-Einstieg</span>
   </div>
+
+  <div class="project-section">
+    <div class="project-hdr">
+      <span class="project-label">Monatsprojekt</span>
+      <span class="project-title">Verzeichnis-Organizer</span>
+    </div>
+    <div class="project-body">
+      <p>Schreibe ein CLI-Tool, das ein Verzeichnis analysiert, Dateien nach Endung gruppiert und einen JSON-Report mit Zeitstempel speichert. Pfad per <code>sys.argv[1]</code>, Default: aktuelles Verzeichnis.</p>
+      <ul class="req-list">
+        <li><span class="req-chk"></span><code>pathlib.Path.rglob()</code> fuer rekursives Scannen</li>
+        <li><span class="req-chk"></span>Gruppierung als <code>dict[str, list[str]]</code> — Schluessel ist die Dateiendung</li>
+        <li><span class="req-chk"></span>Gesamt-Groesse in Bytes berechnen (<code>stat().st_size</code>)</li>
+        <li><span class="req-chk"></span>Report als <code>report_YYYY-MM-DD.json</code> speichern (<code>datetime.date.today()</code>)</li>
+        <li><span class="req-chk"></span>Nicht lesbare Dateien ueberspringen und separat zaehlen</li>
+        <li><span class="req-chk"></span>Report enthaelt: Pfad, Datum, Dateianzahl, Gesamtgroesse, Aufschluesselung nach Typ</li>
+      </ul>
+      <div class="accept-section">
+        <div class="accept-label">Akzeptanzkriterien</div>
+        <pre class="accept-block">python file_organizer.py /etc
+# -> report_2026-06-19.json erzeugt
+
+python -c "import json; d=json.load(open('report_2026-06-19.json')); print(list(d.keys()))"
+# ['path', 'date', 'total_files', 'total_bytes', 'by_extension']</pre>
+      </div>
+    </div>
+  </div>
+
   </div>
 </div>
 

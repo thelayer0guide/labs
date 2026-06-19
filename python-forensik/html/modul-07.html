@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 07 — FileTimeline · Python Forensik</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#e3b341}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+  header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#120f0a 60%,#0d1117 100%)}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+  .header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+  .badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+  .badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+  h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+  .header-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:2}.header-meta span{color:var(--text)}
+  .sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+  .sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .sheet-lnk:last-child{border-bottom:none}.sheet-lnk::before{content:'→';color:var(--accent);opacity:.5;transition:opacity .15s}.sheet-lnk:hover{color:var(--accent)}.sheet-lnk:hover::before{opacity:1}
+  .page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+  .content{min-width:0}.lab-section{margin-bottom:44px}
+  .sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+  h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+  p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+  ul,ol{list-style:none;padding:0;margin-bottom:14px}
+  li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}
+  li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+  ol{counter-reset:item}ol li{counter-increment:item}ol li::before{content:counter(item)'.';font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;left:0;color:var(--accent)}
+  li.task{padding-left:26px}li.task::before{display:none}
+  .chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+  pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+  blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+  blockquote p{margin:0;font-size:13px;color:var(--muted)}
+  .sidebar{position:sticky;top:60px}
+  .sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+  .sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+  .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
+  .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
+  @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Forensik</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 07 — FileTimeline</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 07</span>
+        <span class="badge badge-cat">Filesystem-Forensik</span>
+        <span class="badge badge-cat">3–4 h</span>
+        <span class="badge" style="background:transparent;border:1px solid rgba(227,179,65,.5)"><span style="color:#e3b341">★★★</span><span style="color:#30363d">★★</span> Fortgeschritten</span>
+      </div>
+      <h1>FileTimeline</h1>
+      <div class="header-meta">
+        Tool-Output: <span>timeline.py — Filesystem-Timeline-Rekonstruktion mit CSV/HTML-Export</span><br>
+        Voraussetzungen: <span>pathlib, stat, csv, datetime, html-Grundlagen</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Inode-Zeitstempel (<code>st_mtime</code>, <code>st_atime</code>, <code>st_ctime</code>) und deren Bedeutung verstehen</li>
+        <li>Große Verzeichnisbäume speichereffizient mit Generator-Expressions traversieren</li>
+        <li>Chronologisch sortierte Ereignisliste aus Filesystem-Metadaten aufbauen</li>
+        <li>CSV-Export mit <code>csv.DictWriter</code> inkl. korrekter Timestamp-Serialisierung</li>
+        <li>Einfachen HTML-Report mit Inline-CSS generieren (kein Template-Engine)</li>
+        <li>Zeitraumfilter mit <code>datetime</code>-Vergleich und Dateiendungs-Filter implementieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>In der digitalen Forensik ist die Rekonstruktion einer Ereignis-Timeline zentral. Wann wurde eine Datei erstellt? Wann zuletzt modifiziert? Wann zuletzt gelesen? Diese drei Zeitstempel (mtime/atime/ctime) sind im Inodes gespeichert und über <code>os.stat()</code> direkt aus Python abrufbar.</p>
+      <p>FileTimeline scanst ein Verzeichnis, liest alle Zeitstempel, sortiert chronologisch und macht die Abfolge von Dateioperationen sichtbar. Das ist das erste Werkzeug bei der Analyse eines kompromittierten Webservers: Wann wurde <code>evil.php</code> angelegt? Wurden danach weitere Dateien verändert?</p>
+      <p>Der HTML-Export ist dabei mehr als nur Optik — ein standalone-HTML mit Inline-CSS ist selbst auf forensisch isolierten Systemen ohne Browser-Extension aufrufbar und kann einfach in Incident-Reports eingebettet werden.</p>
+    </div>
+
+    <div class="lab-section" id="konzepte">
+      <div class="sec-heading">Schlüsselkonzepte</div>
+      <h3>Inode-Zeitstempel lesen</h3>
+      <pre><code>from pathlib import Path
+from datetime import datetime
+
+def file_timestamps(path: Path) -&gt; dict:
+    s = path.stat()
+    return {
+        'path':  str(path),
+        'size':  s.st_size,
+        'mtime': datetime.fromtimestamp(s.st_mtime),  # last modified
+        'atime': datetime.fromtimestamp(s.st_atime),  # last accessed
+        'ctime': datetime.fromtimestamp(s.st_ctime),  # inode changed (not "created"!)
+        'ext':   path.suffix.lower(),
+    }</code></pre>
+      <h3>Zeitleiste aufbauen</h3>
+      <pre><code>def build_timeline(root: Path, ts_field: str = 'mtime',
+                   since=None, until=None, exts=None):
+    events = []
+    for p in root.rglob('*'):
+        if not p.is_file():
+            continue
+        if exts and p.suffix.lower() not in exts:
+            continue
+        entry = file_timestamps(p)
+        ts = entry[ts_field]
+        if since and ts &lt; since:
+            continue
+        if until and ts &gt; until:
+            continue
+        events.append(entry)
+    return sorted(events, key=lambda e: e[ts_field])</code></pre>
+      <h3>HTML-Report generieren</h3>
+      <pre><code>def render_html(events: list[dict], title: str) -&gt; str:
+    rows = '\n'.join(
+        f'&lt;tr&gt;&lt;td&gt;{e["mtime"].strftime("%Y-%m-%d %H:%M:%S")}&lt;/td&gt;'
+        f'&lt;td&gt;{e["ext"] or "—"}&lt;/td&gt;'
+        f'&lt;td style="font-family:monospace"&gt;{e["path"]}&lt;/td&gt;'
+        f'&lt;td style="text-align:right"&gt;{e["size"]:,}&lt;/td&gt;&lt;/tr&gt;'
+        for e in events
+    )
+    return f"""&lt;!DOCTYPE html&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;&lt;title&gt;{title}&lt;/title&gt;
+&lt;style&gt;body{{font-family:monospace;background:#0d1117;color:#e6edf3}}
+table{{border-collapse:collapse;width:100%}}
+th,td{{padding:6px 10px;border-bottom:1px solid #30363d;text-align:left}}
+th{{color:#58a6ff}}&lt;/style&gt;&lt;/head&gt;
+&lt;body&gt;&lt;h1&gt;{title}&lt;/h1&gt;&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;Timestamp&lt;/th&gt;&lt;th&gt;Ext&lt;/th&gt;&lt;th&gt;Path&lt;/th&gt;&lt;th&gt;Size&lt;/th&gt;&lt;/tr&gt;
+{rows}&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;"""</code></pre>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe — timeline.py</div>
+      <pre><code># Alle Dateien nach mtime sortiert
+timeline.py /var/www
+
+# Nur PHP-Dateien, letzte 48 Stunden
+timeline.py /var/www --ext .php --since "2025-06-17 00:00"
+
+# Nach atime (Zugriffszeitpunkt) statt mtime
+timeline.py /home/user --ts atime --since "2025-06-19 08:00"
+
+# CSV exportieren
+timeline.py /var/www --format csv --out timeline.csv
+
+# HTML-Report erstellen
+timeline.py /var/www --format html --out report.html --title "Incident 2025-06-19"</code></pre>
+      <blockquote><p>Wichtig: <code>ctime</code> ist auf Linux <em>nicht</em> der Erstellungszeitpunkt, sondern der Zeitpunkt der letzten Inode-Änderung (inkl. Berechtigungsänderungen). Das sollte in der Dokumentation des Tools klargestellt sein.</p></blockquote>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Alle drei Zeitstempel (mtime, atime, ctime) werden gelesen und angezeigt</li>
+        <li class="task"><span class="chk"></span><code>--ts</code> wählt den Sortierschlüssel (mtime ist Standard)</li>
+        <li class="task"><span class="chk"></span><code>--since</code> / <code>--until</code> filtern nach dem gewählten Zeitstempel</li>
+        <li class="task"><span class="chk"></span><code>--ext</code> nimmt mehrere Endungen entgegen (kommagetrennt oder mehrfach angegeben)</li>
+        <li class="task"><span class="chk"></span>CSV-Export enthält alle Spalten inkl. ISO-Zeitstempel und Dateigröße in Bytes</li>
+        <li class="task"><span class="chk"></span>HTML-Export ist standalone (kein externes CSS/JS) und im Browser direkt öffenbar</li>
+        <li class="task"><span class="chk"></span>Nur stdlib</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="akzeptanz">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <ol>
+        <li>Timeline von <code>/var/www</code> mit 5.000 Dateien läuft in unter 3 Sekunden durch</li>
+        <li>Eine bekannte neu erstellte Datei erscheint an der korrekten chronologischen Position</li>
+        <li>CSV kann mit LibreOffice Calc geöffnet werden ohne Zeichensatz-Fehler</li>
+        <li>HTML-Report ist im Browser aufrufbar und zeigt alle Dateien in richtiger Reihenfolge</li>
+        <li>Tool gibt sinnvolle Meldung aus wenn <code>--since</code> nach <code>--until</code> liegt</li>
+      </ol>
+    </div>
+
+  </div>
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte" class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz" class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Navigation</div>
+      <a href="modul-06.html" class="nav-mod-link prev">ErrorCorrelator</a>
+      <a href="modul-08.html" class="nav-mod-link next">SecretScanner</a>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

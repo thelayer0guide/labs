@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 01 — LogParser · Python Forensik</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0d1117; --surface:#161b22; --border:#30363d; --text:#e6edf3; --muted:#7d8590; --code-bg:#10161d; --accent:#58a6ff; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+  header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+  .header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+  .badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+  .badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+  h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+  .header-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:2}
+  .header-meta span{color:var(--text)}
+  .sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+  .sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .sheet-lnk:last-child{border-bottom:none}
+  .sheet-lnk::before{content:'→';color:var(--accent);opacity:.5;transition:opacity .15s}
+  .sheet-lnk:hover{color:var(--accent)}
+  .sheet-lnk:hover::before{opacity:1}
+  .page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+  .content{min-width:0}
+  .lab-section{margin-bottom:44px}
+  .sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+  h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+  p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+  ul,ol{list-style:none;padding:0;margin-bottom:14px}
+  li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}
+  li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+  ol{counter-reset:item}
+  ol li{counter-increment:item}
+  ol li::before{content:counter(item)'.';font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;left:0;color:var(--accent)}
+  li.task{padding-left:26px}
+  li.task::before{display:none}
+  .chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+  pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+  blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+  blockquote p{margin:0;font-size:13px;color:var(--muted)}
+  .sidebar{position:sticky;top:60px}
+  .sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+  .sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .toc-lnk:last-child{border-bottom:none}
+  .toc-lnk:hover{color:var(--accent)}
+  .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}
+  .nav-mod-link:last-child{border-bottom:none}
+  .nav-mod-link:hover{color:var(--accent)}
+  .nav-mod-link.next::after{content:' →'}
+  @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Forensik</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 01 — LogParser</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 01</span>
+        <span class="badge badge-cat">Log-Analyse</span>
+        <span class="badge badge-cat">2–3 h</span>
+        <span class="badge" style="background:transparent;border:1px solid rgba(88,166,255,.5)"><span style="color:#e3b341">★★★</span><span style="color:#30363d">★★</span> Fortgeschritten</span>
+      </div>
+      <h1>LogParser</h1>
+      <div class="header-meta">
+        Tool-Output: <span>logparse.py — universeller CLI-Logreader</span><br>
+        Voraussetzungen: <span>Python Grundlagen, regex, argparse</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="sheet-lnk" target="_blank">regex</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Verschiedene Logformate (syslog, combined access log, journald) mit Regex parsen</li>
+        <li>Zeitstempel-Parsing mit <code>datetime.strptime</code> und Zeitraumfilter implementieren</li>
+        <li>Strukturierte Ausgabe tabellarisch oder als JSON realisieren</li>
+        <li>Flexibles CLI mit <code>argparse</code> mit mehreren Subkommandos aufbauen</li>
+        <li>Generator-Funktionen für speichereffizientes Lesen großer Logdateien einsetzen</li>
+        <li>Farbige Konsolen-Ausgabe mit ANSI-Escapes ohne externe Bibliotheken umsetzen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Logdateien sind der primäre Informationskanal bei der Fehleranalyse und Incident Response. Das Problem: Jeder Dienst schreibt sein eigenes Format. <code>grep</code> und <code>awk</code> sind mächtig, aber schwer kombinierbar und nicht wiederverwendbar als Teil eines größeren Workflows.</p>
+      <p>Ein eigener LogParser löst genau das: einheitliche Schnittstelle für verschiedene Formate, filterbar nach Zeitraum, Log-Level, IP-Adresse oder beliebigem Stichwort — und maschinenlesbarer JSON-Output für die Weiterverarbeitung durch andere Tools.</p>
+      <p>Das Tool soll im Alltag ersetzbar sein für schnelle <code>grep -E "ERROR" /var/log/syslog | tail -100</code>-Einzeiler — nur strukturierter, filterbar und mit Summary-Funktion.</p>
+    </div>
+
+    <div class="lab-section" id="konzepte">
+      <div class="sec-heading">Schlüsselkonzepte</div>
+      <h3>Logformate und Regex-Muster</h3>
+      <pre><code>import re
+from datetime import datetime
+
+# syslog: "Jun 19 14:23:01 hostname sshd[1234]: Failed password..."
+SYSLOG_RE = re.compile(
+    r'(?P&lt;month&gt;\w{3})\s+(?P&lt;day&gt;\d+)\s+(?P&lt;time&gt;[\d:]+)\s+'
+    r'(?P&lt;host&gt;\S+)\s+(?P&lt;proc&gt;\S+?)(?:\[(?P&lt;pid&gt;\d+)\])?\s*:\s+(?P&lt;msg&gt;.+)'
+)
+
+# nginx combined: 192.168.1.1 - - [19/Jun/2025:14:23:01 +0000] "GET / HTTP/1.1" 200 1234
+ACCESS_RE = re.compile(
+    r'(?P&lt;ip&gt;[\d.]+) \S+ \S+ \[(?P&lt;time&gt;[^\]]+)\] '
+    r'"(?P&lt;method&gt;\w+) (?P&lt;path&gt;\S+)[^"]*" (?P&lt;status&gt;\d+) (?P&lt;size&gt;\d+)'
+)</code></pre>
+      <h3>Speichereffizientes Lesen mit Generator</h3>
+      <pre><code>def parse_lines(filepath: str, pattern: re.Pattern):
+    with open(filepath, encoding='utf-8', errors='replace') as f:
+        for line in f:                   # streamt Zeile für Zeile, kein list()
+            m = pattern.match(line.rstrip())
+            if m:
+                yield m.groupdict()</code></pre>
+      <h3>Zeitraumfilter</h3>
+      <pre><code>def in_range(entry: dict, since: datetime | None, until: datetime | None) -&gt; bool:
+    ts = entry.get('timestamp')
+    if ts is None:
+        return True
+    if since and ts &lt; since:
+        return False
+    if until and ts &gt; until:
+        return False
+    return True</code></pre>
+      <h3>CLI-Grundstruktur</h3>
+      <pre><code>import argparse, sys, json
+
+def build_parser() -&gt; argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description='Universeller Logparser')
+    p.add_argument('file', help='Pfad zur Logdatei')
+    p.add_argument('--format', choices=['syslog','access','auto'], default='auto')
+    p.add_argument('--level', help='Filter: ERROR|WARN|INFO (syslog)')
+    p.add_argument('--ip', help='Filter: IP-Adresse (access log)')
+    p.add_argument('--since', help='Von: YYYY-MM-DD HH:MM')
+    p.add_argument('--until', help='Bis:  YYYY-MM-DD HH:MM')
+    p.add_argument('--out', choices=['table','json','summary'], default='table')
+    p.add_argument('-n', type=int, default=0, help='Letzte N Zeilen (0 = alle)')
+    return p</code></pre>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe — logparse.py</div>
+      <p>Baue einen universellen Logparser der folgende Formate erkennt und verarbeitet:</p>
+      <ul>
+        <li><strong>syslog</strong> — <code>/var/log/syslog</code>, <code>/var/log/auth.log</code></li>
+        <li><strong>nginx/apache access log</strong> — combined log format</li>
+        <li><strong>auto</strong> — Format an der ersten Zeile erkennen</li>
+      </ul>
+      <p>Das fertige Tool soll sich wie folgt aufrufen lassen:</p>
+      <pre><code># Alle SSH-Fehler der letzten Stunde
+logparse.py /var/log/auth.log --level ERROR --since "2025-06-19 13:00"
+
+# Top-10 IPs nach Anzahl Requests
+logparse.py /var/log/nginx/access.log --out summary
+
+# Alle 404-Antworten als JSON
+logparse.py access.log --format access --out json | jq '[.[] | select(.status=="404")]'
+
+# Letzte 50 Einträge tabellarisch
+logparse.py /var/log/syslog -n 50 --out table</code></pre>
+      <blockquote><p>Kein <code>pandas</code>, kein <code>tabulate</code> — Tabellenformatierung mit <code>str.ljust()</code> / <code>str.rjust()</code> selbst implementieren.</p></blockquote>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen</div>
+      <ul>
+        <li class="task"><span class="chk"></span>syslog- und access-log-Format werden korrekt geparst</li>
+        <li class="task"><span class="chk"></span><code>--format auto</code> erkennt das Format anhand der ersten nicht-leeren Zeile</li>
+        <li class="task"><span class="chk"></span>Zeitraumfilter <code>--since</code> / <code>--until</code> funktionieren mit Format <code>YYYY-MM-DD HH:MM</code></li>
+        <li class="task"><span class="chk"></span>Ausgabemodi <code>table</code>, <code>json</code> und <code>summary</code> sind implementiert</li>
+        <li class="task"><span class="chk"></span><code>--level</code> filtert syslog-Zeilen nach Schlüsselwort (case-insensitive)</li>
+        <li class="task"><span class="chk"></span><code>--ip</code> filtert access-log-Zeilen nach exakter IP-Adresse</li>
+        <li class="task"><span class="chk"></span><code>-n N</code> limitiert die Ausgabe auf die letzten N Treffer</li>
+        <li class="task"><span class="chk"></span>Nur stdlib — keine Drittbibliotheken</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="akzeptanz">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <ol>
+        <li>Das Tool parst <code>/var/log/auth.log</code> ohne Exception, auch wenn einzelne Zeilen nicht matchen</li>
+        <li><code>--out json</code> produziert valides JSON (prüfbar mit <code>python -m json.tool</code>)</li>
+        <li><code>--out summary</code> zeigt mindestens: Gesamtzeilen, Treffer, Top-5-Quellen (IPs oder Prozesse)</li>
+        <li>Tabellenausgabe ist bei verschiedenen Terminalbreiten nicht kaputt (keine überlappenden Spalten)</li>
+        <li>Das Tool ist als direkt ausführbares Skript verwendbar: <code>chmod +x logparse.py && ./logparse.py</code></li>
+      </ol>
+    </div>
+
+  </div>
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte" class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz" class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">← Katalog</a>
+      <a href="modul-02.html" class="nav-mod-link next">HashGuard</a>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 05 — DataProfiler · Python Forensik</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#ffa657}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+  header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#150f0a 60%,#0d1117 100%)}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+  .header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+  .badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+  .badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+  h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+  .header-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:2}.header-meta span{color:var(--text)}
+  .sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+  .sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .sheet-lnk:last-child{border-bottom:none}.sheet-lnk::before{content:'→';color:var(--accent);opacity:.5;transition:opacity .15s}.sheet-lnk:hover{color:var(--accent)}.sheet-lnk:hover::before{opacity:1}
+  .page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+  .content{min-width:0}.lab-section{margin-bottom:44px}
+  .sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+  h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+  p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+  ul,ol{list-style:none;padding:0;margin-bottom:14px}
+  li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}
+  li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+  ol{counter-reset:item}ol li{counter-increment:item}ol li::before{content:counter(item)'.';font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;left:0;color:var(--accent)}
+  li.task{padding-left:26px}li.task::before{display:none}
+  .chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+  pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+  blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+  blockquote p{margin:0;font-size:13px;color:var(--muted)}
+  .sidebar{position:sticky;top:60px}
+  .sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+  .sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+  .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
+  .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
+  @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Forensik</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 05 — DataProfiler</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 05</span>
+        <span class="badge badge-cat">Datenanalyse</span>
+        <span class="badge badge-cat">3–4 h</span>
+        <span class="badge" style="background:transparent;border:1px solid rgba(255,166,87,.5)"><span style="color:#e3b341">★★★</span><span style="color:#30363d">★★</span> Fortgeschritten</span>
+      </div>
+      <h1>DataProfiler</h1>
+      <div class="header-meta">
+        Tool-Output: <span>dataprofiler.py — CSV/JSON-Datenprofiler mit Ausreißer-Erkennung</span><br>
+        Voraussetzungen: <span>csv, json, statistics, argparse, pathlib</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-lnk" target="_blank">json</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>CSV und JSON mit Stdlib lesen und in ein einheitliches Spalten-Dict-Format überführen</li>
+        <li>Datentypen automatisch inferieren: numerisch, kategorial, boolescher, Datum</li>
+        <li>Statistische Kennzahlen ohne NumPy/Pandas berechnen: Median, Varianz, Std. Abweichung</li>
+        <li>Ausreißer per IQR (Interquartile Range) und Z-Score erkennen</li>
+        <li>Null-/Leer-Anteile und Kardinalität (unique-count) pro Spalte berechnen</li>
+        <li>Profilbericht als JSON und als formatierte Konsolen-Übersicht exportieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Bevor man Daten analysiert, muss man verstehen wie sie aussehen: Wie viele Zeilen? Welche Spalten? Wo fehlen Werte? Welche Werte kommen am häufigsten vor? Gibt es Ausreißer die auf Datenfehler oder Anomalien hindeuten?</p>
+      <p>DataProfiler automatisiert dieses initiale Datenverständnis. Statt Pandas zu importieren und manuell <code>.describe()</code> aufzurufen, genügt ein einziger CLI-Befehl — auch für sehr große Dateien, da der Profiler streamingfähig implementiert wird (ein Pass über die Daten).</p>
+      <p>Typische Anwendung in der Praxis: Export aus einer Datenbank, CSV vom Kunden, JSON aus einer API — schnell prüfen ob die Daten das sind was man erwartet hat, bevor weitere Verarbeitung startet.</p>
+    </div>
+
+    <div class="lab-section" id="konzepte">
+      <div class="sec-heading">Schlüsselkonzepte</div>
+      <h3>Statistik ohne NumPy</h3>
+      <pre><code>import statistics, math
+
+def column_stats(values: list[float]) -&gt; dict:
+    n = len(values)
+    if n == 0:
+        return {}
+    sorted_v = sorted(values)
+    q1 = sorted_v[n // 4]
+    q3 = sorted_v[3 * n // 4]
+    iqr = q3 - q1
+    return {
+        'count':  n,
+        'min':    min(values),
+        'max':    max(values),
+        'mean':   statistics.mean(values),
+        'median': statistics.median(values),
+        'stdev':  statistics.stdev(values) if n &gt; 1 else 0,
+        'q1': q1, 'q3': q3, 'iqr': iqr,
+    }</code></pre>
+      <h3>IQR-Ausreißer</h3>
+      <pre><code>def iqr_outliers(values: list[float], k: float = 1.5) -&gt; list[float]:
+    stats = column_stats(values)
+    lo = stats['q1'] - k * stats['iqr']
+    hi = stats['q3'] + k * stats['iqr']
+    return [v for v in values if v &lt; lo or v &gt; hi]</code></pre>
+      <h3>Z-Score-Ausreißer</h3>
+      <pre><code>def zscore_outliers(values: list[float], threshold: float = 3.0) -&gt; list[float]:
+    mean = statistics.mean(values)
+    std  = statistics.stdev(values) if len(values) &gt; 1 else 1
+    return [v for v in values if abs((v - mean) / std) &gt; threshold]</code></pre>
+      <h3>Datentyp-Inferenz</h3>
+      <pre><code>def infer_type(samples: list[str]) -&gt; str:
+    non_null = [s for s in samples if s.strip()]
+    if not non_null:
+        return 'empty'
+    numeric = 0
+    for s in non_null:
+        try: float(s); numeric += 1
+        except ValueError: pass
+    ratio = numeric / len(non_null)
+    if ratio &gt; 0.9: return 'numeric'
+    return 'categorical'</code></pre>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe — dataprofiler.py</div>
+      <pre><code># CSV profilen — tabellarische Ausgabe
+dataprofiler.py data.csv
+
+# JSON-Datei profilen
+dataprofiler.py events.json --key items  # JSON-Array unter Schlüssel "items"
+
+# Ausreißer-Erkennung per IQR
+dataprofiler.py data.csv --outliers iqr --column response_time_ms
+
+# Kompletten Bericht als JSON exportieren
+dataprofiler.py data.csv --export report.json
+
+# Nur Null-Anteile anzeigen
+dataprofiler.py data.csv --nulls</code></pre>
+      <p>Ausgabe je Spalte: <code>Name | Typ | Count | Null% | Min | Max | Mean | Median | Stdev | Top-3-Werte</code></p>
+      <blockquote><p>Kein <code>pandas</code>, kein <code>numpy</code>. Das <code>statistics</code>-Modul aus der Stdlib enthält alles was du brauchst. Für Median/Quartile: erst sortieren.</p></blockquote>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen</div>
+      <ul>
+        <li class="task"><span class="chk"></span>CSV und JSON werden eingelesen und in einheitliches Format überführt</li>
+        <li class="task"><span class="chk"></span>Datentyp wird automatisch pro Spalte inferiert (numerisch / kategorial)</li>
+        <li class="task"><span class="chk"></span>Statistiken werden korrekt berechnet: min, max, mean, median, stdev, q1, q3</li>
+        <li class="task"><span class="chk"></span>Null-/Leer-Anteil wird in Prozent angezeigt</li>
+        <li class="task"><span class="chk"></span><code>--outliers iqr</code> und <code>--outliers zscore</code> sind implementiert</li>
+        <li class="task"><span class="chk"></span><code>--export</code> produziert valides JSON mit dem vollständigen Profil</li>
+        <li class="task"><span class="chk"></span>Nur stdlib — kein <code>pandas</code>, kein <code>numpy</code></li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="akzeptanz">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <ol>
+        <li>Eine CSV mit 100.000 Zeilen wird in unter 5 Sekunden verarbeitet</li>
+        <li>Spalten mit mehr als 50% Null-Werten werden visuell hervorgehoben</li>
+        <li>IQR-Ausreißer in einer normalverteilten Testspalte werden korrekt erkannt</li>
+        <li>Top-3 häufigste Werte werden für kategoriale Spalten angezeigt</li>
+        <li>Der JSON-Export enthält alle Spaltenprofile und kann von Modul 10 (ForensicKit) weiterverarbeitet werden</li>
+      </ol>
+    </div>
+
+  </div>
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte" class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz" class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Navigation</div>
+      <a href="modul-04.html" class="nav-mod-link prev">NetScope</a>
+      <a href="modul-06.html" class="nav-mod-link next">ErrorCorrelator</a>
+    </div>
+  </aside>
+</div>
+</body>
+</html>

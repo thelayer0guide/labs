@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 10 — ForensicKit · Python Forensik</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#a5d6ff}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+  header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1220 60%,#0d1117 100%)}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+  .header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+  .badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+  .badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+  h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+  .header-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:2}.header-meta span{color:var(--text)}
+  .sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+  .sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .sheet-lnk:last-child{border-bottom:none}.sheet-lnk::before{content:'→';color:var(--accent);opacity:.5;transition:opacity .15s}.sheet-lnk:hover{color:var(--accent)}.sheet-lnk:hover::before{opacity:1}
+  .page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+  .content{min-width:0}.lab-section{margin-bottom:44px}
+  .sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+  h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+  p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+  ul,ol{list-style:none;padding:0;margin-bottom:14px}
+  li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}
+  li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+  ol{counter-reset:item}ol li{counter-increment:item}ol li::before{content:counter(item)'.';font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;left:0;color:var(--accent)}
+  li.task{padding-left:26px}li.task::before{display:none}
+  .chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+  pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+  blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+  blockquote p{margin:0;font-size:13px;color:var(--muted)}
+  .sidebar{position:sticky;top:60px}
+  .sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+  .sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+  .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
+  .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
+  .final-badge{display:inline-flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--accent) 8%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:8px;padding:12px 18px;margin-top:12px}
+  .final-badge-text{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)}
+  @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Forensik</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 10 — ForensicKit</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 10</span>
+        <span class="badge badge-cat">Abschluss · Orchestrierung</span>
+        <span class="badge badge-cat">5–7 h</span>
+        <span class="badge" style="background:transparent;border:1px solid rgba(165,214,255,.5)"><span style="color:#e3b341">★★★★★</span> Experte</span>
+      </div>
+      <h1>ForensicKit</h1>
+      <div class="header-meta">
+        Tool-Output: <span>forensickit.py — vollautomatischer Forensik-Bericht als HTML-Report</span><br>
+        Voraussetzungen: <span>alle Module 01–09, importlib, subprocess, Jinja2-ähnliches Template-Building</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-lnk" target="_blank">json</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Eigene Skripte als Python-Module importieren und deren Funktionen direkt aufrufen</li>
+        <li>Plugin-artiges Modul-System: Scanner-Module werden dynamisch geladen und ausgeführt</li>
+        <li>Parallel-Ausführung mehrerer Scanner mit <code>concurrent.futures.ThreadPoolExecutor</code></li>
+        <li>Ergebnisse verschiedener Tools in eine einheitliche Datenstruktur aggregieren</li>
+        <li>Standalone-HTML-Report mit eingebettetem CSS und JavaScript generieren</li>
+        <li>Fortschrittsanzeige für lang laufende Operationen ohne externe Bibliotheken</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Ein Informatiker, der einen Vorfall untersucht, will nicht 9 verschiedene Tools nacheinander manuell aufrufen, Ergebnisse zusammenkopieren und dann noch einen Bericht schreiben. ForensicKit übernimmt genau das: ein einziger Befehl startet alle Scanner, sammelt die Ergebnisse und gibt einen druckbaren HTML-Report aus.</p>
+      <p>Das ist das Capstone-Modul des Kurses, weil es alle Konzepte der vorherigen Module zusammenführt: Modulimport, Parallel-Ausführung, Aggregation, HTML-Generierung. Gleichzeitig wird ein wichtiges Software-Design-Prinzip geübt: die Scanner sollen nicht direkt miteinander gekoppelt sein. ForensicKit ruft jedes Modul über eine definierte Schnittstelle auf — das ist Plugin-Architektur im Kleinen.</p>
+      <p>Der fertige Report ist ein eigenständiges HTML-Dokument ohne externe Abhängigkeiten. Er kann per E-Mail verschickt, archiviert oder in ein Ticket-System hochgeladen werden — und in 10 Jahren noch im Browser geöffnet werden.</p>
+    </div>
+
+    <div class="lab-section" id="konzepte">
+      <div class="sec-heading">Schlüsselkonzepte</div>
+      <h3>Scanner-Interface (Plugin-Vertrag)</h3>
+      <pre><code># Jedes Scanner-Modul (logparse, hashguard, ...) muss diese Funktion exportieren:
+def run_scan(target: str, config: dict) -&gt; dict:
+    """
+    Führt den Scan aus und gibt strukturiertes Ergebnis zurück.
+    Muss immer ein dict zurückgeben, nie werfen.
+    Pflicht-Keys: 'module', 'status', 'findings', 'summary'
+    """
+    ...
+    return {
+        'module':   'LogParser',
+        'status':   'ok',           # ok | warn | error
+        'findings': [...],          # Liste von Finding-Dicts
+        'summary':  '47 Fehler gefunden, 3 kritisch',
+    }</code></pre>
+      <h3>Parallele Scanner-Ausführung</h3>
+      <pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def run_all_scanners(target: str, config: dict,
+                     scanners: list) -&gt; list[dict]:
+    results = []
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = {
+            pool.submit(scanner.run_scan, target, config): scanner
+            for scanner in scanners
+        }
+        for future in as_completed(futures):
+            try:
+                results.append(future.result())
+            except Exception as e:
+                results.append({
+                    'module': futures[future].__name__,
+                    'status': 'error',
+                    'findings': [],
+                    'summary': str(e),
+                })
+    return results</code></pre>
+      <h3>HTML-Report-Generator</h3>
+      <pre><code>def render_report(results: list[dict], meta: dict) -&gt; str:
+    sections = '\n'.join(render_section(r) for r in results)
+    status_counts = {
+        s: sum(1 for r in results if r['status'] == s)
+        for s in ('ok', 'warn', 'error')
+    }
+    return HTML_TEMPLATE.format(
+        title=meta['title'],
+        timestamp=meta['timestamp'],
+        target=meta['target'],
+        ok=status_counts['ok'],
+        warn=status_counts['warn'],
+        errors=status_counts['error'],
+        sections=sections,
+    )</code></pre>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe — forensickit.py</div>
+      <pre><code># Vollständiger Forensik-Scan
+forensickit.py --target /var/www --logs /var/log --out report/
+
+# Nur bestimmte Scanner aktivieren
+forensickit.py --target /srv --scanners logs integrity secrets
+
+# Mit Vorkonfiguration aus TOML
+forensickit.py --target /var/www --config forensickit.toml
+
+# Report ohne Ausführung aus vorhandenen JSON-Ergebnissen
+forensickit.py --from-json results/*.json --out report.html</code></pre>
+      <p>Der Output-Report <code>forensickit_YYYYMMDD_HHMMSS.html</code> enthält:</p>
+      <ul>
+        <li>Executive Summary: Anzahl Scanner, Gesamtbefunde, kritische Funde</li>
+        <li>Pro Scanner: Status-Badge, Zusammenfassung, Befund-Tabelle</li>
+        <li>Appendix: Raw-JSON-Daten als aufklappbare Sektion</li>
+        <li>Generierungszeitpunkt, Ziel-Pfad, ForensicKit-Version</li>
+      </ul>
+      <blockquote><p>Das Template des HTML-Reports soll direkt als Python-String in <code>forensickit.py</code> eingebettet sein — kein externes Template-File. Das macht das Tool self-contained: eine einzige <code>.py</code>-Datei reicht.</p></blockquote>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Mindestens 5 Scanner aus den Modulen 01–09 sind integriert</li>
+        <li class="task"><span class="chk"></span>Scanner laufen parallel (ThreadPoolExecutor), nicht sequenziell</li>
+        <li class="task"><span class="chk"></span>Ein fehlschlagender Scanner bricht nicht die anderen ab</li>
+        <li class="task"><span class="chk"></span>HTML-Report ist standalone (kein externer CSS/JS)</li>
+        <li class="task"><span class="chk"></span>Report enthält Executive Summary mit Gesamtstatus</li>
+        <li class="task"><span class="chk"></span><code>--from-json</code> erzeugt Report aus bestehenden JSON-Ergebnissen ohne erneuten Scan</li>
+        <li class="task"><span class="chk"></span>Nur stdlib (außer für Scanner-Module selbst)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="akzeptanz">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <ol>
+        <li>Vollständiger Scan von <code>/var/www</code> + <code>/var/log</code> läuft in unter 60 Sekunden durch</li>
+        <li>HTML-Report öffnet sich im Browser ohne JavaScript-Fehler</li>
+        <li>Executive Summary zeigt korrekte Gesamtanzahl der Befunde</li>
+        <li>Ein Scanner der abstürzt erscheint im Report als "Error" — alle anderen Scanner wurden trotzdem ausgeführt</li>
+        <li>Der Report kann als eigenständige Datei ohne Internet-Verbindung vollständig dargestellt werden</li>
+      </ol>
+      <div class="final-badge">
+        <span style="font-size:24px">★</span>
+        <span class="final-badge-text">Kurs abgeschlossen — du hast 10 einsatzfähige Forensik-Tools gebaut</span>
+      </div>
+    </div>
+
+  </div>
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte" class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz" class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Navigation</div>
+      <a href="modul-09.html" class="nav-mod-link prev">DiskForensics</a>
+      <a href="../catalog.html" class="nav-mod-link">← Katalog</a>
+    </div>
+  </aside>
+</div>
+</body>
+</html>
