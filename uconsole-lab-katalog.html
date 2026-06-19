@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>uConsole Security Lab — thelayer0guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:         #0d1117;
+    --bg-card:    #161b22;
+    --bg-raised:  #1c2128;
+    --bg-code:    #0a0e14;
+    --border:     #30363d;
+    --border-sub: #21262d;
+    --tx-primary: #e6edf3;
+    --tx-sec:     #8b949e;
+    --tx-muted:   #6e7681;
+
+    --p0: #58a6ff;
+    --p1: #3fb950;
+    --p2: #d2a8ff;
+    --p3: #ffa657;
+    --p4: #ff7b72;
+    --p5: #79c0ff;
+    --p6: #f0883e;
+    --cp: #e3b341;
+
+    --font-display: 'Syne', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--tx-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── NAV ─────────────────────────────────────────────── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-sub);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 52px;
+  }
+
+  .nav-brand {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    color: var(--tx-primary);
+    text-decoration: none;
+    margin-right: 32px;
+    white-space: nowrap;
+  }
+
+  .nav-brand span { color: var(--p0); }
+
+  .nav-pills {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+  }
+  .nav-pills::-webkit-scrollbar { display: none; }
+
+  .nav-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: var(--tx-sec);
+    transition: all .15s;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .nav-pill:hover { color: var(--tx-primary); background: var(--bg-raised); }
+  .nav-pill.active { color: var(--tx-primary); border-color: var(--border); background: var(--bg-raised); }
+
+  .nav-meta {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--tx-muted);
+    white-space: nowrap;
+    padding-left: 16px;
+  }
+
+  /* ─── HERO ────────────────────────────────────────────── */
+  .hero {
+    padding: 72px 24px 56px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--p0);
+    margin-bottom: 20px;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--tx-primary);
+    margin-bottom: 20px;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--p0);
+  }
+
+  .hero-desc {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--tx-sec);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .hero-terminal {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    max-width: 560px;
+    position: relative;
+  }
+
+  .terminal-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .term-label {
+    font-size: 11px;
+    color: var(--tx-muted);
+    margin-left: 8px;
+    font-family: var(--font-mono);
+  }
+
+  .term-line { display: block; line-height: 1.8; }
+  .term-ps { color: var(--p1); }
+  .term-cmd { color: var(--tx-primary); }
+  .term-arg { color: var(--p3); }
+  .term-comment { color: var(--tx-muted); }
+  .term-out { color: var(--tx-sec); font-size: 12px; }
+  .term-hi { color: var(--p0); }
+
+  /* ─── STATS STRIP ─────────────────────────────────────── */
+  .stats-strip {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px 64px;
+    display: flex;
+    gap: 1px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .stat-cell {
+    flex: 1;
+    background: var(--bg-card);
+    padding: 20px 24px;
+  }
+  .stat-cell:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+  .stat-cell:last-child  { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--tx-muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  /* ─── PHASE MAP ───────────────────────────────────────── */
+  .phase-map {
+    max-width: 1280px;
+    margin: 0 auto 64px;
+    padding: 0 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--tx-muted);
+  }
+
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--border-sub);
+  }
+
+  .phase-track {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .phase-track::-webkit-scrollbar { display: none; }
+
+  .phase-node {
+    flex: 1;
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding-top: 4px;
+  }
+
+  .phase-node::after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    right: -50%;
+    height: 1px;
+    background: var(--border);
+    z-index: 0;
+  }
+  .phase-node:last-child::after { display: none; }
+
+  .phase-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bg);
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .phase-dot:hover { transform: scale(1.12); }
+  .phase-dot.p0 { color: var(--p0); border-color: var(--p0); }
+  .phase-dot.p1 { color: var(--p1); border-color: var(--p1); }
+  .phase-dot.p2 { color: var(--p2); border-color: var(--p2); }
+  .phase-dot.p3 { color: var(--p3); border-color: var(--p3); }
+  .phase-dot.p4 { color: var(--p4); border-color: var(--p4); }
+  .phase-dot.p5 { color: var(--p5); border-color: var(--p5); }
+  .phase-dot.p6 { color: var(--p6); border-color: var(--p6); }
+  .phase-dot.pcp { color: var(--cp); border-color: var(--cp); }
+
+  .phase-label {
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--tx-muted);
+    text-align: center;
+    font-family: var(--font-mono);
+    line-height: 1.4;
+  }
+
+  .phase-count {
+    font-size: 10px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .phase-count.p0 { color: var(--p0); }
+  .phase-count.p1 { color: var(--p1); }
+  .phase-count.p2 { color: var(--p2); }
+  .phase-count.p3 { color: var(--p3); }
+  .phase-count.p4 { color: var(--p4); }
+  .phase-count.p5 { color: var(--p5); }
+  .phase-count.p6 { color: var(--p6); }
+  .phase-count.pcp { color: var(--cp); }
+
+  /* ─── FILTER BAR ──────────────────────────────────────── */
+  .filter-bar {
+    max-width: 1280px;
+    margin: 0 auto 40px;
+    padding: 0 24px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 11px;
+    color: var(--tx-muted);
+    margin-right: 4px;
+    letter-spacing: .06em;
+  }
+
+  .filter-btn {
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--tx-sec);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .filter-btn:hover { color: var(--tx-primary); border-color: var(--tx-muted); }
+  .filter-btn.active { background: var(--bg-raised); color: var(--tx-primary); border-color: var(--tx-sec); }
+
+  /* ─── PHASE SECTION ───────────────────────────────────── */
+  .phase-section {
+    max-width: 1280px;
+    margin: 0 auto 80px;
+    padding: 0 24px;
+  }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-sub);
+  }
+
+  .phase-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .phase-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--tx-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .phase-subtitle {
+    font-size: 12px;
+    color: var(--tx-muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  /* ─── LAB GRID ────────────────────────────────────────── */
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 900px) { .lab-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .lab-grid { grid-template-columns: 1fr; } }
+
+  .lab-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius-lg);
+    border-left-width: 3px;
+    display: flex;
+    flex-direction: column;
+    transition: border-color .15s, background .15s, transform .15s;
+    cursor: default;
+  }
+  .lab-card:hover {
+    background: var(--bg-raised);
+    transform: translateY(-1px);
+  }
+
+  .card-top {
+    padding: 18px 20px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .lab-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: var(--bg-code);
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .lab-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: var(--tx-primary);
+  }
+
+  .card-cli {
+    margin: 0 20px 14px;
+    background: var(--bg-code);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-sub);
+    padding: 10px 14px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+  }
+
+  .card-body {
+    padding: 0 20px;
+    flex: 1;
+  }
+
+  .card-section-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--tx-muted);
+    margin-bottom: 7px;
+    margin-top: 14px;
+  }
+  .card-section-label:first-child { margin-top: 0; }
+
+  .req-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .req-list li {
+    font-size: 11.5px;
+    color: var(--tx-sec);
+    line-height: 1.4;
+    display: flex;
+    gap: 7px;
+    align-items: baseline;
+  }
+  .req-list li::before {
+    content: '›';
+    flex-shrink: 0;
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  .bonus-list li { color: var(--tx-muted); }
+  .bonus-list li::before { content: '+'; font-size: 11px; }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bg-code);
+    border: 1px solid var(--border-sub);
+    color: var(--tx-muted);
+  }
+
+  .hint-box {
+    margin: 14px 20px 0;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    border-left: 2px solid;
+    background: var(--bg-code);
+    font-size: 11px;
+    color: var(--tx-muted);
+    line-height: 1.55;
+  }
+
+  .uconsole-box {
+    margin: 10px 20px 0;
+    padding: 9px 13px;
+    border-radius: var(--radius);
+    background: rgba(88,166,255,.06);
+    border: 1px solid rgba(88,166,255,.15);
+    font-size: 10.5px;
+    color: #58a6ff99;
+    line-height: 1.5;
+    display: flex;
+    gap: 7px;
+  }
+  .uconsole-box::before {
+    content: '⌥';
+    color: var(--p0);
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+
+  .card-bottom {
+    padding: 14px 20px 18px;
+  }
+
+  /* ─── WIDE CARD (capstone) ────────────────────────────── */
+  .lab-card.wide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .lab-card.wide .card-top { flex: 1 1 300px; }
+  .lab-card.wide .card-body { flex: 2 1 400px; }
+
+  /* ─── CAPSTONE SECTION ────────────────────────────────── */
+  .capstone-section {
+    max-width: 1280px;
+    margin: 0 auto 80px;
+    padding: 0 24px;
+  }
+
+  .capstone-card {
+    background: var(--bg-card);
+    border: 1px solid var(--cp);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .capstone-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top left, rgba(227,179,65,.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .capstone-inner {
+    padding: 40px 40px 36px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .capstone-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--cp);
+    margin-bottom: 10px;
+  }
+
+  .capstone-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+
+  .capstone-desc {
+    font-size: 12px;
+    color: var(--tx-sec);
+    max-width: 640px;
+    line-height: 1.65;
+    margin-bottom: 32px;
+  }
+
+  .capstone-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 800px) { .capstone-grid { grid-template-columns: 1fr; } }
+
+  .capstone-box {
+    background: var(--bg-raised);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+
+  .capstone-box-title {
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cp);
+    margin-bottom: 12px;
+    letter-spacing: -.01em;
+  }
+
+  .capstone-term {
+    background: var(--bg-code);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 28px 0 0;
+    border: 1px solid var(--border-sub);
+  }
+
+  /* ─── PHILOSOPHY SECTION ──────────────────────────────── */
+  .philosophy-section {
+    max-width: 1280px;
+    margin: 0 auto 80px;
+    padding: 0 24px;
+  }
+
+  .phil-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 800px) { .phil-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .phil-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .phil-icon {
+    font-size: 20px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .phil-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--tx-primary);
+    margin-bottom: 8px;
+  }
+
+  .phil-text {
+    font-size: 11.5px;
+    color: var(--tx-muted);
+    line-height: 1.6;
+  }
+
+  /* ─── ROUTE SECTION ───────────────────────────────────── */
+  .route-section {
+    max-width: 1280px;
+    margin: 0 auto 80px;
+    padding: 0 24px;
+  }
+
+  .route-bar {
+    background: var(--bg-card);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 2;
+    color: var(--tx-muted);
+    overflow-x: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 4px;
+    align-items: center;
+  }
+
+  .route-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .route-num { font-weight: 600; }
+  .route-arr { color: var(--border); margin: 0 2px; }
+
+  /* ─── FOOTER ──────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border-sub);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .footer-brand span { color: var(--p0); }
+
+  .footer-meta {
+    font-size: 11px;
+    color: var(--tx-muted);
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  /* ─── UTILITIES ───────────────────────────────────────── */
+  .hidden { display: none !important; }
+
+  .p0-color { color: var(--p0); }
+  .p1-color { color: var(--p1); }
+  .p2-color { color: var(--p2); }
+  .p3-color { color: var(--p3); }
+  .p4-color { color: var(--p4); }
+  .p5-color { color: var(--p5); }
+  .p6-color { color: var(--p6); }
+  .cp-color  { color: var(--cp); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="nav-brand">the<span>layer0</span>guide</a>
+  <div class="nav-pills">
+    <a href="#philosophy" class="nav-pill">Philosophie</a>
+    <a href="#phase0"  class="nav-pill">Phase 0</a>
+    <a href="#phase1"  class="nav-pill">Phase 1</a>
+    <a href="#phase2"  class="nav-pill">Phase 2</a>
+    <a href="#phase3"  class="nav-pill">Phase 3</a>
+    <a href="#phase4"  class="nav-pill">Phase 4</a>
+    <a href="#phase5"  class="nav-pill">Phase 5</a>
+    <a href="#phase6"  class="nav-pill">Phase 6</a>
+    <a href="#capstone" class="nav-pill">Capstone</a>
+  </div>
+  <div class="nav-meta">18 Labs · 6 Phasen</div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────── -->
+<header class="hero">
+  <div class="hero-eyebrow">// uConsole Security Lab Curriculum</div>
+  <h1 class="hero-title">Baue deine<br>eigene <em>Security Suite</em></h1>
+  <p class="hero-desc">
+    18 aufeinander aufbauende Python-Labs. Jedes Tool ist eigenständig nutzbar.
+    Am Ende vereint als <code style="color:var(--p3)">uctl</code> — eine einheitliche CLI-Suite,
+    die auf der uConsole läuft. Defensiv, forensisch, dein eigenes Werk.
+  </p>
+  <div class="hero-terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="term-label">uctl — zsh</span>
+    </div>
+    <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl hash</span> <span class="term-arg">kali-linux-2026.iso</span></span>
+    <span class="term-line term-out">  SHA256  a4f2... <span style="color:var(--p1)">✓ match</span></span>
+    <span class="term-line" style="margin-top:6px"><span class="term-ps">❯</span> <span class="term-cmd">uctl cert</span> <span class="term-arg">github.com</span></span>
+    <span class="term-line term-out">  Issuer  DigiCert TLS RSA SHA256 2020 CA1</span>
+    <span class="term-line term-out">  Läuft ab  <span style="color:var(--p3)">2026-09-17</span>  (91 Tage)</span>
+    <span class="term-line" style="margin-top:6px"><span class="term-ps">❯</span> <span class="term-cmd">uctl secrets</span> <span class="term-arg">~/projects --format md</span></span>
+    <span class="term-line term-out">  <span style="color:var(--p4)">HIGH</span>   .env:12   AWS_ACCESS_KEY_ID  AKIA***...***F3</span>
+    <span class="term-line term-out">  <span style="color:var(--p3)">MED</span>    config.py:44   password=***</span>
+    <span class="term-line" style="margin-top:6px"><span class="term-ps">❯</span> <span class="term-cmd">uctl entropy</span> <span class="term-arg">~/Downloads --threshold 7.5</span></span>
+    <span class="term-line term-out">  <span style="color:var(--p4)">SUSPECT</span>  payload.bin  7.94 bit/byte</span>
+    <span class="term-line term-out">  <span style="color:var(--tx-muted)">OK</span>       readme.txt   3.21 bit/byte</span>
+  </div>
+</header>
+
+<!-- ─── STATS STRIP ───────────────────────────────────────── -->
+<section style="max-width:1280px;margin:0 auto;padding:0 24px 64px;">
+  <div class="stats-strip">
+    <div class="stat-cell">
+      <div class="stat-num p0-color">18</div>
+      <div class="stat-label">Labs</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num p2-color">6</div>
+      <div class="stat-label">Phasen</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num p1-color">4–6</div>
+      <div class="stat-label">Monate (~4h/Woche)</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num p3-color">1</div>
+      <div class="stat-label">Unified CLI Suite</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num p4-color">0</div>
+      <div class="stat-label">Offensive Tools</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PHILOSOPHY ────────────────────────────────────────── -->
+<section class="philosophy-section" id="philosophy">
+  <div class="section-header">
+    <div class="section-title">Lernphilosophie</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="phil-grid">
+    <div class="phil-card">
+      <span class="phil-icon">📦</span>
+      <div class="phil-title">Stdlib First</div>
+      <p class="phil-text">Jedes Lab läuft zuerst mit <code>hashlib</code>, <code>socket</code>, <code>ssl</code>, <code>re</code>, <code>argparse</code>, <code>json</code>. Keine Dependency, die du nicht verstehst.</p>
+    </div>
+    <div class="phil-card">
+      <span class="phil-icon">🔪</span>
+      <div class="phil-title">Logik von I/O trennen</div>
+      <p class="phil-text">Kernfunktionen ohne <code>print()</code> oder Dateizugriff. Macht spätere Tests und Integration in <code>uctl</code> trivial.</p>
+    </div>
+    <div class="phil-card">
+      <span class="phil-icon">📱</span>
+      <div class="phil-title">uConsole-Realität</div>
+      <p class="phil-text">ARM64, kleines Terminal (~80 Spalten), oft offline. Keine Busy-Loops, schlanke Dependencies, Terminal-Breite dynamisch erkennen.</p>
+    </div>
+    <div class="phil-card">
+      <span class="phil-icon">🔗</span>
+      <div class="phil-title">Plugin-Ready von Anfang an</div>
+      <p class="phil-text">Jedes Tool bekommt eine Schnittstelle, die 1:1 ein <code>uctl</code>-Subcommand wird. Phase 6 fügt alles zusammen.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PHASE MAP ──────────────────────────────────────────── -->
+<section class="phase-map">
+  <div class="section-header">
+    <div class="section-title">Lernpfad</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="phase-track">
+    <div class="phase-node">
+      <a href="#phase0" class="phase-dot p0">0</a>
+      <div class="phase-label">Fundament<br><span class="phase-count p0">1 Lab</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#phase1" class="phase-dot p1">1</a>
+      <div class="phase-label">Daten &amp; Dateien<br><span class="phase-count p1">3 Labs</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#phase2" class="phase-dot p2">2</a>
+      <div class="phase-label">Parsing &amp; Forensik<br><span class="phase-count p2">3 Labs</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#phase3" class="phase-dot p3">3</a>
+      <div class="phase-label">Krypto &amp; Netzwerk<br><span class="phase-count p3">3 Labs</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#phase4" class="phase-dot p4">4</a>
+      <div class="phase-label">Integrität &amp; Monitoring<br><span class="phase-count p4">3 Labs</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#phase5" class="phase-dot p5">5</a>
+      <div class="phase-label">Erweiterte Analyse<br><span class="phase-count p5">3 Labs</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#phase6" class="phase-dot p6">6</a>
+      <div class="phase-label">Engineering<br><span class="phase-count p6">2 Labs</span></div>
+    </div>
+    <div class="phase-node">
+      <a href="#capstone" class="phase-dot pcp">★</a>
+      <div class="phase-label">Capstone<br><span class="phase-count pcp">uctl</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── EMPFOHLENE ROUTE ────────────────────────────────────── -->
+<section class="route-section">
+  <div class="section-header">
+    <div class="section-title">Empfohlene Reihenfolge</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="route-bar">
+    <span class="route-item p0-color"><span class="route-num">00</span></span><span class="route-arr">→</span>
+    <span class="route-item p1-color"><span class="route-num">01</span></span><span class="route-arr">→</span>
+    <span class="route-item p1-color"><span class="route-num">02</span></span><span class="route-arr">→</span>
+    <span class="route-item p1-color"><span class="route-num">03</span></span><span class="route-arr">→</span>
+    <span class="route-item p2-color"><span class="route-num">04</span></span><span class="route-arr">→</span>
+    <span class="route-item p2-color"><span class="route-num">05</span></span><span class="route-arr">→</span>
+    <span class="route-item p2-color"><span class="route-num">06</span></span><span class="route-arr">→</span>
+    <span class="route-item p3-color"><span class="route-num">07</span></span><span class="route-arr">→</span>
+    <span class="route-item p3-color"><span class="route-num">08</span></span><span class="route-arr">→</span>
+    <span class="route-item p3-color"><span class="route-num">09</span></span><span class="route-arr">→</span>
+    <span class="route-item p4-color"><span class="route-num">10</span></span><span class="route-arr">→</span>
+    <span class="route-item p4-color"><span class="route-num">11</span></span><span class="route-arr">→</span>
+    <span class="route-item p4-color"><span class="route-num">12</span></span><span class="route-arr">→</span>
+    <span class="route-item p5-color"><span class="route-num">13</span></span><span class="route-arr">→</span>
+    <span class="route-item p5-color"><span class="route-num">14</span></span><span class="route-arr">→</span>
+    <span class="route-item p5-color"><span class="route-num">15</span></span><span class="route-arr">→</span>
+    <span class="route-item p6-color"><span class="route-num">16</span></span><span class="route-arr">→</span>
+    <span class="route-item p6-color"><span class="route-num">17</span></span><span class="route-arr">→</span>
+    <span class="route-item cp-color"><span class="route-num">★ uctl</span></span>
+    <span style="margin-left:16px;font-size:11px;color:var(--tx-muted)">&nbsp;// Phase 3 kann parallel zu Phase 2 laufen</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 0                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase0">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p0);border-color:var(--p0);background:rgba(88,166,255,.07)">Phase 0</span>
+    <h2 class="phase-title">Fundament</h2>
+    <span class="phase-subtitle">Projektstruktur · venv · Git · pytest</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 00 -->
+    <div class="lab-card" style="border-left-color:var(--p0)">
+      <div class="card-top">
+        <span class="lab-num p0-color">LAB 00</span>
+        <h3 class="lab-title">Projekt-Skeleton &amp; Dev-Workflow</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">mkdir security-lab &amp;&amp; cd security-lab</span><br>
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">poetry init &amp;&amp; poetry add --dev pytest ruff black</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Aufgabe</div>
+        <ul class="req-list">
+          <li>Mono-Repo mit einem Unterordner pro Tool (je <code>core.py</code>, <code>cli.py</code>, <code>tests/</code>)</li>
+          <li><code>shared/</code> für spätere gemeinsame Utils (Logging, Output-Formatting)</li>
+          <li><code>pyproject.toml</code> mit pytest, black, ruff als Dev-Dependencies</li>
+          <li>Makefile / justfile mit <code>test</code>, <code>lint</code>, <code>format</code></li>
+          <li>Sinnvolles <code>.gitignore</code> (pycache, .venv, *.egg-info)</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">poetry</span>
+          <span class="tag">pyproject.toml</span>
+          <span class="tag">pytest-Grundgerüst</span>
+          <span class="tag">Git-Workflow</span>
+          <span class="tag">Projektstruktur</span>
+        </div>
+      </div>
+      <div class="uconsole-box">Richte sofort ein zweites venv direkt auf der uConsole ein. ARM64-Wheels sind nicht immer verfügbar — teste pip install früh, nicht erst am Ende.</div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 1                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase1">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p1);border-color:var(--p1);background:rgba(63,185,80,.07)">Phase 1</span>
+    <h2 class="phase-title">Daten &amp; Dateien</h2>
+    <span class="phase-subtitle">hashlib · Bytes/Strings · Statistik · CSV-Export</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 01 -->
+    <div class="lab-card" style="border-left-color:var(--p1)">
+      <div class="card-top">
+        <span class="lab-num p1-color">LAB 01</span>
+        <h3 class="lab-title">Hash Inspector</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">hashinspect</span> <span style="color:var(--p3)">kali.iso --check hashes.txt</span><br>
+        <span style="color:var(--p1)">  SHA256  ✓</span> <span style="color:var(--tx-muted)">3.8 GB · 4.2s</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>SHA256, SHA1, MD5 berechnen</li>
+          <li>Dateien in Blöcken lesen (kein komplett-in-RAM — wichtig bei ISO-Dateien)</li>
+          <li>Vergleich gegen <code>--check hashes.txt</code> (Format wie <code>sha256sum</code>)</li>
+          <li>Exit-Code 0/1 für Skript-Verkettung</li>
+          <li>Eigene Fortschrittsanzeige mit <code>\r</code> + <code>sys.stdout.write</code></li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li><code>--algo sha256</code> zur Auswahl einzelner Algorithmen</li>
+          <li>Mehrere Dateien parallel verarbeiten</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">hashlib</span>
+          <span class="tag">chunked I/O</span>
+          <span class="tag">argparse</span>
+          <span class="tag">Exit-Codes</span>
+          <span class="tag">Fortschrittsanzeige</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p1)">
+        <strong style="color:var(--p1)">Schnittstelle für später:</strong><br>
+        <code>def hash_file(path: Path, algos: list[str]) -> dict[str, str]</code><br>
+        Diese Signatur wird 1:1 ein <code>uctl hash</code>-Subcommand.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 02 -->
+    <div class="lab-card" style="border-left-color:var(--p1)">
+      <div class="card-top">
+        <span class="lab-num p1-color">LAB 02</span>
+        <h3 class="lab-title">Base Encoding Toolkit</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">enc decode</span> <span style="color:var(--p3)">"SGVsbG8="</span><br>
+        <span style="color:var(--tx-sec)">  Hello</span><br>
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">enc encode --format hex -f</span> <span style="color:var(--p3)">file.bin</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>encode/decode für Base64, Base32, Hex, URL-Encoding</li>
+          <li>String-Modus und Datei-Modus (<code>-f</code>)</li>
+          <li>Sinnvolle Fehlermeldung bei ungültigem Input (fehlerhaftes Padding)</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Auto-Erkennung des Encodings bei <code>decode</code> (Zeichensatz-Heuristik)</li>
+          <li><code>--chain base64,hex</code> für mehrfaches Encoding in einer Pipeline</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">base64</span>
+          <span class="tag">urllib.parse</span>
+          <span class="tag">Bytes vs Strings</span>
+          <span class="tag">pytest parametrize</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p1)">
+        <strong style="color:var(--p1)">Test-Highlight:</strong> Hier ist die Logik reine Transformation — idealer Einstieg in <code>@pytest.mark.parametrize</code> mit vielen Input/Output-Paaren.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 03 -->
+    <div class="lab-card" style="border-left-color:var(--p1)">
+      <div class="card-top">
+        <span class="lab-num p1-color">LAB 03</span>
+        <h3 class="lab-title">Entropy Scanner</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">entropy</span> <span style="color:var(--p3)">~/Downloads --threshold 7.5</span><br>
+        <span style="color:var(--p4)">  SUSPECT  payload.bin  7.94</span><br>
+        <span style="color:var(--tx-muted)">  OK       readme.txt   3.21</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>Shannon-Entropie pro Datei: <code>-Σ p·log2(p)</code> auf Byte-Häufigkeiten</li>
+          <li>Rekursiver Verzeichnisscan mit Filter (<code>--ext</code>, <code>--min-size</code>)</li>
+          <li>Schwellenwert-Markierung (>7.5 bit/byte = "verdächtig")</li>
+          <li>CSV-Report (<code>pfad, größe, entropie, flag</code>)</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Byte-Verteilung als ASCII-Balkendiagramm im Terminal</li>
+          <li>Kombination mit Dateityp/Extension im Report</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Shannon-Entropie</span>
+          <span class="tag">pathlib.rglob</span>
+          <span class="tag">csv</span>
+          <span class="tag">Statistik</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p4)">
+        <strong style="color:var(--p4)">Forensischer Kontext:</strong> Hohe Entropie ≠ Malware. Backups, Crypto-Container und Mediendateien sind genauso hoch-entropisch. Report immer mit Dateityp kombinieren — schult sauberes <em>Findings vs. Interpretation</em>-Denken.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 2                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase2">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p2);border-color:var(--p2);background:rgba(210,168,255,.07)">Phase 2</span>
+    <h2 class="phase-title">Parsing &amp; Forensik</h2>
+    <span class="phase-subtitle">Regex · Datenmodelle · Rekursion · Metadaten</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 04 -->
+    <div class="lab-card" style="border-left-color:var(--p2)">
+      <div class="card-top">
+        <span class="lab-num p2-color">LAB 04</span>
+        <h3 class="lab-title">Log Forensics Toolkit</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">logaudit</span> <span style="color:var(--p3)">auth.log --since "2026-06-01"</span><br>
+        <span style="color:var(--tx-muted)">  Top-IP: 185.220.101.x · 1842 Versuche</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>IP-Adressen extrahieren (IPv4 + IPv6) via Regex-Gruppen</li>
+          <li>Fehlgeschlagene SSH-Logins zählen, nach IP gruppiert + sortiert</li>
+          <li>Zeitraum-Filter (<code>--since</code>, <code>--until</code>)</li>
+          <li>Zusammenfassung: Top-10-IPs, Stunden-Histogramm, Login-Erfolgsquote</li>
+          <li><code>--format json</code> für maschinenlesbaren Output</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>GeoIP-Lookup via lokaler MaxMind-DB (offline)</li>
+          <li>nginx-Logs zusätzlich zu auth.log parsen</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Regex-Gruppen</span>
+          <span class="tag">datetime-Parsing</span>
+          <span class="tag">Counter</span>
+          <span class="tag">dataclass</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p2)">
+        <strong style="color:var(--p2)">Architektur-Muster:</strong> Hier einführen: Parser → Datenmodell (<code>dataclass LogEntry</code>) → Aggregation → Report. Dieses Muster zieht sich durch fast alle folgenden Labs.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 05 -->
+    <div class="lab-card" style="border-left-color:var(--p2)">
+      <div class="card-top">
+        <span class="lab-num p2-color">LAB 05</span>
+        <h3 class="lab-title">Metadata Extractor</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">meta</span> <span style="color:var(--p3)">foto.jpg --format json</span><br>
+        <span style="color:var(--tx-muted)">  GPS  48.1351° N, 11.5820° E</span><br>
+        <span style="color:var(--tx-muted)">  Camera  iPhone 15 Pro Max</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>EXIF-Daten aus JPEG/PNG (Kamera, GPS, Aufnahmedatum)</li>
+          <li>PDF-Metadaten (Autor, Erstellungstool, Änderungsdatum, Seitenanzahl)</li>
+          <li>Generische Dateieigenschaften via <code>os.stat</code></li>
+          <li>Einheitlicher JSON-Export, unabhängig vom Dateityp</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Warnung bei verdächtigen Diskrepanzen (PDF "erstellt" nach "geändert")</li>
+          <li>GPS-Koordinaten aus EXIF in Dezimalgrad umrechnen</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Pillow</span>
+          <span class="tag">pypdf</span>
+          <span class="tag">EXIF</span>
+          <span class="tag">os.stat</span>
+          <span class="tag">Datenstrukturen</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p2)">
+        <strong style="color:var(--p2)">Datenschutz-Mindset:</strong> Dieses Tool zeigt, wie viel Metadaten man unabsichtlich weitergibt. Guter Use-Case: auf eigene Dateien anwenden, bevor man sie teilt.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 06 -->
+    <div class="lab-card" style="border-left-color:var(--p2)">
+      <div class="card-top">
+        <span class="lab-num p2-color">LAB 06</span>
+        <h3 class="lab-title">Secret Detector</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">secretaudit</span> <span style="color:var(--p3)">~/projects --format md</span><br>
+        <span style="color:var(--p4)">  [HIGH]  .env:12  AWS_ACCESS_KEY_ID</span><br>
+        <span style="color:var(--tx-muted)">          AKIA***...***4F3</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>Pattern: generische API-Keys, AWS (<code>AKIA[0-9A-Z]{16}</code>), Private Keys, JWTs, <code>password=</code></li>
+          <li>Ausschluss von <code>node_modules</code>, <code>.git</code>, <code>venv</code></li>
+          <li>Severity-Einstufung: High / Medium / Low je Pattern</li>
+          <li>Secrets im Report immer maskieren (erste + letzte 4 Zeichen)</li>
+          <li>Markdown-Report mit Datei, Zeile, Pattern-Typ, Context-Snippet</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Entropie-Check (Lab 03) als zweites Signal kombinieren</li>
+          <li><code>.secretauditignore</code> für bekannte False Positives</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Regex-Pattern</span>
+          <span class="tag">Severity-Modelle</span>
+          <span class="tag">rekursive Suche</span>
+          <span class="tag">Security Auditing</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p4)">
+        <strong style="color:var(--p4)">Wichtig:</strong> Dieses Tool maskiert gefundene Secrets immer im Report. Es ist ein Auditing-Tool, kein Exfiltrations-Tool.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 3                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase3">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p3);border-color:var(--p3);background:rgba(255,166,87,.07)">Phase 3</span>
+    <h2 class="phase-title">Krypto &amp; Netzwerk</h2>
+    <span class="phase-subtitle">sockets · ssl · psutil · Entropie-Theorie</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 07 -->
+    <div class="lab-card" style="border-left-color:var(--p3)">
+      <div class="card-top">
+        <span class="lab-num p3-color">LAB 07</span>
+        <h3 class="lab-title">Certificate Auditor</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">certaudit</span> <span style="color:var(--p3)">github.com</span><br>
+        <span style="color:var(--tx-sec)">  Issuer   DigiCert TLS RSA SHA256</span><br>
+        <span style="color:var(--p3)">  ⚠  Läuft ab in 28 Tagen</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>TLS-Verbindung aufbauen, Zertifikat auslesen (<code>ssl</code> + <code>cryptography.x509</code>)</li>
+          <li>Issuer, Subject, Gültigkeitszeitraum, SAN-Einträge anzeigen</li>
+          <li>Warnung bei &lt;30 Tagen Restlaufzeit (konfigurierbarer Schwellenwert)</li>
+          <li>Zertifikatskette anzeigen (Anzahl Zwischenzertifikate)</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Batch-Modus: Host-Liste aus Datei, Sammelreport</li>
+          <li>Schwache Signaturalgorithmen flaggen (z. B. SHA1)</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">socket</span>
+          <span class="tag">ssl</span>
+          <span class="tag">X.509</span>
+          <span class="tag">datetime</span>
+          <span class="tag">cryptography</span>
+        </div>
+      </div>
+      <div class="uconsole-box">Ideal für eigene Heimnetz-Zertifikate (Router, NAS, selbst gehostete Dienste) — auch offline gegen lokale IPs prüfbar.</div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 08 -->
+    <div class="lab-card" style="border-left-color:var(--p3)">
+      <div class="card-top">
+        <span class="lab-num p3-color">LAB 08</span>
+        <h3 class="lab-title">Password Strength Analyzer</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">pwcheck</span> <span style="color:var(--p3)">"Tr0ub4dor&amp;3"</span><br>
+        <span style="color:var(--p1)">  Stärke  Gut · 72.3 bit</span><br>
+        <span style="color:var(--tx-muted)">  Crack    ~147 Jahre @ 10^9/s</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>Zeichenklassen erkennen (Klein/Groß, Ziffern, Sonderzeichen)</li>
+          <li>Entropie in Bit berechnen (Zeichenraum × Länge)</li>
+          <li>Abgleich gegen lokale Liste häufiger Passwörter (rockyou-Auszug, offline)</li>
+          <li>Verständlicher Bericht inkl. geschätzter Crack-Zeit bei definierten Angriffsraten</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Tastatur-Mustererkennung (<code>qwertz123</code>, <code>asdf</code>)</li>
+          <li>HaveIBeenPwned-API via k-Anonymity (Klartext verlässt das Gerät nie)</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Entropie-Theorie</span>
+          <span class="tag">Regex</span>
+          <span class="tag">String-Verarbeitung</span>
+          <span class="tag">Privacy-Design</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p3)">
+        <strong style="color:var(--p3)">Privacy-Hinweis:</strong> Reine lokale Bewertung — kein Versand von Klartextpasswörtern. Die k-Anonymity-Integration ist ein Lehrbeispiel für privacy-bewusstes API-Design.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 09 -->
+    <div class="lab-card" style="border-left-color:var(--p3)">
+      <div class="card-top">
+        <span class="lab-num p3-color">LAB 09</span>
+        <h3 class="lab-title">Local Port Inventory</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">portinv</span> <span style="color:var(--p3)">--proto tcp --format json</span><br>
+        <span style="color:var(--tx-sec)">  :22  sshd  (pid 1234, root)</span><br>
+        <span style="color:var(--tx-sec)">  :8080  python3  (pid 5678, user)</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>Listening TCP/UDP-Ports auflisten</li>
+          <li>Zugehörige Prozesse (PID, Name, Pfad, User)</li>
+          <li>Filter nach Protokoll und Port-Range</li>
+          <li>JSON-Export</li>
+          <li>IPv6 berücksichtigen</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Vergleich gegen <code>ports.toml</code>-Whitelist → Abweichungen flaggen</li>
+          <li>Regelmäßige Baseline (Brücke zu Lab 10)</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">psutil</span>
+          <span class="tag">Netzwerkprogrammierung</span>
+          <span class="tag">Prozessanalyse</span>
+        </div>
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 4                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase4">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p4);border-color:var(--p4);background:rgba(255,123,114,.07)">Phase 4</span>
+    <h2 class="phase-title">Integrität &amp; Monitoring</h2>
+    <span class="phase-subtitle">Baseline · Diffing · Config-Parsing · Heuristik</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 10 -->
+    <div class="lab-card" style="border-left-color:var(--p4)">
+      <div class="card-top">
+        <span class="lab-num p4-color">LAB 10</span>
+        <h3 class="lab-title">File Integrity Monitor</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">fim init</span> <span style="color:var(--p3)">/etc</span><br>
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">fim scan</span> <span style="color:var(--p3)">/etc</span><br>
+        <span style="color:var(--p4)">  CHANGED  /etc/ssh/sshd_config</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li><code>fim init</code> erstellt Baseline (Pfad, Hash, Größe, mtime, Permissions) als JSON</li>
+          <li><code>fim scan</code> vergleicht gegen Baseline → neu / gelöscht / geändert</li>
+          <li>Report: Konsole + optional Markdown/JSON</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Inkrementelle Baseline-Updates nach manueller Prüfung</li>
+          <li>Ausschlussregeln für volatile Pfade (<code>/var/log</code>, <code>/tmp</code>)</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Baseline-Pattern</span>
+          <span class="tag">JSON-Persistenz</span>
+          <span class="tag">Verzeichnisrekursion</span>
+          <span class="tag">Diff-Logik</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p4)">
+        <strong style="color:var(--p4)">Architektur:</strong> Gemeinsame <code>BaselineStore</code>-Klasse in <code>shared/</code> — wird von Lab 11 wiederverwendet.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 11 -->
+    <div class="lab-card" style="border-left-color:var(--p4)">
+      <div class="card-top">
+        <span class="lab-num p4-color">LAB 11</span>
+        <h3 class="lab-title">Process &amp; Service Baseline Monitor</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">procmon scan</span><br>
+        <span style="color:var(--p4)">  NEW      /tmp/.x  (pid 9911, nobody)</span><br>
+        <span style="color:var(--p4)">  ⚠ deleted exe detected</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>Baseline aller laufenden Prozesse (PID, Name, Pfad, Hash der Binary, User)</li>
+          <li>Erkennung neuer/unbekannter Prozesse seit letzter Baseline</li>
+          <li>Heuristik: Prozess läuft aus <code>/tmp</code> oder gelöschtem Pfad (<code>(deleted)</code> in <code>/proc/PID/exe</code>)</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Whitelist für bekannte, häufig wechselnde Prozesse</li>
+          <li>Prozess-Binary-Hash gegen VirusTotal-Cache (offline)</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">psutil</span>
+          <span class="tag">/proc-Filesystem</span>
+          <span class="tag">Heuristiken</span>
+          <span class="tag">shared/BaselineStore</span>
+        </div>
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 12 -->
+    <div class="lab-card" style="border-left-color:var(--p4)">
+      <div class="card-top">
+        <span class="lab-num p4-color">LAB 12</span>
+        <h3 class="lab-title">SSH &amp; Firewall Config Auditor</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">configaudit</span> <span style="color:var(--p3)">/etc/ssh/sshd_config</span><br>
+        <span style="color:var(--p4)">  [HIGH]  PermitRootLogin yes</span><br>
+        <span style="color:var(--p3)">  [MED]   PasswordAuthentication yes</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li><code>sshd_config</code> parsen: <code>PermitRootLogin</code>, <code>PasswordAuthentication</code>, Cipher-Liste</li>
+          <li><code>iptables-save</code>/<code>nft list ruleset</code>: fehlende Default-DROP-Policy, zu offene ACCEPTs</li>
+          <li>Findings als <code>dataclass Finding(rule, severity, recommendation)</code></li>
+          <li>Markdown-Report sortiert nach Severity</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Eigene Regelwerk-Datei (YAML/TOML) für eigene Checks — erste Plugin-Vorstufe</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">Config-Parsing</span>
+          <span class="tag">Findings-Modell</span>
+          <span class="tag">sshd</span>
+          <span class="tag">iptables/nft</span>
+        </div>
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 5                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase5">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p5);border-color:var(--p5);background:rgba(121,192,255,.07)">Phase 5</span>
+    <h2 class="phase-title">Erweiterte Analyse</h2>
+    <span class="phase-subtitle">Binärformate · CVE-APIs · Subprocess · Hardware-Inventar</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 13 -->
+    <div class="lab-card" style="border-left-color:var(--p5)">
+      <div class="card-top">
+        <span class="lab-num p5-color">LAB 13</span>
+        <h3 class="lab-title">Offline PCAP Analyzer</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">pcapaudit</span> <span style="color:var(--p3)">capture.pcap</span><br>
+        <span style="color:var(--tx-sec)">  Top-Talker  192.168.1.10 → 1.1.1.1  2.3 MB</span><br>
+        <span style="color:var(--p4)">  ⚠ HTTP-Basic-Auth Cleartext detected</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>PCAP-Datei einlesen mit <code>dpkt</code> oder <code>scapy</code> (nur lesen, kein Live-Capture)</li>
+          <li>Top-Talker nach Traffic-Volumen, Protokollverteilung (TCP/UDP/ICMP/DNS)</li>
+          <li>DNS-Queries extrahieren und auflisten</li>
+          <li>Klartext-Zugangsdaten in HTTP-Basic-Auth erkennen (Awareness)</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Traffic-Zeitachse als ASCII-Sparkline</li>
+          <li>TLS-Versionsverteilung aus Client-Hello-Paketen auslesen</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">dpkt / scapy</span>
+          <span class="tag">Binärformate</span>
+          <span class="tag">Protokoll-Parsing</span>
+          <span class="tag">Paketanalyse</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p5)">
+        <strong style="color:var(--p5)">Hinweis:</strong> Reine Nachanalyse gespeicherter Dateien. Capture-Dateien erzeugst du dir selbst im eigenen Netz: <code>tcpdump -w capture.pcap</code>
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 14 -->
+    <div class="lab-card" style="border-left-color:var(--p5)">
+      <div class="card-top">
+        <span class="lab-num p5-color">LAB 14</span>
+        <h3 class="lab-title">Installed-Package CVE Auditor</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">cveaudit --source pip</span><br>
+        <span style="color:var(--p4)">  requests 2.28.1  CVE-2023-32681  HIGH</span><br>
+        <span style="color:var(--p3)">  urllib3  1.26.14 CVE-2023-43804  MED</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>Python-Pakete (<code>pip list --format=json</code>) oder Debian (<code>dpkg -l</code>) einlesen</li>
+          <li>Abfrage gegen OSV.dev-API (kostenlos, kein Key nötig)</li>
+          <li>Report sortiert nach Severity, mit Link zur Advisory</li>
+          <li>Lokales Caching der Antworten (JSON + TTL) für Mobilfunk/Offline-Nutzung</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li><code>--offline</code>-Modus mit lokal heruntergeladener CVE-DB</li>
+          <li>npm-Packages zusätzlich unterstützen</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">httpx</span>
+          <span class="tag">OSV.dev-API</span>
+          <span class="tag">Versionsvergleich</span>
+          <span class="tag">Caching</span>
+        </div>
+      </div>
+      <div class="uconsole-box">Lokales Caching ist essentiell — die uConsole ist oft nur über Mobilfunk online. Datenvolumen sparen zählt.</div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 15 -->
+    <div class="lab-card" style="border-left-color:var(--p5)">
+      <div class="card-top">
+        <span class="lab-num p5-color">LAB 15</span>
+        <h3 class="lab-title">USB &amp; Hardware Inventory</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">hwaudit --diff</span><br>
+        <span style="color:var(--p4)">  NEW USB  0951:1666 Kingston DataTraveler</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Pflicht</div>
+        <ul class="req-list">
+          <li>USB-Geräte auflisten (Vendor/Product-ID, Beschreibung via <code>lsusb</code>)</li>
+          <li>Block-Devices inventarisieren (<code>lsblk --json</code> direkt parsen)</li>
+          <li>Sicherheitsrelevante Kernel-Module prüfen (z. B. <code>usb-storage</code> geladen?)</li>
+        </ul>
+        <div class="card-section-label">Bonus</div>
+        <ul class="req-list bonus-list">
+          <li>Baseline-Vergleich (Lab 10-Pattern): Alarm bei neu angeschlossenem USB</li>
+          <li>PCI-Geräteinventar (<code>lspci</code>) zusätzlich</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">subprocess</span>
+          <span class="tag">lsusb / lsblk</span>
+          <span class="tag">Kernel-Module</span>
+          <span class="tag">JSON-Parsing</span>
+        </div>
+      </div>
+      <div class="uconsole-box">uConsole-spezifisch: Alarm bei neu angeschlossenem USB ist gerade am mobilen Gerät nützlich — die uConsole hat exponierte Ports.</div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- PHASE 6                                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="phase-section" id="phase6">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:var(--p6);border-color:var(--p6);background:rgba(240,136,62,.07)">Phase 6</span>
+    <h2 class="phase-title">Engineering &amp; Integration</h2>
+    <span class="phase-subtitle">pytest · Mocking · Plugin-Architektur · importlib</span>
+  </div>
+  <div class="lab-grid">
+
+    <!-- LAB 16 -->
+    <div class="lab-card" style="border-left-color:var(--p6)">
+      <div class="card-top">
+        <span class="lab-num p6-color">LAB 16</span>
+        <h3 class="lab-title">Testing &amp; CI für alle Tools</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">pytest --cov=. --cov-report=term</span><br>
+        <span style="color:var(--p1)">  18 passed · 2 skipped · 84% coverage</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Aufgabe</div>
+        <ul class="req-list">
+          <li>Kernlogik (nicht CLI!) jedes Tools vollständig testen inkl. Edge Cases</li>
+          <li><code>tmp_path</code>-Fixture für Dateisystem-Tests</li>
+          <li><code>unittest.mock</code> für Netzwerkzugriffe (Cert-Auditor, CVE-Auditor)</li>
+          <li>Coverage-Ziel: 80 % auf allen <code>core.py</code>-Modulen</li>
+          <li>GitHub Actions: Tests + ruff bei jedem Push</li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">pytest-Fixtures</span>
+          <span class="tag">Mocking</span>
+          <span class="tag">Coverage</span>
+          <span class="tag">CI/CD</span>
+          <span class="tag">GitHub Actions</span>
+        </div>
+      </div>
+      <div class="hint-box" style="border-left-color:var(--p6)">
+        <strong style="color:var(--p6)">Voraussetzung:</strong> Mind. 5 abgeschlossene Labs. Diese Phase macht deine vorherige Arbeit erst wirklich productionsreif.
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+    <!-- LAB 17 -->
+    <div class="lab-card" style="border-left-color:var(--p6)">
+      <div class="card-top">
+        <span class="lab-num p6-color">LAB 17</span>
+        <h3 class="lab-title">Plugin-Architektur Prototyp</h3>
+      </div>
+      <div class="card-cli">
+        <span class="term-ps">❯</span> <span style="color:var(--tx-sec)">python -c "</span><br>
+        <span style="color:var(--tx-sec)">from importlib.metadata import entry_points</span><br>
+        <span style="color:var(--tx-sec)">print(list(entry_points(group='uctl.plugins')))"</span>
+      </div>
+      <div class="card-body">
+        <div class="card-section-label">Aufgabe</div>
+        <ul class="req-list">
+          <li>Gemeinsames Interface definieren:</li>
+        </ul>
+        <div class="card-cli" style="margin:8px 0 10px;font-size:11px">
+          <span style="color:var(--p5)">class</span> <span style="color:var(--p3)">SecurityTool</span>(ABC):<br>
+          &nbsp;&nbsp;name: str<br>
+          &nbsp;&nbsp;<span style="color:var(--p5)">@abstractmethod</span><br>
+          &nbsp;&nbsp;<span style="color:var(--p5)">def</span> run(self, args) → int: ...<br>
+          &nbsp;&nbsp;<span style="color:var(--p5)">def</span> register_args(self, sub): ...
+        </div>
+        <ul class="req-list">
+          <li>2–3 bestehende Tools in dieses Interface umwandeln</li>
+          <li>Dynamische Discovery über <code>entry_points(group="uctl.plugins")</code></li>
+        </ul>
+        <div class="card-section-label">Gelernt</div>
+        <div class="tag-row">
+          <span class="tag">importlib</span>
+          <span class="tag">ABC</span>
+          <span class="tag">entry_points</span>
+          <span class="tag">Plugin-Pattern</span>
+        </div>
+      </div>
+      <div class="card-bottom"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- CAPSTONE                                                -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<section class="capstone-section" id="capstone">
+  <div class="section-header">
+    <div class="section-title" style="color:var(--cp)">★ Capstone</div>
+    <div class="section-rule"></div>
+  </div>
+  <div class="capstone-card">
+    <div class="capstone-inner">
+      <div class="capstone-eyebrow">// Unified Security Toolkit — Endprojekt</div>
+      <h2 class="capstone-title"><span style="color:var(--cp)">uctl</span> — alles in einem</h2>
+      <p class="capstone-desc">Alle 18 Labs werden zu einer einzigen CLI-Suite vereint. Jedes Tool wird zum Plugin. Eine gemeinsame Config, ein gemeinsames Logging, ein gemeinsames Output-Format. Installierbar via <code>pipx install .</code> — auch offline auf der uConsole.</p>
+
+      <div class="capstone-grid">
+        <div class="capstone-box">
+          <div class="capstone-box-title">CLI-Framework</div>
+          <ul class="req-list">
+            <li>Typer ersetzt alle bisherigen argparse-Subcommands</li>
+            <li>Zentrale <code>~/.config/uctl/config.toml</code> für Defaults (Schwellenwerte, Ausschlusspfade)</li>
+            <li>Zentrales Logging (<code>logging</code>-Modul, <code>--verbose</code>/<code>--quiet</code>)</li>
+          </ul>
+        </div>
+        <div class="capstone-box">
+          <div class="capstone-box-title">Output &amp; Integration</div>
+          <ul class="req-list">
+            <li>Einheitliches Format über alle Subcommands via <code>rich</code></li>
+            <li><code>--json</code> für Skriptverkettung bei jedem Command</li>
+            <li>Terminal-Breite dynamisch: <code>shutil.get_terminal_size()</code></li>
+            <li>Online-Tools explizit markiert (Cert, CVE)</li>
+          </ul>
+        </div>
+        <div class="capstone-box">
+          <div class="capstone-box-title">Packaging &amp; Deployment</div>
+          <ul class="req-list">
+            <li><code>pipx install .</code> — funktioniert offline nach Wheel-Cache</li>
+            <li>Plugin-Discovery via <code>entry_points</code> (Lab 17)</li>
+            <li>Unit-Tests für alle Kernmodule (Lab 16)</li>
+            <li>Kein Polling ohne expliziten <code>--watch</code>-Flag</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="capstone-term">
+        <div class="terminal-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="term-label">uctl — alle Subcommands</span>
+        </div>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl hash</span>   <span class="term-arg">file.iso</span>          <span class="term-comment"># Lab 01</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl enc</span>    <span class="term-arg">decode SGVs...</span>     <span class="term-comment"># Lab 02</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl entropy</span> <span class="term-arg">~/Downloads</span>       <span class="term-comment"># Lab 03</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl logs</span>   <span class="term-arg">auth.log --since 7d</span> <span class="term-comment"># Lab 04</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl meta</span>   <span class="term-arg">foto.jpg</span>           <span class="term-comment"># Lab 05</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl secrets</span> <span class="term-arg">~/projects</span>        <span class="term-comment"># Lab 06</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl cert</span>   <span class="term-arg">github.com</span>         <span class="term-comment"># Lab 07</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl pw</span>     <span class="term-arg">"Tr0ub4dor&amp;3"</span>      <span class="term-comment"># Lab 08</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl ports</span>  <span class="term-arg">--proto tcp</span>        <span class="term-comment"># Lab 09</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl fim</span>    <span class="term-arg">scan /etc</span>          <span class="term-comment"># Lab 10</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl procs</span>  <span class="term-arg">--diff</span>             <span class="term-comment"># Lab 11</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl config</span> <span class="term-arg">/etc/ssh/sshd_config</span> <span class="term-comment"># Lab 12</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl pcap</span>   <span class="term-arg">capture.pcap</span>       <span class="term-comment"># Lab 13</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl cve</span>    <span class="term-arg">--source pip</span>       <span class="term-comment"># Lab 14</span></span>
+        <span class="term-line"><span class="term-ps">❯</span> <span class="term-cmd">uctl hw</span>     <span class="term-arg">--diff</span>             <span class="term-comment"># Lab 15</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-brand">the<span>layer0</span>guide</div>
+  <div class="footer-meta">
+    uConsole Security Lab Curriculum<br>
+    18 Labs · 6 Phasen · 4–6 Monate
+  </div>
+</footer>
+
+<script>
+  // Nav pill active state on scroll
+  const sections = document.querySelectorAll('section[id], header');
+  const pills = document.querySelectorAll('.nav-pill');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        pills.forEach(p => p.classList.remove('active'));
+        const id = e.target.id;
+        const match = document.querySelector(`.nav-pill[href="#${id}"]`);
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '-60px 0px -60% 0px' });
+
+  document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+
+  // Phase dot smooth scroll (already handled by href, but add keyboard nav)
+  document.querySelectorAll('.phase-dot').forEach(dot => {
+    dot.addEventListener('keydown', e => {
+      if (e.key === 'Enter') dot.click();
+    });
+    dot.setAttribute('tabindex', '0');
+    dot.setAttribute('role', 'link');
+  });
+</script>
+
+</body>
+</html>

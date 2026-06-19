@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Jahreskurs — thelayer0guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --bg-raised: #1c2128;
+  --bg-code:   #0a0e14;
+  --border:    #30363d;
+  --border-s:  #21262d;
+  --tx:        #e6edf3;
+  --tx-sec:    #8b949e;
+  --tx-muted:  #6e7681;
+
+  --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+  --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+  --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r: 6px; --rl: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);padding:0 24px;display:flex;align-items:center;height:52px;gap:0}
+.nav-brand{font-family:var(--fd);font-weight:800;font-size:15px;letter-spacing:-.02em;color:var(--tx);text-decoration:none;margin-right:28px;white-space:nowrap}
+.nav-brand span{color:var(--m1)}
+.nav-pills{display:flex;gap:3px;overflow-x:auto;scrollbar-width:none;flex:1}
+.nav-pills::-webkit-scrollbar{display:none}
+.nav-pill{padding:4px 10px;border-radius:20px;border:1px solid transparent;font-family:var(--fm);font-size:11px;cursor:pointer;background:transparent;color:var(--tx-sec);transition:all .15s;white-space:nowrap;text-decoration:none}
+.nav-pill:hover{color:var(--tx);background:var(--bg-raised)}
+.nav-pill.active{color:var(--tx);border-color:var(--border);background:var(--bg-raised)}
+.nav-badge{margin-left:auto;padding-left:16px;font-size:11px;color:var(--tx-muted);white-space:nowrap}
+
+/* HERO */
+.hero{padding:72px 24px 56px;max-width:1280px;margin:0 auto}
+.hero-eye{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--m1);margin-bottom:18px}
+.hero-title{font-family:var(--fd);font-size:clamp(30px,5vw,58px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:18px}
+.hero-title em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--m12)}
+.hero-sub{font-size:13px;color:var(--tx-sec);max-width:580px;line-height:1.75;margin-bottom:40px}
+.hero-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px}
+@media(max-width:640px){.hero-cols{grid-template-columns:1fr}}
+.hero-stat{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);padding:20px 24px}
+.hero-stat-n{font-family:var(--fd);font-size:32px;font-weight:800;line-height:1;margin-bottom:5px}
+.hero-stat-l{font-size:11px;color:var(--tx-muted);letter-spacing:.07em;text-transform:uppercase}
+
+/* TERMINAL */
+.term-box{background:var(--bg-code);border:1px solid var(--border);border-radius:var(--rl);padding:18px 22px;font-family:var(--fm);font-size:12px;line-height:1.8}
+.term-bar{display:flex;gap:6px;margin-bottom:14px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%}
+.dr{background:#ff5f57}.dy{background:#febc2e}.dg{background:#28c840}
+.tlbl{font-size:11px;color:var(--tx-muted);margin-left:8px}
+.ps{color:#3fb950}.cmd{color:var(--tx)}.arg{color:var(--m7)}.cmt{color:var(--tx-muted)}.out{color:var(--tx-sec);font-size:11.5px}.hi{color:var(--m1)}
+.kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
+
+/* SECTION HEADER */
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.sec-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:24px}
+.sec-lbl{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx-muted)}
+.sec-rule{flex:1;height:1px;background:var(--border-s)}
+
+/* OVERVIEW GRID (12 months) */
+.overview{padding:0 24px 64px;max-width:1280px;margin:0 auto}
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:800px){.ov-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.ov-grid{grid-template-columns:repeat(2,1fr)}}
+.ov-cell{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;border-left-width:3px;text-decoration:none;display:block}
+.ov-cell:hover{background:var(--bg-raised);transform:translateY(-1px)}
+.ov-num{font-family:var(--fm);font-size:10px;font-weight:600;margin-bottom:6px}
+.ov-name{font-family:var(--fd);font-size:13px;font-weight:700;line-height:1.25;margin-bottom:5px}
+.ov-sub{font-size:10.5px;color:var(--tx-muted);line-height:1.4}
+
+/* PHASE BANNER */
+.phase-banner{padding:0 24px 48px;max-width:1280px;margin:0 auto}
+.phase-row{display:flex;gap:0;border:1px solid var(--border-s);border-radius:var(--rl);overflow:hidden}
+.phase-cell{flex:1;padding:16px 18px;background:var(--bg-card)}
+.phase-cell+.phase-cell{border-left:1px solid var(--border-s)}
+.phase-cell-lbl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.phase-cell-name{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2;margin-bottom:4px}
+.phase-cell-months{font-size:10.5px;color:var(--tx-muted)}
+@media(max-width:800px){.phase-row{flex-direction:column}}
+
+/* MONTH SECTION */
+.month-section{padding:0 24px 88px;max-width:1280px;margin:0 auto}
+.month-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-s)}
+.month-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+.month-title{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.02em}
+.month-sub{font-size:11.5px;color:var(--tx-muted);margin-left:auto;white-space:nowrap}
+
+/* WEEK GRID */
+.week-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.week-grid{grid-template-columns:1fr}}
+.week-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);border-left-width:3px;padding:18px 20px}
+.week-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.week-num{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg-code)}
+.week-title{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2}
+.topic-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.topic-list li{font-size:11.5px;color:var(--tx-sec);display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.topic-list li::before{content:'›';color:inherit;opacity:.6;flex-shrink:0}
+.ex-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-bottom:6px}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ex-list li{font-size:11px;color:var(--tx-muted);display:flex;gap:7px;line-height:1.35}
+.ex-list li::before{content:'→';flex-shrink:0}
+
+/* CODE SNIPPET */
+.code-block{background:var(--bg-code);border:1px solid var(--border-s);border-radius:var(--r);padding:12px 16px;font-family:var(--fm);font-size:11.5px;line-height:1.7;margin:10px 0;overflow-x:auto}
+
+/* TAGS */
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg-code);border:1px solid var(--border-s);color:var(--tx-muted)}
+
+/* MILESTONE */
+.milestone-card{background:var(--bg-card);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;position:relative}
+.milestone-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.milestone-inner{padding:28px 32px;position:relative;z-index:1}
+.milestone-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.milestone-title{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.milestone-desc{font-size:12px;color:var(--tx-sec);line-height:1.65;max-width:600px;margin-bottom:18px}
+.milestone-feats{display:flex;flex-wrap:wrap;gap:8px}
+.milestone-feat{font-size:11px;background:var(--bg-raised);border:1px solid var(--border-s);border-radius:4px;padding:4px 10px;color:var(--tx-sec)}
+.milestone-code{margin-top:20px}
+
+/* SECLAB HINT */
+.seclab-box{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:var(--r);padding:12px 16px;font-size:11px;color:#58a6ff99;line-height:1.55;display:flex;gap:8px;margin-top:14px}
+.seclab-box::before{content:'⬡';color:var(--m1);flex-shrink:0;font-size:13px}
+.seclab-box strong{color:var(--m1)}
+
+/* HINT BOX */
+.hint-box{border-left:2px solid;background:var(--bg-code);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--tx-muted);line-height:1.55;margin-top:12px}
+
+/* DIFFICULTY */
+.diff{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
+.diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:currentColor}
+
+/* SKILLS ROW */
+.skills-row{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.skills-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-right:8px;white-space:nowrap}
+
+/* PHASE DIVIDERS */
+.phase-div{padding:0 24px 32px;max-width:1280px;margin:0 auto}
+.phase-div-inner{background:var(--bg-card);border-radius:var(--rl);padding:24px 28px;display:flex;align-items:center;gap:20px;border:1px solid var(--border-s)}
+.phase-div-icon{font-size:28px;flex-shrink:0}
+.phase-div-title{font-family:var(--fd);font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.phase-div-sub{font-size:12px;color:var(--tx-muted);line-height:1.5}
+
+/* CAPSTONE */
+.capstone-full{padding:0 24px 100px;max-width:1280px;margin:0 auto}
+.cap-card{border-radius:var(--rl);overflow:hidden;position:relative}
+.cap-inner{padding:44px 44px 40px;position:relative;z-index:1}
+@media(max-width:640px){.cap-inner{padding:28px}}
+.cap-eye{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.cap-title{font-family:var(--fd);font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-.03em;margin-bottom:12px}
+.cap-desc{font-size:12.5px;color:var(--tx-sec);max-width:640px;line-height:1.7;margin-bottom:28px}
+.cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:800px){.cap-grid{grid-template-columns:1fr}}
+.cap-box{background:var(--bg-raised);border:1px solid var(--border-s);border-radius:var(--r);padding:18px 20px}
+.cap-box-t{font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:12px}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border-s);max-width:1280px;margin:0 auto;padding:32px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.foot-brand{font-family:var(--fd);font-size:14px;font-weight:800;letter-spacing:-.02em}
+.foot-brand span{color:var(--m1)}
+.foot-meta{font-size:11px;color:var(--tx-muted);text-align:right;line-height:1.6}
+
+/* UTIL */
+.hidden{display:none!important}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">the<span>layer0</span>guide</a>
+  <div class="nav-pills">
+    <a href="#overview"   class="nav-pill">Übersicht</a>
+    <a href="#phase-a"    class="nav-pill">Phase A</a>
+    <a href="#m1"  class="nav-pill">M01</a>
+    <a href="#m2"  class="nav-pill">M02</a>
+    <a href="#phase-b"   class="nav-pill">Phase B</a>
+    <a href="#m3"  class="nav-pill">M03</a>
+    <a href="#m4"  class="nav-pill">M04</a>
+    <a href="#m5"  class="nav-pill">M05</a>
+    <a href="#phase-c"   class="nav-pill">Phase C</a>
+    <a href="#m6"  class="nav-pill">M06</a>
+    <a href="#m7"  class="nav-pill">M07</a>
+    <a href="#phase-d"   class="nav-pill">Phase D</a>
+    <a href="#m8"  class="nav-pill">M08</a>
+    <a href="#m9"  class="nav-pill">M09</a>
+    <a href="#phase-e"   class="nav-pill">Phase E</a>
+    <a href="#m10" class="nav-pill">M10</a>
+    <a href="#m11" class="nav-pill">M11</a>
+    <a href="#phase-f"   class="nav-pill">Phase F</a>
+    <a href="#m12" class="nav-pill">M12</a>
+    <a href="#capstone"  class="nav-pill">★ Capstone</a>
+  </div>
+  <div class="nav-badge">12 Monate · Vollzeit</div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-eye">// Python — Vollzeit Jahreskurs · Zero to Pro</div>
+  <h1 class="hero-title">Von der ersten<br><em>Variable</em> zum<br>vollständigen Programm</h1>
+  <p class="hero-sub">
+    Ein strukturierter 12-Monats-Lehrplan — Vollzeit, hands-on, kein Framework-Cargo-Cult.
+    Du baust von Grund auf: eigene Module, eigene Tools, eigene Architektur.
+    Am Ende läuft dein Code auf der uConsole.
+  </p>
+  <div class="hero-cols">
+    <div class="hero-stat">
+      <div class="hero-stat-n" style="color:var(--m1)">12</div>
+      <div class="hero-stat-l">Monate · ~40h/Woche</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-n" style="color:var(--m3)">48</div>
+      <div class="hero-stat-l">Wochen strukturierter Inhalt</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-n" style="color:var(--m5)">7</div>
+      <div class="hero-stat-l">Milestone-Projekte</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-n" style="color:var(--m12)">∞</div>
+      <div class="hero-stat-l">Eigene Programme danach</div>
+    </div>
+  </div>
+</header>
+
+<!-- OVERVIEW GRID -->
+<section class="overview" id="overview">
+  <div class="sec-hdr">
+    <div class="sec-lbl">12-Monats-Überblick</div>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="ov-grid">
+    <a href="#m1"  class="ov-cell" style="border-left-color:var(--m1)"><div class="ov-num" style="color:var(--m1)">MONAT 01</div><div class="ov-name">Python Basics I</div><div class="ov-sub">Variablen, Typen, Strings, Control Flow</div></a>
+    <a href="#m2"  class="ov-cell" style="border-left-color:var(--m2)"><div class="ov-num" style="color:var(--m2)">MONAT 02</div><div class="ov-name">Python Basics II</div><div class="ov-sub">Collections, Funktionen, erste eigene Tools</div></a>
+    <a href="#m3"  class="ov-cell" style="border-left-color:var(--m3)"><div class="ov-num" style="color:var(--m3)">MONAT 03</div><div class="ov-name">Dateiarbeit &amp; Stdlib</div><div class="ov-sub">File I/O, pathlib, json, csv, Module</div></a>
+    <a href="#m4"  class="ov-cell" style="border-left-color:var(--m4)"><div class="ov-num" style="color:var(--m4)">MONAT 04</div><div class="ov-name">Fehler &amp; OOP I</div><div class="ov-sub">Exceptions, Klassen, Vererbung, Dunder</div></a>
+    <a href="#m5"  class="ov-cell" style="border-left-color:var(--m5)"><div class="ov-num" style="color:var(--m5)">MONAT 05</div><div class="ov-name">OOP II &amp; Funktional</div><div class="ov-sub">Generatoren, Dekoratoren, Context Manager</div></a>
+    <a href="#m6"  class="ov-cell" style="border-left-color:var(--m6)"><div class="ov-num" style="color:var(--m6)">MONAT 06</div><div class="ov-name">Types &amp; CLI-Tools</div><div class="ov-sub">Type Hints, Dataclasses, argparse, Typer, Rich</div></a>
+    <a href="#m7"  class="ov-cell" style="border-left-color:var(--m7)"><div class="ov-num" style="color:var(--m7)">MONAT 07</div><div class="ov-name">Datenbanken</div><div class="ov-sub">sqlite3, SQL, Konfigurationsdateien, SQLAlchemy</div></a>
+    <a href="#m8"  class="ov-cell" style="border-left-color:var(--m8)"><div class="ov-num" style="color:var(--m8)">MONAT 08</div><div class="ov-name">Netzwerk &amp; APIs</div><div class="ov-sub">Sockets, HTTP, REST-APIs, Web Scraping</div></a>
+    <a href="#m9"  class="ov-cell" style="border-left-color:var(--m9)"><div class="ov-num" style="color:var(--m9)">MONAT 09</div><div class="ov-name">Asyncio &amp; Web</div><div class="ov-sub">async/await, aiohttp, Flask, FastAPI</div></a>
+    <a href="#m10" class="ov-cell" style="border-left-color:var(--m10)"><div class="ov-num" style="color:var(--m10)">MONAT 10</div><div class="ov-name">Concurrency &amp; Performance</div><div class="ov-sub">Threading, Multiprocessing, Profiling</div></a>
+    <a href="#m11" class="ov-cell" style="border-left-color:var(--m11)"><div class="ov-num" style="color:var(--m11)">MONAT 11</div><div class="ov-name">Testing &amp; Architektur</div><div class="ov-sub">pytest, Packaging, Patterns, CI/CD</div></a>
+    <a href="#m12" class="ov-cell" style="border-left-color:var(--m12)"><div class="ov-num" style="color:var(--m12)">MONAT 12</div><div class="ov-name">Abschlussprojekt</div><div class="ov-sub">Vollständiges Programm · Design bis Release</div></a>
+  </div>
+</section>
+
+<!-- PHASE BANNER -->
+<section class="phase-banner">
+  <div class="phase-row">
+    <div class="phase-cell">
+      <div class="phase-cell-lbl" style="color:var(--m1)">Phase A · M01–02</div>
+      <div class="phase-cell-name">Fundament</div>
+      <div class="phase-cell-months">Syntax · Collections · Funktionen</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-cell-lbl" style="color:var(--m3)">Phase B · M03–05</div>
+      <div class="phase-cell-name">Kern-Python</div>
+      <div class="phase-cell-months">I/O · Module · OOP · Patterns</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-cell-lbl" style="color:var(--m6)">Phase C · M06–07</div>
+      <div class="phase-cell-name">Tools &amp; Daten</div>
+      <div class="phase-cell-months">CLI · Type Hints · SQL · Config</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-cell-lbl" style="color:var(--m8)">Phase D · M08–09</div>
+      <div class="phase-cell-name">Netzwerk</div>
+      <div class="phase-cell-months">Sockets · HTTP · Async · APIs</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-cell-lbl" style="color:var(--m10)">Phase E · M10–11</div>
+      <div class="phase-cell-name">Engineering</div>
+      <div class="phase-cell-months">Concurrency · Tests · Packaging</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-cell-lbl" style="color:var(--m12)">Phase F · M12</div>
+      <div class="phase-cell-name">Capstone</div>
+      <div class="phase-cell-months">Vollständiges Programm</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PHASE A — FUNDAMENT                                  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="phase-div" id="phase-a">
+  <div class="phase-div-inner" style="border-left:3px solid var(--m1)">
+    <div class="phase-div-icon">🧱</div>
+    <div>
+      <div class="phase-div-title" style="color:var(--m1)">Phase A — Fundament</div>
+      <div class="phase-div-sub">Du lernst, wie Python denkt: Variablen sind nur Namen für Objekte, alles hat einen Typ, und Logik entsteht durch Kombination von Blöcken. Kein Setup-Chaos, kein Framework — nur die Sprache selbst.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONAT 01 -->
+<section class="month-section" id="m1">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m1);border-color:var(--m1);background:rgba(88,166,255,.07)">Monat 01</span>
+    <h2 class="month-title">Python Basics I</h2>
+    <span class="month-sub">Variablen · Typen · Strings · Control Flow</span>
+  </div>
+
+  <div class="week-grid">
+    <!-- W1 -->
+    <div class="week-card" style="border-left-color:var(--m1)">
+      <div class="week-top">
+        <span class="week-num" style="color:var(--m1)">W 01</span>
+        <div class="week-title">Setup &amp; erste Schritte</div>
+      </div>
+      <ul class="topic-list">
+        <li>Python installieren, pyenv, REPL vs. Skriptdatei</li>
+        <li>Erstes <code>hello_world.py</code> — <code>print()</code>, Kommentare</li>
+        <li>Variablen: <code>name = "Ada"</code>, dynamische Typisierung verstehen</li>
+        <li><code>type()</code>, <code>id()</code> — was ist eigentlich ein Objekt?</li>
+        <li><code>input()</code> — erste Interaktion mit dem User</li>
+      </ul>
+      <div class="code-block"><span class="cm"># Dein erstes Skript</span>
+<span class="fn">name</span> = <span class="fn">input</span>(<span class="str">"Wie heißt du? "</span>)
+<span class="fn">print</span>(<span class="str">f"Hallo, {name}!"</span>)
+<span class="fn">print</span>(<span class="str">f"type: {</span><span class="fn">type</span>(name)<span class="str">}"</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Begrüßungs-Script mit Input</li>
+        <li>Lieblingsfilm + Erscheinungsjahr ausgeben</li>
+        <li>REPL: 10 verschiedene Ausdrücke ausprobieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">REPL</span><span class="tag">print()</span><span class="tag">input()</span><span class="tag">type()</span><span class="tag">pyenv</span></div>
+    </div>
+
+    <!-- W2 -->
+    <div class="week-card" style="border-left-color:var(--m1)">
+      <div class="week-top">
+        <span class="week-num" style="color:var(--m1)">W 02</span>
+        <div class="week-title">Datentypen &amp; Operatoren</div>
+      </div>
+      <ul class="topic-list">
+        <li><code>int</code>, <code>float</code>, <code>bool</code>, <code>None</code> — Unterschiede und Fallen</li>
+        <li>Arithmetik: <code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>//</code> <code>%</code> <code>**</code></li>
+        <li>Vergleichsoperatoren: <code>==</code> <code>!=</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></li>
+        <li>Logische Operatoren: <code>and</code> <code>or</code> <code>not</code></li>
+        <li>Typkonvertierung: <code>int()</code>, <code>float()</code>, <code>str()</code></li>
+        <li>Augmented assignment: <code>x += 1</code>, <code>x //= 2</code></li>
+      </ul>
+      <div class="code-block"><span class="fn">preis</span> = <span class="num">9.99</span>
+<span class="fn">menge</span> = <span class="num">3</span>
+<span class="fn">gesamt</span> = <span class="fn">preis</span> * <span class="fn">menge</span>
+<span class="fn">print</span>(<span class="str">f"Gesamt: {gesamt:.2f} €"</span>)  <span class="cm"># 29.97 €</span>
+<span class="fn">print</span>(<span class="num">7</span> <span class="op">//</span> <span class="num">2</span>, <span class="num">7</span> <span class="op">%</span> <span class="num">2</span>)  <span class="cm"># 3  1</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Temperaturkonverter (°C → °F und zurück)</li>
+        <li>BMI-Rechner (Eingabe kg + cm)</li>
+        <li>Gerade/Ungerade mit <code>%</code></li>
+      </ul>
+      <div class="tag-row"><span class="tag">int</span><span class="tag">float</span><span class="tag">bool</span><span class="tag">Operatoren</span><span class="tag">Typkonvertierung</span></div>
+    </div>
+
+    <!-- W3 -->
+    <div class="week-card" style="border-left-color:var(--m1)">
+      <div class="week-top">
+        <span class="week-num" style="color:var(--m1)">W 03</span>
+        <div class="week-title">Strings in der Tiefe</div>
+      </div>
+      <ul class="topic-list">
+        <li>String-Methoden: <code>.upper()</code>, <code>.strip()</code>, <code>.split()</code>, <code>.join()</code>, <code>.replace()</code>, <code>.find()</code></li>
+        <li>f-Strings: Formatierung, Ausdrücke, Formatspec <code>{x:.2f}</code></li>
+        <li>Slicing: <code>s[1:5]</code>, <code>s[::-1]</code>, negative Indizes</li>
+        <li>Strings sind immutable — was bedeutet das?</li>
+        <li>Multi-line Strings, Raw-Strings (<code>r"..."</code>)</li>
+        <li><code>in</code>-Operator, <code>len()</code>, <code>count()</code>, <code>startswith()</code></li>
+      </ul>
+      <div class="code-block"><span class="fn">text</span> = <span class="str">"  Hallo, Welt!  "</span>
+<span class="fn">sauber</span> = <span class="fn">text</span>.strip().lower()
+<span class="fn">woerter</span> = <span class="fn">sauber</span>.split(<span class="str">", "</span>)
+<span class="fn">print</span>(<span class="fn">woerter</span>)       <span class="cm"># ['hallo', 'welt!']</span>
+<span class="fn">print</span>(<span class="fn">text</span>[<span class="op">-</span><span class="num">3</span>:<span class="op">-</span><span class="num">1</span>])   <span class="cm"># lt</span>
+<span class="fn">print</span>(<span class="fn">text</span>[::<span class="op">-</span><span class="num">1</span>])    <span class="cm"># rückwärts</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Palindrom-Prüfer</li>
+        <li>Wörter in einem Satz zählen</li>
+        <li>Zensur-Tool: bestimmte Wörter ersetzen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">str-Methoden</span><span class="tag">f-Strings</span><span class="tag">Slicing</span><span class="tag">immutable</span></div>
+    </div>
+
+    <!-- W4 -->
+    <div class="week-card" style="border-left-color:var(--m1)">
+      <div class="week-top">
+        <span class="week-num" style="color:var(--m1)">W 04</span>
+        <div class="week-title">Control Flow</div>
+      </div>
+      <ul class="topic-list">
+        <li><code>if</code> / <code>elif</code> / <code>else</code> — Bedingungen korrekt formulieren</li>
+        <li><code>while</code>-Schleife: <code>break</code>, <code>continue</code>, <code>else</code>-Klausel</li>
+        <li><code>for</code>-Schleife über Strings</li>
+        <li><code>range()</code>: start, stop, step</li>
+        <li>Verschachtelungen vermeiden (early return pattern)</li>
+        <li>Ternärer Ausdruck: <code>x if condition else y</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">101</span>):
+    <span class="kw">if</span> i <span class="op">%</span> <span class="num">15</span> <span class="op">==</span> <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">"FizzBuzz"</span>)
+    <span class="kw">elif</span> i <span class="op">%</span> <span class="num">3</span> <span class="op">==</span> <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">"Fizz"</span>)
+    <span class="kw">elif</span> i <span class="op">%</span> <span class="num">5</span> <span class="op">==</span> <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">"Buzz"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(i)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>FizzBuzz (Klassiker, und dann variieren)</li>
+        <li>Zahlenratespiel (while + break)</li>
+        <li>Primzahlprüfer bis N</li>
+      </ul>
+      <div class="tag-row"><span class="tag">if/elif/else</span><span class="tag">while</span><span class="tag">for</span><span class="tag">range()</span><span class="tag">break/continue</span></div>
+    </div>
+  </div>
+  <div class="skills-row">
+    <span class="skills-lbl">M01 Skills</span>
+    <span class="tag">Variablen</span><span class="tag">int/float/str/bool</span><span class="tag">Operatoren</span><span class="tag">f-Strings</span><span class="tag">Slicing</span><span class="tag">if/elif/else</span><span class="tag">for/while</span><span class="tag">range()</span><span class="tag">input()/print()</span>
+  </div>
+</section>
+
+<!-- MONAT 02 -->
+<section class="month-section" id="m2">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m2);border-color:var(--m2);background:rgba(121,192,255,.07)">Monat 02</span>
+    <h2 class="month-title">Python Basics II</h2>
+    <span class="month-sub">Lists · Dicts · Sets · Funktionen · Comprehensions</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m2)">
+      <div class="week-top"><span class="week-num" style="color:var(--m2)">W 05</span><div class="week-title">Lists &amp; Tuples</div></div>
+      <ul class="topic-list">
+        <li>List erstellen, indexieren, slicen, verschachteln</li>
+        <li>Methoden: <code>.append()</code>, <code>.extend()</code>, <code>.insert()</code>, <code>.pop()</code>, <code>.remove()</code>, <code>.sort()</code>, <code>.reverse()</code></li>
+        <li><code>for item in liste</code>, <code>enumerate()</code>, <code>zip()</code></li>
+        <li>Tuple: unveränderlich, Packing/Unpacking, als Return-Wert</li>
+        <li>Kopien: shallow vs. deep copy (<code>copy</code>-Modul)</li>
+      </ul>
+      <div class="code-block"><span class="fn">namen</span> = [<span class="str">"Ada"</span>, <span class="str">"Grace"</span>, <span class="str">"Alan"</span>]
+<span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">namen</span>):
+    <span class="fn">print</span>(<span class="str">f"{i}: {name}"</span>)
+
+<span class="fn">paare</span> = <span class="fn">list</span>(<span class="fn">zip</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], [<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>]))
+<span class="cm"># [(1,'a'), (2,'b'), (3,'c')]</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Einkaufsliste mit Add/Remove/Anzeigen</li>
+        <li>Notendurchschnitt aus Liste berechnen</li>
+        <li>Zwei Listen zu Dict zusammenführen via zip</li>
+      </ul>
+      <div class="tag-row"><span class="tag">list</span><span class="tag">tuple</span><span class="tag">enumerate</span><span class="tag">zip</span><span class="tag">shallow copy</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m2)">
+      <div class="week-top"><span class="week-num" style="color:var(--m2)">W 06</span><div class="week-title">Dicts &amp; Sets</div></div>
+      <ul class="topic-list">
+        <li>Dict erstellen, lesen, schreiben, <code>.get()</code>, <code>.setdefault()</code></li>
+        <li>Iteration: <code>.keys()</code>, <code>.values()</code>, <code>.items()</code></li>
+        <li>Verschachtelte Dicts (JSON-ähnliche Strukturen)</li>
+        <li>Set: <code>add()</code>, <code>discard()</code>, Mengenoperationen (<code>&amp;</code> <code>|</code> <code>-</code> <code>^</code>)</li>
+        <li><code>collections.defaultdict</code>, <code>Counter</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> collections <span class="kw">import</span> Counter
+
+<span class="fn">text</span> = <span class="str">"ein stein ist kein stein"</span>
+<span class="fn">haeufig</span> = Counter(<span class="fn">text</span>.split())
+<span class="fn">print</span>(<span class="fn">haeufig</span>.most_common(<span class="num">3</span>))
+<span class="cm"># [('stein', 2), ('ein', 2), ('ist', 1)]</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Wortfrequenz-Analyse eines Texts</li>
+        <li>Telefonbuch (Dict, CRUD-Operationen)</li>
+        <li>Duplikate aus einer Liste entfernen (Set-Trick)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">dict</span><span class="tag">set</span><span class="tag">Counter</span><span class="tag">defaultdict</span><span class="tag">.items()</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m2)">
+      <div class="week-top"><span class="week-num" style="color:var(--m2)">W 07</span><div class="week-title">Comprehensions</div></div>
+      <ul class="topic-list">
+        <li>List Comprehension: <code>[x*2 for x in nums if x &gt; 0]</code></li>
+        <li>Dict Comprehension: <code>{k: v for k, v in items}</code></li>
+        <li>Set Comprehension, Generator Expression</li>
+        <li>Wann Comprehension, wann normale Schleife?</li>
+        <li><code>any()</code>, <code>all()</code>, <code>sum()</code>, <code>min()</code>, <code>max()</code> auf Iterables</li>
+        <li>Verschachtelte Comprehensions (mit Vorsicht)</li>
+      </ul>
+      <div class="code-block"><span class="fn">zahlen</span> = <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>)
+<span class="fn">quadrate</span>  = [x<span class="op">**</span><span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">zahlen</span>]
+<span class="fn">gerade_sq</span> = [x<span class="op">**</span><span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">zahlen</span> <span class="kw">if</span> x<span class="op">%</span><span class="num">2</span><span class="op">==</span><span class="num">0</span>]
+<span class="fn">summe</span>     = <span class="fn">sum</span>(x<span class="op">**</span><span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">zahlen</span>)  <span class="cm"># Gen</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Alle Primzahlen bis 100 als List Comprehension</li>
+        <li>Dict: Wort → Länge für einen Satz</li>
+        <li>Umgekehrte Zuordnung: <code>{v: k for k, v in d.items()}</code></li>
+      </ul>
+      <div class="tag-row"><span class="tag">list comprehension</span><span class="tag">dict comprehension</span><span class="tag">generator expression</span><span class="tag">any/all</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m2)">
+      <div class="week-top"><span class="week-num" style="color:var(--m2)">W 08</span><div class="week-title">Funktionen</div></div>
+      <ul class="topic-list">
+        <li><code>def</code>, <code>return</code>, mehrere Rückgabewerte (tuple)</li>
+        <li>Positional, Keyword, Default-Parameter</li>
+        <li><code>*args</code>, <code>**kwargs</code> — Einsatz und Gefahren</li>
+        <li>Scope: LEGB-Regel (Local, Enclosing, Global, Built-in)</li>
+        <li>Docstrings (<code>"""..."""</code>), <code>help()</code></li>
+        <li>Funktionen als Objekte: in Listen speichern, übergeben</li>
+      </ul>
+      <div class="code-block"><span class="kw">def</span> <span class="fn">begruesse</span>(name: <span class="fn">str</span>, formal: <span class="fn">bool</span> = <span class="kw">False</span>) -> <span class="fn">str</span>:
+    <span class="str">"""Gibt eine Begrüßung zurück."""</span>
+    <span class="fn">titel</span> = <span class="str">"Sehr geehrte/r"</span> <span class="kw">if</span> formal <span class="kw">else</span> <span class="str">"Hey"</span>
+    <span class="kw">return</span> <span class="str">f"{titel}, {name}!"</span>
+
+<span class="fn">print</span>(<span class="fn">begruesse</span>(<span class="str">"Ada"</span>, formal=<span class="kw">True</span>))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Taschenrechner als Funktions-Sammlung</li>
+        <li><code>*args</code>: Summe beliebig vieler Zahlen</li>
+        <li>Higher-Order: apply(func, liste) implementieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">def/return</span><span class="tag">*args/**kwargs</span><span class="tag">LEGB-Scope</span><span class="tag">Docstrings</span><span class="tag">First-Class Functions</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 1 -->
+  <div class="milestone-card" style="border:1px solid var(--m2)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m2)">★ Milestone 1 — Ende Monat 02</div>
+      <div class="milestone-title">Word Counter CLI</div>
+      <div class="milestone-desc">Ein vollständiges Kommandozeilen-Tool. Der Nutzer gibt einen Text oder eine Datei an, das Tool gibt Wortanzahl, häufigste Wörter, Zeichenanzahl und Satzdurchschnitt aus. Alles in einer einzigen <code>.py</code>-Datei.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">input() oder Datei-Argument</span>
+        <span class="milestone-feat">Collections.Counter für Häufigkeit</span>
+        <span class="milestone-feat">Formatierte Ausgabe mit f-Strings</span>
+        <span class="milestone-feat">Funktionen klar getrennt</span>
+        <span class="milestone-feat">Fehlerbehandlung für fehlende Datei</span>
+      </div>
+      <div class="milestone-code">
+        <div class="code-block"><span class="kw">def</span> <span class="fn">analysiere</span>(text: <span class="fn">str</span>) -> <span class="fn">dict</span>:
+    <span class="fn">woerter</span> = text.lower().split()
+    <span class="kw">return</span> {
+        <span class="str">"gesamt"</span>:  <span class="fn">len</span>(<span class="fn">woerter</span>),
+        <span class="str">"einzigartig"</span>: <span class="fn">len</span>(<span class="fn">set</span>(<span class="fn">woerter</span>)),
+        <span class="str">"top5"</span>: Counter(<span class="fn">woerter</span>).most_common(<span class="num">5</span>),
+    }
+<span class="cm"># → direkte Brücke zu Lab 04 (Log Forensics)</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M02 Skills</span>
+    <span class="tag">list/dict/set/tuple</span><span class="tag">enumerate/zip</span><span class="tag">Counter</span><span class="tag">Comprehensions</span><span class="tag">Funktionen</span><span class="tag">*args/**kwargs</span><span class="tag">Scope</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PHASE B — KERN-PYTHON                                -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="phase-div" id="phase-b">
+  <div class="phase-div-inner" style="border-left:3px solid var(--m3)">
+    <div class="phase-div-icon">⚙️</div>
+    <div>
+      <div class="phase-div-title" style="color:var(--m3)">Phase B — Kern-Python</div>
+      <div class="phase-div-sub">File I/O, Module, Fehlerbehandlung und Objektorientierung. Du hörst auf, Skripte zu schreiben, und fängst an, Programme zu bauen. Der Unterschied: Struktur, Wiederverwendbarkeit und echte Fehlerbehandlung.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONAT 03 -->
+<section class="month-section" id="m3">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m3);border-color:var(--m3);background:rgba(63,185,80,.07)">Monat 03</span>
+    <h2 class="month-title">Dateiarbeit &amp; Stdlib</h2>
+    <span class="month-sub">File I/O · pathlib · json · csv · datetime · Module</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 09</span><div class="week-title">File I/O</div></div>
+      <ul class="topic-list">
+        <li><code>open()</code> mit Moden: <code>'r'</code>, <code>'w'</code>, <code>'a'</code>, <code>'rb'</code></li>
+        <li><code>with</code>-Statement: warum immer <code>with open(...) as f</code></li>
+        <li><code>f.read()</code>, <code>f.readline()</code>, <code>f.readlines()</code>, Iteration</li>
+        <li>Encoding: <code>utf-8</code>, <code>latin-1</code>, <code>errors='replace'</code></li>
+        <li>Binärdateien lesen (erste Bytes einer Datei)</li>
+      </ul>
+      <div class="code-block"><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"logfile.txt"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> zeile <span class="kw">in</span> f:          <span class="cm"># memory-efficient</span>
+        <span class="kw">if</span> <span class="str">"ERROR"</span> <span class="kw">in</span> zeile:
+            <span class="fn">print</span>(zeile.strip())</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Logdatei nach ERROR-Zeilen filtern + in neue Datei schreiben</li>
+        <li>Datei zeilenweise nummeriert ausgeben (wie <code>cat -n</code>)</li>
+        <li>Wortfrequenz aus Textdatei (Milestone 1 erweitert)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">open()</span><span class="tag">with-Statement</span><span class="tag">Encoding</span><span class="tag">readline</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 10</span><div class="week-title">pathlib &amp; os</div></div>
+      <ul class="topic-list">
+        <li><code>pathlib.Path</code>: plattformunabhängige Pfade</li>
+        <li><code>Path.cwd()</code>, <code>.home()</code>, <code>.parent</code>, <code>.stem</code>, <code>.suffix</code></li>
+        <li><code>.exists()</code>, <code>.is_file()</code>, <code>.is_dir()</code>, <code>.stat()</code></li>
+        <li><code>.mkdir(parents=True)</code>, <code>.rename()</code>, <code>.unlink()</code></li>
+        <li><code>.glob()</code>, <code>.rglob()</code> für Verzeichnissuche</li>
+        <li><code>os.environ</code>, <code>os.getenv()</code>, <code>sys.argv</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="fn">logs</span> = Path(<span class="str">"/var/log"</span>)
+<span class="kw">for</span> datei <span class="kw">in</span> <span class="fn">logs</span>.rglob(<span class="str">"*.log"</span>):
+    <span class="fn">size</span> = datei.stat().st_size
+    <span class="fn">print</span>(<span class="str">f"{datei.name}: {size:,} bytes"</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Alle .py-Dateien in einem Verzeichnis listen</li>
+        <li>Ordnerstruktur anlegen (mkdir parents)</li>
+        <li>Alle Dateien nach Extension gruppieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">pathlib.Path</span><span class="tag">.glob()/.rglob()</span><span class="tag">os.environ</span><span class="tag">sys.argv</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 11</span><div class="week-title">json, csv &amp; datetime</div></div>
+      <ul class="topic-list">
+        <li><code>json.load()</code>, <code>json.dump()</code>, <code>json.loads()</code>, <code>json.dumps()</code></li>
+        <li>JSON pretty-print: <code>indent=2, ensure_ascii=False</code></li>
+        <li><code>csv.reader()</code>, <code>csv.DictReader()</code>, <code>csv.writer()</code></li>
+        <li><code>datetime.datetime.now()</code>, <code>.strftime()</code>, <code>.strptime()</code></li>
+        <li>Zeitdifferenzen: <code>timedelta</code></li>
+        <li><code>pathlib.Path.read_text()</code>, <code>.write_text()</code> als Kurzweg</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="fn">eintrag</span> = {<span class="str">"ts"</span>: datetime.now().isoformat(), <span class="str">"msg"</span>: <span class="str">"OK"</span>}
+Path(<span class="str">"log.json"</span>).write_text(
+    json.dumps(<span class="fn">eintrag</span>, indent=<span class="num">2</span>), encoding=<span class="str">"utf-8"</span>
+)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Config-Datei als JSON laden und zurückschreiben</li>
+        <li>CSV-Tabelle in eine Liste von Dicts umwandeln</li>
+        <li>Wie viele Tage bis Silvester? (timedelta)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">json</span><span class="tag">csv</span><span class="tag">datetime</span><span class="tag">timedelta</span><span class="tag">ISO 8601</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 12</span><div class="week-title">Module &amp; Packages</div></div>
+      <ul class="topic-list">
+        <li>Eigenes Modul erstellen: einfach eine <code>.py</code>-Datei</li>
+        <li><code>import</code>, <code>from X import Y</code>, <code>as</code>-Alias</li>
+        <li><code>if __name__ == "__main__":</code> — warum und wie</li>
+        <li>Package: Ordner mit <code>__init__.py</code></li>
+        <li><code>re</code>-Modul Einstieg: <code>re.search()</code>, <code>re.findall()</code>, Gruppen</li>
+        <li><code>sys.path</code> — wie Python Module findet</li>
+      </ul>
+      <div class="code-block"><span class="cm"># mein_tool/utils.py</span>
+<span class="kw">def</span> <span class="fn">lade_json</span>(pfad: <span class="fn">str</span>) -> <span class="fn">dict</span>:
+    <span class="kw">with</span> <span class="fn">open</span>(pfad) <span class="kw">as</span> f:
+        <span class="kw">return</span> json.load(f)
+
+<span class="cm"># mein_tool/main.py</span>
+<span class="kw">from</span> mein_tool.utils <span class="kw">import</span> <span class="fn">lade_json</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="fn">print</span>(<span class="fn">lade_json</span>(<span class="str">"config.json"</span>))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Bisherige Funktionen in ein eigenes Modul auslagern</li>
+        <li>Regex: IPs aus einem Text extrahieren</li>
+        <li>Package mit <code>__init__.py</code> anlegen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">import</span><span class="tag">__name__</span><span class="tag">packages</span><span class="tag">re.findall</span><span class="tag">sys.path</span></div>
+    </div>
+  </div>
+
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W09 (File I/O) + W10 (pathlib.rglob) + W11 (json/datetime) + W12 (re-Modul) sind exakt die Bausteine für <strong>Lab 01 (Hash Inspector)</strong>, <strong>Lab 03 (Entropy Scanner)</strong> und <strong>Lab 04 (Log Forensics)</strong>.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M03 Skills</span>
+    <span class="tag">File I/O</span><span class="tag">with-Statement</span><span class="tag">pathlib</span><span class="tag">json/csv</span><span class="tag">datetime</span><span class="tag">eigene Module</span><span class="tag">re-Einstieg</span>
+  </div>
+</section>
+
+<!-- MONAT 04 -->
+<section class="month-section" id="m4">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m4);border-color:var(--m4);background:rgba(86,211,100,.07)">Monat 04</span>
+    <h2 class="month-title">Fehlerbehandlung &amp; OOP I</h2>
+    <span class="month-sub">Exceptions · Klassen · Vererbung · Dunder-Methoden</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m4)">
+      <div class="week-top"><span class="week-num" style="color:var(--m4)">W 13</span><div class="week-title">Exceptions &amp; Fehlerbehandlung</div></div>
+      <ul class="topic-list">
+        <li><code>try</code> / <code>except</code> / <code>else</code> / <code>finally</code></li>
+        <li>Exception-Hierarchie: <code>BaseException</code> → <code>Exception</code> → spezifisch</li>
+        <li>Mehrere Exceptions abfangen, <code>as e</code> für Details</li>
+        <li>Eigene Exception-Klassen ableiten</li>
+        <li><code>raise</code>, <code>raise X from Y</code> (Exception Chaining)</li>
+        <li>Wann exception abfangen, wann durchlassen?</li>
+      </ul>
+      <div class="code-block"><span class="kw">class</span> <span class="fn">KonfigFehler</span>(ValueError):
+    <span class="str">"""Konfigurationsdatei ist ungültig."""</span>
+    <span class="kw">pass</span>
+
+<span class="kw">def</span> <span class="fn">lade_config</span>(pfad):
+    <span class="kw">try</span>:
+        <span class="kw">return</span> json.loads(Path(pfad).read_text())
+    <span class="kw">except</span> json.JSONDecodeError <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">KonfigFehler</span>(<span class="str">f"Ungültig: {e}"</span>) <span class="kw">from</span> e</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Robuster Datei-Loader (FileNotFoundError, PermissionError)</li>
+        <li>Eigene <code>ValidationError</code>-Klasse mit Feldname</li>
+        <li>finally: Resource-Cleanup demonstrieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">try/except</span><span class="tag">eigene Exceptions</span><span class="tag">raise from</span><span class="tag">Exception-Hierarchie</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m4)">
+      <div class="week-top"><span class="week-num" style="color:var(--m4)">W 14</span><div class="week-title">OOP: Klassen &amp; Methoden</div></div>
+      <ul class="topic-list">
+        <li><code>class</code>, <code>__init__</code>, <code>self</code></li>
+        <li>Instanzattribute vs. Klassenattribute</li>
+        <li>Instanzmethoden, <code>@classmethod</code>, <code>@staticmethod</code></li>
+        <li>Objektidentität: <code>is</code> vs. <code>==</code></li>
+        <li>Objekte sind Namespaces — wie Python sie intern verwaltet</li>
+      </ul>
+      <div class="code-block"><span class="kw">class</span> <span class="fn">Konto</span>:
+    <span class="fn">zinssatz</span> = <span class="num">0.025</span>  <span class="cm"># Klassenattribut</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, inhaber: <span class="fn">str</span>, stand: <span class="fn">float</span> = <span class="num">0</span>):
+        self.<span class="fn">inhaber</span> = inhaber
+        self.<span class="fn">_stand</span> = stand  <span class="cm"># Konvention: privat</span>
+
+    <span class="kw">def</span> <span class="fn">einzahlen</span>(self, betrag: <span class="fn">float</span>) -> <span class="kw">None</span>:
+        self.<span class="fn">_stand</span> += betrag</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Bankkonto (Einzahlen, Abheben, Kontostand)</li>
+        <li>Temperatur-Klasse (Celsius intern, °F via classmethod)</li>
+        <li>Playlist-Klasse mit Liste von Songs</li>
+      </ul>
+      <div class="tag-row"><span class="tag">class/__init__</span><span class="tag">self</span><span class="tag">@classmethod</span><span class="tag">@staticmethod</span><span class="tag">Klassenattribute</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m4)">
+      <div class="week-top"><span class="week-num" style="color:var(--m4)">W 15</span><div class="week-title">Vererbung &amp; Polymorphismus</div></div>
+      <ul class="topic-list">
+        <li>Vererbung: <code>class B(A):</code>, <code>super()</code></li>
+        <li>Method Overriding — wie und wann</li>
+        <li>Multiple Inheritance &amp; MRO (<code>Class.__mro__</code>)</li>
+        <li><code>isinstance()</code>, <code>issubclass()</code></li>
+        <li>Polymorphismus: gleiche Schnittstelle, unterschiedliches Verhalten</li>
+        <li>Komposition vs. Vererbung — die wichtige Designfrage</li>
+      </ul>
+      <div class="code-block"><span class="kw">class</span> <span class="fn">Tier</span>:
+    <span class="kw">def</span> <span class="fn">laut</span>(self) -> <span class="fn">str</span>: ...
+
+<span class="kw">class</span> <span class="fn">Hund</span>(<span class="fn">Tier</span>):
+    <span class="kw">def</span> <span class="fn">laut</span>(self) -> <span class="fn">str</span>: <span class="kw">return</span> <span class="str">"Wuff"</span>
+
+<span class="kw">class</span> <span class="fn">Katze</span>(<span class="fn">Tier</span>):
+    <span class="kw">def</span> <span class="fn">laut</span>(self) -> <span class="fn">str</span>: <span class="kw">return</span> <span class="str">"Miau"</span>
+
+<span class="kw">for</span> t <span class="kw">in</span> [<span class="fn">Hund</span>(), <span class="fn">Katze</span>()]:
+    <span class="fn">print</span>(t.<span class="fn">laut</span>())  <span class="cm"># Polymorphismus</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Geometrie: Shape → Circle, Rectangle, Triangle</li>
+        <li>Fahrzeug-Hierarchie (Motor, Elektro, Hybrid)</li>
+        <li>super() mit __init__ und eigenen Attributen kombinieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Vererbung</span><span class="tag">super()</span><span class="tag">MRO</span><span class="tag">Polymorphismus</span><span class="tag">isinstance</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m4)">
+      <div class="week-top"><span class="week-num" style="color:var(--m4)">W 16</span><div class="week-title">Dunder-Methoden</div></div>
+      <ul class="topic-list">
+        <li><code>__str__</code> vs. <code>__repr__</code> — und wann was</li>
+        <li><code>__len__</code>, <code>__contains__</code>, <code>__getitem__</code></li>
+        <li>Vergleichsoperatoren: <code>__eq__</code>, <code>__lt__</code>, <code>__le__</code></li>
+        <li>Arithmetik: <code>__add__</code>, <code>__mul__</code>, <code>__iadd__</code></li>
+        <li><code>__bool__</code>, <code>__hash__</code></li>
+        <li>Callable: <code>__call__</code> — Objekte als Funktionen</li>
+      </ul>
+      <div class="code-block"><span class="kw">class</span> <span class="fn">Vektor</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, x, y): self.x, self.y = x, y
+    <span class="kw">def</span> <span class="fn">__repr__</span>(self): <span class="kw">return</span> <span class="str">f"Vektor({self.x}, {self.y})"</span>
+    <span class="kw">def</span> <span class="fn">__add__</span>(self, other): <span class="kw">return</span> <span class="fn">Vektor</span>(self.x+other.x, self.y+other.y)
+    <span class="kw">def</span> <span class="fn">__len__</span>(self): <span class="kw">return</span> <span class="fn">int</span>((self.x<span class="op">**</span><span class="num">2</span>+self.y<span class="op">**</span><span class="num">2</span>)<span class="op">**</span><span class="num">0.5</span>)
+
+<span class="fn">print</span>(<span class="fn">Vektor</span>(<span class="num">3</span>,<span class="num">4</span>) + <span class="fn">Vektor</span>(<span class="num">1</span>,<span class="num">1</span>))  <span class="cm"># Vektor(4, 5)</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Vektor-Klasse (vollständig mit allen Operatoren)</li>
+        <li>Stack-Klasse mit <code>__len__</code> und <code>__bool__</code></li>
+        <li>Callable-Config-Objekt mit __call__</li>
+      </ul>
+      <div class="tag-row"><span class="tag">__str__/__repr__</span><span class="tag">__eq__/__lt__</span><span class="tag">__add__</span><span class="tag">__call__</span><span class="tag">Dunder</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 2 -->
+  <div class="milestone-card" style="border:1px solid var(--m4)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m4)">★ Milestone 2 — Ende Monat 04</div>
+      <div class="milestone-title">Kontaktbuch CLI</div>
+      <div class="milestone-desc">Ein vollständiges CRUD-CLI-Tool für Kontaktverwaltung. Kontakte werden als Objekte modelliert, in JSON persistiert, über <code>sys.argv</code> oder Menü verwaltet — mit robuster Fehlerbehandlung.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">Kontakt-Klasse mit Validierung</span>
+        <span class="milestone-feat">JSON-Persistenz via pathlib</span>
+        <span class="milestone-feat">CRUD (add/list/search/delete)</span>
+        <span class="milestone-feat">Eigene Exceptions für ungültige Daten</span>
+        <span class="milestone-feat">__repr__ für Debug-Ausgabe</span>
+        <span class="milestone-feat">Eigenes Package (kontaktbuch/)</span>
+      </div>
+    </div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M04 Skills</span>
+    <span class="tag">try/except/finally</span><span class="tag">eigene Exceptions</span><span class="tag">Klassen</span><span class="tag">Vererbung</span><span class="tag">super()</span><span class="tag">Dunder-Methoden</span><span class="tag">Polymorphismus</span>
+  </div>
+</section>
+
+<!-- MONAT 05 -->
+<section class="month-section" id="m5">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m5);border-color:var(--m5);background:rgba(210,168,255,.07)">Monat 05</span>
+    <h2 class="month-title">OOP II &amp; Fortgeschrittenes</h2>
+    <span class="month-sub">Properties · Decorators · Generators · Context Manager · Funktional</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m5)">
+      <div class="week-top"><span class="week-num" style="color:var(--m5)">W 17</span><div class="week-title">Properties &amp; Decorators</div></div>
+      <ul class="topic-list">
+        <li><code>@property</code>, <code>@X.setter</code>, <code>@X.deleter</code></li>
+        <li>Dekoratoren verstehen: Funktionen, die Funktionen zurückgeben</li>
+        <li>Eigenen Dekorator schreiben: <code>functools.wraps</code></li>
+        <li>Dekoratoren mit Argumenten (Dekorator-Factory)</li>
+        <li>Klassen-Dekoratoren (kurze Einführung)</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> functools, time
+
+<span class="kw">def</span> <span class="fn">messe_zeit</span>(func):
+    @functools.wraps(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        t0 = time.perf_counter()
+        <span class="fn">ergebnis</span> = <span class="fn">func</span>(*args, **kwargs)
+        <span class="fn">print</span>(<span class="str">f"{func.__name__}: {time.perf_counter()-t0:.4f}s"</span>)
+        <span class="kw">return</span> <span class="fn">ergebnis</span>
+    <span class="kw">return</span> <span class="fn">wrapper</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li><code>@property</code> für Konto-Klasse (read-only Kontostand)</li>
+        <li>Logging-Dekorator mit functools.wraps</li>
+        <li>Retry-Dekorator mit max_versuche-Parameter</li>
+      </ul>
+      <div class="tag-row"><span class="tag">@property</span><span class="tag">Decorators</span><span class="tag">functools.wraps</span><span class="tag">Dekorator-Factory</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m5)">
+      <div class="week-top"><span class="week-num" style="color:var(--m5)">W 18</span><div class="week-title">Generatoren &amp; Iteratoren</div></div>
+      <ul class="topic-list">
+        <li><code>yield</code>: Generatorfunktionen Schritt für Schritt</li>
+        <li><code>yield from</code> für Sub-Generatoren</li>
+        <li>Iterator-Protokoll: <code>__iter__</code>, <code>__next__</code></li>
+        <li><code>itertools</code>: <code>chain</code>, <code>islice</code>, <code>takewhile</code>, <code>groupby</code></li>
+        <li>Lazy Evaluation — warum Generatoren RAM sparen</li>
+        <li>Infinite Generator: <code>counter(start)</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">def</span> <span class="fn">lese_chunks</span>(pfad, groesse=<span class="num">4096</span>):
+    <span class="str">"""Liest Datei in Chunks – Memory-efficient."""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(pfad, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">while</span> chunk := f.read(<span class="fn">groesse</span>):
+            <span class="kw">yield</span> chunk
+
+<span class="cm"># Genau so liest Lab 01 (Hash Inspector) Dateien!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Fibonacci-Generator (unendlich)</li>
+        <li>Datei-Chunk-Reader (Basis für hashlib)</li>
+        <li>Pipeline: generator → filter → map → sum</li>
+      </ul>
+      <div class="tag-row"><span class="tag">yield</span><span class="tag">__iter__/__next__</span><span class="tag">itertools</span><span class="tag">Lazy Evaluation</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m5)">
+      <div class="week-top"><span class="week-num" style="color:var(--m5)">W 19</span><div class="week-title">Context Manager</div></div>
+      <ul class="topic-list">
+        <li><code>__enter__</code> / <code>__exit__</code> — wie <code>with</code> intern funktioniert</li>
+        <li><code>contextlib.contextmanager</code>: Context Manager mit <code>yield</code></li>
+        <li><code>contextlib.suppress</code>, <code>contextlib.redirect_stdout</code></li>
+        <li>Eigene Resource-Manager (Timer, Temp-Verzeichnis, DB-Transaktion)</li>
+        <li>Mehrere Context Manager: <code>with A() as a, B() as b:</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+<span class="kw">import</span> time
+
+@contextmanager
+<span class="kw">def</span> <span class="fn">timer</span>(label: <span class="fn">str</span>):
+    t0 = time.perf_counter()
+    <span class="kw">yield</span>
+    <span class="fn">print</span>(<span class="str">f"{label}: {time.perf_counter()-t0:.3f}s"</span>)
+
+<span class="kw">with</span> <span class="fn">timer</span>(<span class="str">"Hash-Berechnung"</span>):
+    <span class="cm"># ... teurer Code</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Timer-Context-Manager mit contextmanager</li>
+        <li>TempDir-Manager (anlegen + aufräumen)</li>
+        <li>DB-Transaktion simulieren (commit/rollback)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">with/__enter__/__exit__</span><span class="tag">contextmanager</span><span class="tag">contextlib</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m5)">
+      <div class="week-top"><span class="week-num" style="color:var(--m5)">W 20</span><div class="week-title">Funktional &amp; functools</div></div>
+      <ul class="topic-list">
+        <li><code>map()</code>, <code>filter()</code>, <code>zip()</code> — und wann Comprehensions besser sind</li>
+        <li><code>lambda</code>: sparsam einsetzen, Lesbarkeit</li>
+        <li><code>functools.partial</code>: vorausgefüllte Funktionen</li>
+        <li><code>functools.reduce</code></li>
+        <li><code>functools.lru_cache</code> / <code>cache</code>: Memoization</li>
+        <li>Pure Functions &amp; Seiteneffekte: Konzept</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> functools <span class="kw">import</span> lru_cache
+
+@lru_cache(maxsize=<span class="kw">None</span>)
+<span class="kw">def</span> <span class="fn">fibonacci</span>(n: <span class="fn">int</span>) -> <span class="fn">int</span>:
+    <span class="kw">if</span> n &lt; <span class="num">2</span>: <span class="kw">return</span> n
+    <span class="kw">return</span> <span class="fn">fibonacci</span>(n-<span class="num">1</span>) + <span class="fn">fibonacci</span>(n-<span class="num">2</span>)
+
+<span class="fn">print</span>(<span class="fn">fibonacci</span>(<span class="num">100</span>))  <span class="cm"># Sofortig dank Cache</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Fibonacci mit lru_cache (Geschwindigkeitsvergleich!)</li>
+        <li>partial: print_fehler = partial(print, file=sys.stderr)</li>
+        <li>reduce: Produkt aller Listenelemente</li>
+      </ul>
+      <div class="tag-row"><span class="tag">map/filter</span><span class="tag">lambda</span><span class="tag">partial</span><span class="tag">lru_cache</span><span class="tag">Pure Functions</span></div>
+    </div>
+  </div>
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> Generatoren (W18 chunk-reader) sind exakt wie Lab 01 große Dateien liest. Decorators (W17) werden Logging und Timing in <code>uctl</code>. Context Manager (W19) werden Datenbankverbindungen in Lab 07 (Finance Tracker).</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M05 Skills</span>
+    <span class="tag">@property/@setter</span><span class="tag">Eigene Dekoratoren</span><span class="tag">yield/Generator</span><span class="tag">__iter__/__next__</span><span class="tag">Context Manager</span><span class="tag">lru_cache</span><span class="tag">functools</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PHASE C — TOOLS & DATEN                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="phase-div" id="phase-c">
+  <div class="phase-div-inner" style="border-left:3px solid var(--m6)">
+    <div class="phase-div-icon">🛠️</div>
+    <div>
+      <div class="phase-div-title" style="color:var(--m6)">Phase C — Tools &amp; Daten</div>
+      <div class="phase-div-sub">Jetzt baust du echte, benutzbare Tools. Type Hints machen Code selbstdokumentierend. Typer und Rich machen CLIs professionell. SQLite macht Daten dauerhaft. Das ist der Übergang vom Skript zum Programm.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONAT 06 -->
+<section class="month-section" id="m6">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m6);border-color:var(--m6);background:rgba(188,140,255,.07)">Monat 06</span>
+    <h2 class="month-title">Type Hints &amp; CLI-Tools</h2>
+    <span class="month-sub">Type Hints · Dataclasses · argparse · Typer · Rich</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 21</span><div class="week-title">Type Hints &amp; Annotations</div></div>
+      <ul class="topic-list">
+        <li><code>def f(x: int) -> str</code> — Syntax und Zweck</li>
+        <li><code>Optional[X]</code>, <code>Union[X, Y]</code>, <code>X | Y</code> (3.10+)</li>
+        <li><code>list[str]</code>, <code>dict[str, int]</code>, <code>tuple[int, ...]</code></li>
+        <li><code>Any</code>, <code>Callable</code>, <code>TypeVar</code> Einführung</li>
+        <li>Mypy: statische Typprüfung lokal ausführen</li>
+        <li>Type Hints sind kein Laufzeit-Check — <code>isinstance()</code> bleibt nötig</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+<span class="kw">def</span> <span class="fn">finde_eintrag</span>(
+    eintraege: <span class="fn">list</span>[<span class="fn">dict</span>[<span class="fn">str</span>, <span class="fn">str</span>]],
+    schluessel: <span class="fn">str</span>,
+) -> Optional[<span class="fn">dict</span>[<span class="fn">str</span>, <span class="fn">str</span>]]:
+    <span class="kw">return</span> next((e <span class="kw">for</span> e <span class="kw">in</span> eintraege <span class="kw">if</span> e[<span class="str">"name"</span>]==schluessel), <span class="kw">None</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch (Milestone 2) vollständig mit Type Hints versehen</li>
+        <li>mypy über alle eigenen Module laufen lassen</li>
+        <li>TypeVar: generische Funktion first(lst)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Type Hints</span><span class="tag">Optional/Union</span><span class="tag">mypy</span><span class="tag">TypeVar</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 22</span><div class="week-title">Dataclasses &amp; NamedTuple</div></div>
+      <ul class="topic-list">
+        <li><code>@dataclass</code>: automatisch <code>__init__</code>, <code>__repr__</code>, <code>__eq__</code></li>
+        <li><code>field(default_factory=...)</code>, <code>frozen=True</code></li>
+        <li><code>__post_init__</code> für Validierung</li>
+        <li><code>NamedTuple</code> vs. <code>dataclass</code> — Unterschiede</li>
+        <li><code>Protocol</code>: duck typing mit Typprüfung</li>
+        <li>JSON-Serialisierung von Dataclasses (<code>asdict()</code>)</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field, asdict
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+@dataclass
+<span class="kw">class</span> <span class="fn">Kontakt</span>:
+    name: <span class="fn">str</span>
+    email: <span class="fn">str</span>
+    tags: <span class="fn">list</span>[<span class="fn">str</span>] = field(default_factory=<span class="fn">list</span>)
+    erstellt: <span class="fn">str</span>  = field(default_factory=<span class="kw">lambda</span>: datetime.now().isoformat())</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontakt (Milestone 2) auf Dataclass umstellen</li>
+        <li>Finding-Dataclass für Security-Lab-Vorbereitung</li>
+        <li>Frozen dataclass als Dict-Key nutzen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">@dataclass</span><span class="tag">field()</span><span class="tag">__post_init__</span><span class="tag">asdict()</span><span class="tag">Protocol</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 23</span><div class="week-title">argparse in der Tiefe</div></div>
+      <ul class="topic-list">
+        <li><code>ArgumentParser</code>, <code>add_argument</code>, <code>parse_args()</code></li>
+        <li>Positional vs. Optional Arguments</li>
+        <li>Typen (<code>type=int</code>), <code>nargs</code>, <code>action='store_true'</code></li>
+        <li>Subcommands: <code>add_subparsers()</code></li>
+        <li><code>mutually_exclusive_group</code></li>
+        <li>Exit-Codes: <code>sys.exit(0)</code> vs. <code>sys.exit(1)</code> — Konventionen</li>
+      </ul>
+      <div class="code-block"><span class="fn">parser</span> = argparse.ArgumentParser(description=<span class="str">"Mein Tool"</span>)
+<span class="fn">sub</span>    = <span class="fn">parser</span>.add_subparsers(dest=<span class="str">"cmd"</span>)
+
+<span class="fn">add_p</span>  = <span class="fn">sub</span>.add_parser(<span class="str">"add"</span>)
+<span class="fn">add_p</span>.add_argument(<span class="str">"name"</span>)
+<span class="fn">add_p</span>.add_argument(<span class="str">"--email"</span>, required=<span class="kw">True</span>)
+
+<span class="fn">args</span> = <span class="fn">parser</span>.parse_args()  <span class="cm"># mein_tool add Ada --email ...</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch auf argparse + Subcommands umbauen</li>
+        <li>Tool mit --verbose / --quiet Flag</li>
+        <li>Mehrere Dateien als nargs='+'</li>
+      </ul>
+      <div class="tag-row"><span class="tag">argparse</span><span class="tag">Subparsers</span><span class="tag">Exit-Codes</span><span class="tag">nargs</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 24</span><div class="week-title">Typer &amp; Rich</div></div>
+      <ul class="topic-list">
+        <li>Typer: Subcommands via Funktionen mit Type-Hints</li>
+        <li><code>typer.Option()</code>, <code>typer.Argument()</code>, <code>typer.confirm()</code></li>
+        <li>Rich: <code>Console</code>, <code>Table</code>, <code>Panel</code>, <code>Syntax</code></li>
+        <li>Rich Progress-Bars (ersetzt den self-built aus Lab 01)</li>
+        <li>Rich Themes &amp; custom Styles</li>
+        <li>Kombination: Typer-App mit Rich-Output</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> typer
+<span class="kw">from</span> rich.console <span class="kw">import</span> Console
+
+<span class="fn">app</span>     = typer.Typer()
+<span class="fn">console</span> = Console()
+
+@<span class="fn">app</span>.command()
+<span class="kw">def</span> <span class="fn">hash</span>(datei: str, algo: <span class="fn">str</span> = <span class="str">"sha256"</span>):
+    <span class="str">"""Berechnet Hash einer Datei."""</span>
+    <span class="fn">console</span>.print(f<span class="str">"[green]✓[/] {algo}: ..."</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch mit Typer + Rich Table umbauen</li>
+        <li>Rich Progress für Datei-Scan</li>
+        <li>Eigene Rich-Theme für das Tool</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Typer</span><span class="tag">Rich</span><span class="tag">Console/Table</span><span class="tag">Progress</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 3 -->
+  <div class="milestone-card" style="border:1px solid var(--m6)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m6)">★ Milestone 3 — Ende Monat 06</div>
+      <div class="milestone-title">File Organizer CLI</div>
+      <div class="milestone-desc">Ein vollständiges Typer-Tool: <code>orgfile scan ~/Downloads</code> analysiert, <code>orgfile move --dry-run</code> sortiert Dateien nach Typ in Unterordner, <code>orgfile report</code> erzeugt eine Rich-Tabelle. Vollständig mit Dataclasses und Type Hints.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">Typer-App mit Subcommands</span>
+        <span class="milestone-feat">Rich Table + Progress</span>
+        <span class="milestone-feat">Dataclasses für Datei-Einträge</span>
+        <span class="milestone-feat">Dry-run Modus</span>
+        <span class="milestone-feat">Type Hints überall</span>
+        <span class="milestone-feat">mypy-sauber</span>
+      </div>
+    </div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M06 Skills</span>
+    <span class="tag">Type Hints</span><span class="tag">@dataclass</span><span class="tag">argparse/Typer</span><span class="tag">Rich</span><span class="tag">Exit-Codes</span><span class="tag">Protocol</span>
+  </div>
+</section>
+
+<!-- MONAT 07 -->
+<section class="month-section" id="m7">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m7);border-color:var(--m7);background:rgba(255,166,87,.07)">Monat 07</span>
+    <h2 class="month-title">Datenbanken &amp; Persistenz</h2>
+    <span class="month-sub">sqlite3 · SQL · TOML/YAML · SQLAlchemy-Einstieg</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 25</span><div class="week-title">sqlite3 Grundlagen</div></div>
+      <ul class="topic-list">
+        <li><code>sqlite3.connect()</code>, <code>cursor()</code>, <code>execute()</code>, <code>commit()</code></li>
+        <li>CREATE TABLE, INSERT, SELECT, UPDATE, DELETE</li>
+        <li>Parameterized queries (<code>?</code>) — SQL Injection verhindern</li>
+        <li><code>fetchone()</code>, <code>fetchall()</code>, <code>fetchmany()</code></li>
+        <li><code>row_factory = sqlite3.Row</code> für dict-ähnlichen Zugriff</li>
+        <li>In-Memory-DB: <code>":memory:"</code> für Tests</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> sqlite3
+<span class="kw">from</span> contextlib <span class="kw">import</span> closing
+
+<span class="kw">with</span> sqlite3.connect(<span class="str">"kontakte.db"</span>) <span class="kw">as</span> conn:
+    conn.row_factory = sqlite3.Row
+    <span class="kw">with</span> closing(conn.cursor()) <span class="kw">as</span> cur:
+        cur.execute(<span class="str">"SELECT * FROM kontakte WHERE name LIKE ?"</span>, (<span class="str">"%Ada%"</span>,))
+        <span class="kw">for</span> row <span class="kw">in</span> cur.fetchall():
+            <span class="fn">print</span>(<span class="fn">dict</span>(row))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch auf SQLite umstellen (Milestone 2 v2)</li>
+        <li>Aufgabenliste mit done/pending Status</li>
+        <li>Parameterized queries: SQL Injection demonstrieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">sqlite3</span><span class="tag">cursor</span><span class="tag">parameterized queries</span><span class="tag">row_factory</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 26</span><div class="week-title">SQL vertiefen</div></div>
+      <ul class="topic-list">
+        <li>JOINs: INNER, LEFT, RIGHT — mit Beispielen</li>
+        <li>Aggregatfunktionen: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>GROUP BY</code></li>
+        <li>Indizes: <code>CREATE INDEX</code>, wann hilft ein Index?</li>
+        <li>Transaktionen: <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code></li>
+        <li>Migrations-Konzept: Schema versionieren</li>
+        <li><code>PRAGMA</code>: <code>foreign_keys=ON</code>, <code>journal_mode=WAL</code></li>
+      </ul>
+      <div class="code-block"><span class="cm">-- Ausgaben pro Kategorie</span>
+SELECT kategorie,
+       COUNT(*) AS anzahl,
+       SUM(betrag) AS gesamt,
+       AVG(betrag) AS schnitt
+FROM ausgaben
+GROUP BY kategorie
+ORDER BY gesamt DESC;</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Ausgaben-DB: Kategorien + Beträge, GROUP BY Bericht</li>
+        <li>JOIN: Kontakte ↔ Tags (Many-to-Many)</li>
+        <li>Index hinzufügen und Explain Query Plan lesen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">SQL JOINs</span><span class="tag">GROUP BY</span><span class="tag">Indizes</span><span class="tag">Transaktionen</span><span class="tag">PRAGMA</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 27</span><div class="week-title">Konfigurationsdateien</div></div>
+      <ul class="topic-list">
+        <li>TOML: <code>tomllib</code> (3.11+) oder <code>tomli</code>, lesen und verstehen</li>
+        <li>YAML: <code>PyYAML</code>, Sicherheit (<code>yaml.safe_load</code>!)</li>
+        <li>INI: <code>configparser</code>, Sektionen, Fallbacks</li>
+        <li>Konfigurationshierarchie: Defaults → Config-Datei → Env-Vars → CLI-Args</li>
+        <li><code>os.environ</code> + <code>python-dotenv</code></li>
+        <li><code>XDG_CONFIG_HOME</code> und plattformübergreifende Config-Pfade</li>
+      </ul>
+      <div class="code-block"><span class="cm"># config.toml</span>
+[tool]
+threshold = 7.5
+output    = <span class="str">"json"</span>
+[tool.exclude]
+dirs = [<span class="str">".git"</span>, <span class="str">"node_modules"</span>]
+
+<span class="cm"># Python</span>
+<span class="kw">import</span> tomllib
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"config.toml"</span>, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+    cfg = tomllib.load(f)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>uctl-Config aus TOML laden mit Fallbacks</li>
+        <li>Env-Var überschreibt TOML-Wert (12-Factor App Prinzip)</li>
+        <li>configparser mit Sektionen für verschiedene Umgebungen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">TOML</span><span class="tag">YAML safe_load</span><span class="tag">configparser</span><span class="tag">dotenv</span><span class="tag">XDG</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 28</span><div class="week-title">SQLAlchemy Core</div></div>
+      <ul class="topic-list">
+        <li>Core vs. ORM — Unterschied und wann was</li>
+        <li>Engine, Connection, MetaData, Table</li>
+        <li>Queries mit <code>select()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code></li>
+        <li>ORM: <code>DeclarativeBase</code>, <code>Mapped</code>, <code>mapped_column</code></li>
+        <li><code>Session</code>: <code>add()</code>, <code>commit()</code>, <code>query()</code>, <code>filter()</code></li>
+        <li>Alembic (Konzept): automatische Schema-Migrationen</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> sqlalchemy.orm <span class="kw">import</span> DeclarativeBase, Mapped, mapped_column
+
+<span class="kw">class</span> <span class="fn">Base</span>(DeclarativeBase): <span class="kw">pass</span>
+
+<span class="kw">class</span> <span class="fn">Ausgabe</span>(<span class="fn">Base</span>):
+    __tablename__ = <span class="str">"ausgaben"</span>
+    id:        Mapped[<span class="fn">int</span>] = mapped_column(primary_key=<span class="kw">True</span>)
+    kategorie: Mapped[<span class="fn">str</span>]
+    betrag:    Mapped[<span class="fn">float</span>]</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Finance Tracker auf SQLAlchemy ORM umstellen</li>
+        <li>Relationship: Ausgabe → Kategorie (ForeignKey)</li>
+        <li>Session + with-Statement korrekt nutzen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">SQLAlchemy</span><span class="tag">ORM</span><span class="tag">Session</span><span class="tag">Mapped</span><span class="tag">Alembic</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 4 -->
+  <div class="milestone-card" style="border:1px solid var(--m7)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m7)">★ Milestone 4 — Ende Monat 07</div>
+      <div class="milestone-title">Personal Finance Tracker</div>
+      <div class="milestone-desc">Ein vollständiger Finance-Tracker: Ausgaben erfassen, nach Kategorie gruppieren, Monatsreport als Rich-Tabelle, Daten in SQLite persistiert, Konfiguration über TOML, CLI über Typer.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">SQLite + SQLAlchemy ORM</span>
+        <span class="milestone-feat">Typer CLI + Rich Tabelle</span>
+        <span class="milestone-feat">TOML-Konfiguration</span>
+        <span class="milestone-feat">Monatsreport mit GROUP BY</span>
+        <span class="milestone-feat">Dataclasses für Business-Logik</span>
+        <span class="milestone-feat">Export als CSV/JSON</span>
+      </div>
+    </div>
+  </div>
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W27 (TOML-Konfiguration) ist die Basis von <code>~/.config/uctl/config.toml</code>. W25/26 (sqlite3) trägt Security-Lab-Findings persistent. W28 (SQLAlchemy ORM) skaliert für größere Projekte.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M07 Skills</span>
+    <span class="tag">sqlite3</span><span class="tag">SQL (JOIN/GROUP BY)</span><span class="tag">TOML/YAML/INI</span><span class="tag">SQLAlchemy ORM</span><span class="tag">dotenv</span><span class="tag">Konfigurationshierarchie</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PHASE D — NETZWERK                                   -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="phase-div" id="phase-d">
+  <div class="phase-div-inner" style="border-left:3px solid var(--m8)">
+    <div class="phase-div-icon">🌐</div>
+    <div>
+      <div class="phase-div-title" style="color:var(--m8)">Phase D — Netzwerk &amp; Web</div>
+      <div class="phase-div-sub">Python kommuniziert mit der Welt. Sockets, HTTP, REST-APIs, Web Scraping, async Requests — und du baust deine ersten eigenen APIs. Hier werden Security-Tool-Konzepte (Cert-Auditor, CVE-Auditor) endgültig verständlich.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONAT 08 -->
+<section class="month-section" id="m8">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m8);border-color:var(--m8);background:rgba(227,160,58,.07)">Monat 08</span>
+    <h2 class="month-title">Netzwerk &amp; Web-APIs</h2>
+    <span class="month-sub">socket · HTTP · REST-APIs konsumieren · Web Scraping</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 29</span><div class="week-title">socket-Programmierung</div></div>
+      <ul class="topic-list">
+        <li><code>socket.socket()</code>, AF_INET vs. AF_INET6, SOCK_STREAM vs. SOCK_DGRAM</li>
+        <li>TCP-Client: <code>connect()</code>, <code>send()</code>, <code>recv()</code></li>
+        <li>TCP-Server: <code>bind()</code>, <code>listen()</code>, <code>accept()</code></li>
+        <li>Context Manager für Sockets: <code>with socket.socket() as s:</code></li>
+        <li><code>ssl.wrap_socket()</code> — TLS über raw Socket</li>
+        <li>UDP: verbindungslos, <code>sendto()</code>, <code>recvfrom()</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> socket, ssl
+
+<span class="kw">def</span> <span class="fn">hole_zertifikat</span>(host: <span class="fn">str</span>, port: <span class="fn">int</span> = <span class="num">443</span>):
+    ctx = ssl.create_default_context()
+    <span class="kw">with</span> socket.socket() <span class="kw">as</span> raw:
+        <span class="kw">with</span> ctx.wrap_socket(raw, server_hostname=host) <span class="kw">as</span> s:
+            s.connect((host, port))
+            <span class="kw">return</span> s.getpeercert()
+<span class="cm"># Basis von Lab 07 (Certificate Auditor)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>TCP-Echo-Server + Client</li>
+        <li>TLS-Zertifikat auslesen (Basis Cert-Auditor)</li>
+        <li>UDP-Zeitserver (RFC 868)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">socket</span><span class="tag">TCP/UDP</span><span class="tag">ssl</span><span class="tag">bind/listen/accept</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 30</span><div class="week-title">HTTP &amp; REST-APIs konsumieren</div></div>
+      <ul class="topic-list">
+        <li><code>urllib.request</code>: HTTP ohne externe Bibliothek</li>
+        <li><code>httpx</code>: modernes HTTP, sync und async</li>
+        <li>GET, POST, PUT, DELETE — mit Headers und Auth</li>
+        <li>JSON-Antworten parsen: <code>response.json()</code></li>
+        <li>Fehlerbehandlung: Status-Codes, <code>raise_for_status()</code></li>
+        <li>Pagination: <code>while next_page:</code>-Muster</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> httpx
+
+<span class="kw">def</span> <span class="fn">pruefe_cves</span>(paket: <span class="fn">str</span>, version: <span class="fn">str</span>) -> <span class="fn">list</span>[<span class="fn">dict</span>]:
+    <span class="fn">resp</span> = httpx.post(
+        <span class="str">"https://api.osv.dev/v1/query"</span>,
+        json={<span class="str">"package"</span>: {<span class="str">"name"</span>: paket, <span class="str">"ecosystem"</span>: <span class="str">"PyPI"</span>}},
+        timeout=<span class="num">10</span>,
+    )
+    <span class="fn">resp</span>.raise_for_status()
+    <span class="kw">return</span> <span class="fn">resp</span>.json().get(<span class="str">"vulns"</span>, [])
+<span class="cm"># Direkt Lab 14 (CVE Auditor)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>OSV.dev CVE-Abfrage (direkte Security-Lab-Verbindung)</li>
+        <li>GitHub-API: eigene Repos listen</li>
+        <li>Pagination: alle Seiten eines API-Endpoints holen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">httpx</span><span class="tag">REST-APIs</span><span class="tag">raise_for_status</span><span class="tag">Pagination</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 31</span><div class="week-title">Web Scraping</div></div>
+      <ul class="topic-list">
+        <li><code>BeautifulSoup</code>: HTML parsen, <code>find()</code>, <code>find_all()</code>, CSS-Selectors</li>
+        <li>XPath-Grundlagen mit <code>lxml</code></li>
+        <li><code>robots.txt</code> respektieren — ethisches Scraping</li>
+        <li>Rate Limiting: <code>time.sleep()</code> und <code>tenacity</code></li>
+        <li>Session-Handling: Cookies, Headers (User-Agent)</li>
+        <li>Encoding-Probleme erkennen und lösen</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+<span class="kw">import</span> httpx
+
+<span class="fn">html</span> = httpx.get(<span class="str">"https://example.com"</span>).text
+<span class="fn">soup</span> = BeautifulSoup(<span class="fn">html</span>, <span class="str">"html.parser"</span>)
+
+<span class="kw">for</span> link <span class="kw">in</span> <span class="fn">soup</span>.find_all(<span class="str">"a"</span>, href=<span class="kw">True</span>):
+    <span class="fn">print</span>(link[<span class="str">"href"</span>], link.get_text(strip=<span class="kw">True</span>))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Eigene Website scrapen (robots.txt erst prüfen!)</li>
+        <li>CVE-Advisories von einer öffentlichen Seite parsen</li>
+        <li>Link-Extraktor mit Duplikatfilter</li>
+      </ul>
+      <div class="tag-row"><span class="tag">BeautifulSoup</span><span class="tag">HTML-Parsing</span><span class="tag">robots.txt</span><span class="tag">Session</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 32</span><div class="week-title">Regex — Mastery</div></div>
+      <ul class="topic-list">
+        <li>Gruppen: <code>(.+?)</code>, benannte Gruppen <code>(?P&lt;name&gt;...)</code></li>
+        <li>Lookahead / Lookbehind: <code>(?=...)</code>, <code>(?&lt;=...)</code></li>
+        <li>Flags: <code>re.IGNORECASE</code>, <code>re.MULTILINE</code>, <code>re.DOTALL</code></li>
+        <li>Kompilierte Patterns: <code>re.compile()</code> für Performance</li>
+        <li>Greedy vs. non-greedy: <code>.*</code> vs. <code>.*?</code></li>
+        <li>Praktische Patterns: IPv4, IPv6, Email, JWT, AWS-Keys</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> re
+
+IP_V4 = re.compile(
+    <span class="str">r'\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}'</span>
+    <span class="str">r'(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b'</span>
+)
+AWS_KEY = re.compile(<span class="str">r'AKIA[0-9A-Z]{16}'</span>)
+JWT     = re.compile(<span class="str">r'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'</span>)
+<span class="cm"># Exakt die Pattern aus Lab 06 (Secret Detector)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Auth-Log-Parser: IPs, Timestamps, Usernamen per Regex</li>
+        <li>Secret-Detector: AWS/JWT/PEM-Pattern</li>
+        <li>Benchmark: compile() vs. inline re.search()</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Regex-Gruppen</span><span class="tag">Lookahead</span><span class="tag">re.compile</span><span class="tag">named groups</span><span class="tag">Security-Pattern</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 5 -->
+  <div class="milestone-card" style="border:1px solid var(--m8)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m8)">★ Milestone 5 — Ende Monat 08</div>
+      <div class="milestone-title">Weather &amp; CVE CLI</div>
+      <div class="milestone-desc">Zwei Mini-Tools: <code>weather Berlin</code> (OpenWeatherMap API, Rich-Ausgabe, Caching in JSON) und <code>cvecheck requests==2.28.1</code> (OSV.dev-API, Severity-Sort, Markdown-Report). Beide kombiniert in einem Typer-App.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">httpx + REST-API</span>
+        <span class="milestone-feat">JSON-Caching mit TTL</span>
+        <span class="milestone-feat">Markdown-Report Generator</span>
+        <span class="milestone-feat">Robuste Fehlerbehandlung</span>
+        <span class="milestone-feat">Environment-Variable für API-Key</span>
+      </div>
+    </div>
+  </div>
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W29 (socket+ssl) ist 1:1 die Basis von <strong>Lab 07 (Certificate Auditor)</strong>. W30 (httpx + OSV.dev) ist <strong>Lab 14 (CVE Auditor)</strong>. W32 (Regex-Mastery) ist <strong>Lab 04 (Log Forensics)</strong> und <strong>Lab 06 (Secret Detector)</strong>.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M08 Skills</span>
+    <span class="tag">socket/ssl</span><span class="tag">httpx</span><span class="tag">BeautifulSoup</span><span class="tag">REST-APIs</span><span class="tag">Regex-Mastery</span><span class="tag">Rate Limiting</span>
+  </div>
+</section>
+
+<!-- MONAT 09 -->
+<section class="month-section" id="m9">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m9);border-color:var(--m9);background:rgba(255,123,114,.07)">Monat 09</span>
+    <h2 class="month-title">Asyncio &amp; Web-Backends</h2>
+    <span class="month-sub">async/await · aiohttp · Flask · FastAPI · Pydantic</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m9)">
+      <div class="week-top"><span class="week-num" style="color:var(--m9)">W 33</span><div class="week-title">asyncio Grundlagen</div></div>
+      <ul class="topic-list">
+        <li>Event Loop: wie asyncio intern funktioniert (konzeptuell)</li>
+        <li><code>async def</code>, <code>await</code>, Coroutinen</li>
+        <li><code>asyncio.run()</code>, <code>asyncio.gather()</code>, <code>asyncio.create_task()</code></li>
+        <li><code>asyncio.Queue</code>, Producer-Consumer-Pattern</li>
+        <li><code>asyncio.timeout()</code>, <code>asyncio.wait_for()</code></li>
+        <li>Wann sync, wann async? I/O-bound vs. CPU-bound</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="fn">pruefe_host</span>(host: <span class="fn">str</span>) -> <span class="fn">tuple</span>[<span class="fn">str</span>, <span class="fn">bool</span>]:
+    <span class="kw">try</span>:
+        _, w = <span class="kw">await</span> asyncio.open_connection(host, <span class="num">443</span>)
+        w.close(); <span class="kw">return</span> host, <span class="kw">True</span>
+    <span class="kw">except</span> OSError: <span class="kw">return</span> host, <span class="kw">False</span>
+
+<span class="kw">async def</span> <span class="fn">main</span>():
+    hosts = [<span class="str">"github.com"</span>, <span class="str">"example.com"</span>, <span class="str">"python.org"</span>]
+    ergebnisse = <span class="kw">await</span> asyncio.gather(*[<span class="fn">pruefe_host</span>(h) <span class="kw">for</span> h <span class="kw">in</span> hosts])</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Async Cert-Check für Liste von Hosts parallel</li>
+        <li>Producer-Consumer: URL-Queue + Worker-Tasks</li>
+        <li>asyncio.timeout: Requests mit Deadline</li>
+      </ul>
+      <div class="tag-row"><span class="tag">async/await</span><span class="tag">asyncio.gather</span><span class="tag">Queue</span><span class="tag">create_task</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m9)">
+      <div class="week-top"><span class="week-num" style="color:var(--m9)">W 34</span><div class="week-title">aiohttp &amp; async httpx</div></div>
+      <ul class="topic-list">
+        <li><code>httpx.AsyncClient</code>: async HTTP ohne aiohttp</li>
+        <li>Session-Pooling, Connection Reuse</li>
+        <li>Parallele API-Anfragen: <code>gather()</code> mit <code>AsyncClient</code></li>
+        <li>Streaming-Responses: große Dateien async herunterladen</li>
+        <li>Semaphore: <code>asyncio.Semaphore(10)</code> für Rate-Limiting</li>
+        <li>Retry mit <code>tenacity</code> (async-kompatibel)</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> asyncio, httpx
+
+<span class="kw">async def</span> <span class="fn">batch_cve</span>(pakete: <span class="fn">list</span>[<span class="fn">str</span>]) -> <span class="fn">dict</span>:
+    sem = asyncio.Semaphore(<span class="num">5</span>)  <span class="cm"># max 5 parallel</span>
+    <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+        <span class="kw">async def</span> <span class="fn">query</span>(p):
+            <span class="kw">async with</span> sem:
+                r = <span class="kw">await</span> client.post(<span class="str">"https://api.osv.dev/v1/query"</span>, json={...})
+                <span class="kw">return</span> p, r.json()
+        <span class="kw">return</span> <span class="fn">dict</span>(<span class="kw">await</span> asyncio.gather(*[<span class="fn">query</span>(p) <span class="kw">for</span> p <span class="kw">in</span> pakete]))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Async Download-Manager (10 URLs parallel)</li>
+        <li>CVE-Batch mit Semaphore (Lab 14 async Version)</li>
+        <li>Streaming: große Datei async in Chunks speichern</li>
+      </ul>
+      <div class="tag-row"><span class="tag">httpx.AsyncClient</span><span class="tag">Semaphore</span><span class="tag">Streaming</span><span class="tag">tenacity</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m9)">
+      <div class="week-top"><span class="week-num" style="color:var(--m9)">W 35</span><div class="week-title">Flask — Mini-API</div></div>
+      <ul class="topic-list">
+        <li>Flask-App in 5 Zeilen: <code>@app.route()</code>, <code>jsonify()</code></li>
+        <li>Request: <code>request.json</code>, <code>request.args</code>, <code>request.headers</code></li>
+        <li>HTTP-Status-Codes korrekt setzen</li>
+        <li>Error Handler: <code>@app.errorhandler(404)</code></li>
+        <li>Blueprint für modulare Apps</li>
+        <li>Wann Flask, wann FastAPI? Vergleich</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> flask <span class="kw">import</span> Flask, jsonify, request
+
+<span class="fn">app</span> = Flask(__name__)
+
+@<span class="fn">app</span>.route(<span class="str">"/api/hash"</span>, methods=[<span class="str">"POST"</span>])
+<span class="kw">def</span> <span class="fn">hash_endpoint</span>():
+    <span class="fn">data</span> = request.get_json()
+    <span class="kw">import</span> hashlib
+    h = hashlib.sha256(<span class="fn">data</span>[<span class="str">"text"</span>].encode()).hexdigest()
+    <span class="kw">return</span> jsonify({<span class="str">"sha256"</span>: h}), <span class="num">200</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>REST-API um den Finance Tracker bauen</li>
+        <li>POST /scan → Entropy-Scanner als API</li>
+        <li>Blueprint: /api/v1/ + /api/v2/ Struktur</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Flask</span><span class="tag">@app.route</span><span class="tag">jsonify</span><span class="tag">Blueprint</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m9)">
+      <div class="week-top"><span class="week-num" style="color:var(--m9)">W 36</span><div class="week-title">FastAPI &amp; Pydantic</div></div>
+      <ul class="topic-list">
+        <li>FastAPI: automatische OpenAPI-Docs, Validierung via Pydantic</li>
+        <li><code>BaseModel</code>: Pydantic-Datenvalidierung</li>
+        <li>Path-Parameter, Query-Parameter, Request Body</li>
+        <li>Dependency Injection in FastAPI</li>
+        <li><code>async def</code>-Endpoints: nativ async</li>
+        <li>Uvicorn als ASGI-Server</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+
+<span class="fn">app</span> = FastAPI()
+
+<span class="kw">class</span> <span class="fn">HashRequest</span>(BaseModel):
+    text: <span class="fn">str</span>
+    algo: <span class="fn">str</span> = <span class="str">"sha256"</span>
+
+@<span class="fn">app</span>.post(<span class="str">"/hash"</span>)
+<span class="kw">async def</span> <span class="fn">berechne_hash</span>(req: <span class="fn">HashRequest</span>):
+    <span class="kw">import</span> hashlib
+    h = hashlib.new(req.algo, req.text.encode()).hexdigest()
+    <span class="kw">return</span> {<span class="str">"algo"</span>: req.algo, <span class="str">"hash"</span>: h}</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>uctl-Tools als FastAPI-Endpoints wrappen</li>
+        <li>Pydantic: Validierung von Security-Findings</li>
+        <li>Swagger-UI erkunden: automatische API-Docs</li>
+      </ul>
+      <div class="tag-row"><span class="tag">FastAPI</span><span class="tag">Pydantic</span><span class="tag">BaseModel</span><span class="tag">Dependency Injection</span><span class="tag">Uvicorn</span></div>
+    </div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M09 Skills</span>
+    <span class="tag">async/await</span><span class="tag">asyncio.gather</span><span class="tag">httpx.AsyncClient</span><span class="tag">Semaphore</span><span class="tag">Flask</span><span class="tag">FastAPI</span><span class="tag">Pydantic</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PHASE E — ENGINEERING                                -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="phase-div" id="phase-e">
+  <div class="phase-div-inner" style="border-left:3px solid var(--m10)">
+    <div class="phase-div-icon">🔧</div>
+    <div>
+      <div class="phase-div-title" style="color:var(--m10)">Phase E — Engineering</div>
+      <div class="phase-div-sub">Concurrency, Testing, Packaging — hier lernt man, was den Unterschied zwischen Code der funktioniert und Code der gut ist ausmacht. Deine früheren Tools bekommen Tests, werden paketiert, und laufen parallel.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONAT 10 -->
+<section class="month-section" id="m10">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m10);border-color:var(--m10);background:rgba(255,161,152,.07)">Monat 10</span>
+    <h2 class="month-title">Concurrency &amp; Performance</h2>
+    <span class="month-sub">threading · multiprocessing · Profiling · Optimierung</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m10)">
+      <div class="week-top"><span class="week-num" style="color:var(--m10)">W 37</span><div class="week-title">threading</div></div>
+      <ul class="topic-list">
+        <li><code>Thread</code>, <code>start()</code>, <code>join()</code>, <code>daemon=True</code></li>
+        <li>GIL: warum Threads in Python kein echtes Parallelrechnen</li>
+        <li><code>Lock</code>, <code>RLock</code>, <code>Semaphore</code>, <code>Event</code>, <code>Condition</code></li>
+        <li><code>threading.local()</code> für Thread-lokale Daten</li>
+        <li><code>queue.Queue</code> für threadsichere Kommunikation</li>
+        <li>Thread Pool mit <code>concurrent.futures.ThreadPoolExecutor</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> hashlib
+
+<span class="kw">def</span> <span class="fn">hash_datei</span>(p: Path) -> <span class="fn">tuple</span>[<span class="fn">str</span>, <span class="fn">str</span>]:
+    h = hashlib.sha256(p.read_bytes()).hexdigest()
+    <span class="kw">return</span> str(p), h
+
+<span class="kw">with</span> ThreadPoolExecutor(max_workers=<span class="num">8</span>) <span class="kw">as</span> ex:
+    <span class="fn">results</span> = <span class="fn">list</span>(ex.map(<span class="fn">hash_datei</span>, Path(<span class="str">"."</span>).rglob(<span class="str">"*"</span>)))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Paralleler Hash-Scanner (Milestone 1 × 8 Threads)</li>
+        <li>Race Condition demonstrieren + mit Lock fixen</li>
+        <li>Thread-Pool für batch-CVE-Check</li>
+      </ul>
+      <div class="tag-row"><span class="tag">threading</span><span class="tag">Lock/Semaphore</span><span class="tag">ThreadPoolExecutor</span><span class="tag">GIL</span><span class="tag">queue.Queue</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m10)">
+      <div class="week-top"><span class="week-num" style="color:var(--m10)">W 38</span><div class="week-title">multiprocessing</div></div>
+      <ul class="topic-list">
+        <li><code>Process</code>, echtes Parallelrechnen (kein GIL)</li>
+        <li><code>Pool.map()</code>, <code>Pool.starmap()</code>, <code>imap_unordered()</code></li>
+        <li>Inter-Process Communication: <code>Queue</code>, <code>Pipe</code>, <code>Value</code>, <code>Array</code></li>
+        <li><code>ProcessPoolExecutor</code> (concurrent.futures)</li>
+        <li>Wann multiprocessing, wann threading, wann asyncio?</li>
+        <li>Pickle-Einschränkungen: was kann als Argument übergeben werden?</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> concurrent.futures <span class="kw">import</span> ProcessPoolExecutor
+<span class="kw">import</span> hashlib
+
+<span class="kw">def</span> <span class="fn">entropie</span>(data: <span class="fn">bytes</span>) -> <span class="fn">float</span>:
+    <span class="cm"># CPU-intensiv → ProcessPool!</span>
+    freq = [data.count(b) / len(data) <span class="kw">for</span> b <span class="kw">in</span> range(<span class="num">256</span>) <span class="kw">if</span> data.count(b)]
+    <span class="kw">import</span> math
+    <span class="kw">return</span> -sum(p * math.log2(p) <span class="kw">for</span> p <span class="kw">in</span> freq)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Entropy-Scanner parallel (ProcessPool)</li>
+        <li>Benchmark: sequential vs. thread vs. process</li>
+        <li>Shared Memory: Fortschritt zwischen Prozessen teilen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">multiprocessing</span><span class="tag">ProcessPoolExecutor</span><span class="tag">Pipe/Queue</span><span class="tag">CPU-bound</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m10)">
+      <div class="week-top"><span class="week-num" style="color:var(--m10)">W 39</span><div class="week-title">Profiling &amp; Messung</div></div>
+      <ul class="topic-list">
+        <li><code>timeit</code>: Micro-Benchmarks korrekt messen</li>
+        <li><code>cProfile</code>: Wo ist mein Code langsam?</li>
+        <li><code>line_profiler</code>: Zeilenweise Zeitaufteilung</li>
+        <li><code>memory_profiler</code>: RAM-Verbrauch pro Zeile</li>
+        <li><code>pstats</code>: Profile-Daten auswerten</li>
+        <li>Big-O intuitiv: O(n), O(n²), O(log n) an eigenen Algorithmen messen</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> cProfile, pstats
+
+<span class="kw">with</span> cProfile.Profile() <span class="kw">as</span> pr:
+    <span class="fn">mein_teurer_code</span>()
+
+<span class="fn">stats</span> = pstats.Stats(pr)
+<span class="fn">stats</span>.sort_stats(<span class="str">"cumulative"</span>)
+<span class="fn">stats</span>.print_stats(<span class="num">20</span>)  <span class="cm"># Top 20 Hotspots</span>
+
+<span class="cm"># timeit: 10.000 Durchläufe für stabile Messung</span>
+<span class="kw">import</span> timeit
+timeit.timeit(<span class="str">"sorted(range(1000))"</span>, number=<span class="num">10000</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Entropy-Scanner profilen: Hotspot finden + fixen</li>
+        <li>list vs. set lookup: O(n) vs. O(1) messen</li>
+        <li>lru_cache Speedup quantifizieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">cProfile</span><span class="tag">timeit</span><span class="tag">memory_profiler</span><span class="tag">Big-O</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m10)">
+      <div class="week-top"><span class="week-num" style="color:var(--m10)">W 40</span><div class="week-title">subprocess &amp; Systemintegration</div></div>
+      <ul class="topic-list">
+        <li><code>subprocess.run()</code>: <code>capture_output</code>, <code>check=True</code>, <code>timeout</code></li>
+        <li><code>subprocess.Popen()</code>: streaming output, stdin</li>
+        <li>Shell-Injection vermeiden: immer <code>shell=False</code> + list</li>
+        <li><code>shlex.split()</code> für sichere Befehlsaufspaltung</li>
+        <li><code>psutil</code>: Prozesse, Netzwerk, CPU, Speicher</li>
+        <li>Platform-Detection: <code>sys.platform</code>, <code>platform</code>-Modul</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> subprocess, json
+
+<span class="kw">def</span> <span class="fn">lsblk</span>() -> <span class="fn">list</span>[<span class="fn">dict</span>]:
+    <span class="cm"># shell=False + list = sicher!</span>
+    <span class="fn">result</span> = subprocess.run(
+        [<span class="str">"lsblk"</span>, <span class="str">"--json"</span>, <span class="str">"--output"</span>, <span class="str">"NAME,SIZE,TYPE,MOUNTPOINT"</span>],
+        capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>, check=<span class="kw">True</span>
+    )
+    <span class="kw">return</span> json.loads(<span class="fn">result</span>.stdout)[<span class="str">"blockdevices"</span>]
+<span class="cm"># Direkt Lab 15 (USB & Hardware Inventory)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>lsblk/lsusb-Wrapper (Hardware Inventory)</li>
+        <li>Shell-Injection demonstrieren + verhindern</li>
+        <li>psutil: Prozess-Monitor in Echtzeit</li>
+      </ul>
+      <div class="tag-row"><span class="tag">subprocess</span><span class="tag">shell=False</span><span class="tag">psutil</span><span class="tag">shlex</span><span class="tag">platform</span></div>
+    </div>
+  </div>
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W37 (ThreadPoolExecutor) macht <strong>Lab 01 (Hash Inspector)</strong> parallel. W38 (ProcessPool) beschleunigt den <strong>Entropy Scanner</strong>. W40 (subprocess) ist exakt <strong>Lab 09 (Port Inventory)</strong> und <strong>Lab 15 (Hardware)</strong>.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M10 Skills</span>
+    <span class="tag">threading/ThreadPool</span><span class="tag">multiprocessing</span><span class="tag">cProfile/timeit</span><span class="tag">subprocess</span><span class="tag">psutil</span><span class="tag">Big-O</span>
+  </div>
+</section>
+
+<!-- MONAT 11 -->
+<section class="month-section" id="m11">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m11);border-color:var(--m11);background:rgba(227,179,65,.07)">Monat 11</span>
+    <h2 class="month-title">Testing, Packaging &amp; Architektur</h2>
+    <span class="month-sub">pytest · mypy · ruff · pyproject.toml · Design Patterns · Logging</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m11)">
+      <div class="week-top"><span class="week-num" style="color:var(--m11)">W 41</span><div class="week-title">pytest in der Tiefe</div></div>
+      <ul class="topic-list">
+        <li><code>@pytest.fixture</code>: Setup/Teardown elegant</li>
+        <li><code>tmp_path</code>: Dateisystem-Tests ohne echte Dateien</li>
+        <li><code>@pytest.mark.parametrize</code>: viele Inputs, eine Testfunktion</li>
+        <li><code>unittest.mock.patch</code>: Netzwerk/Dateisystem mocken</li>
+        <li><code>pytest-cov</code>: Coverage-Report</li>
+        <li>TDD-Flow: Test schreiben → scheitern → implementieren → grün</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> pytest
+<span class="kw">from</span> unittest.mock <span class="kw">import</span> patch, MagicMock
+
+@pytest.mark.parametrize(<span class="str">"algo,expected_len"</span>, [
+    (<span class="str">"md5"</span>, <span class="num">32</span>), (<span class="str">"sha1"</span>, <span class="num">40</span>), (<span class="str">"sha256"</span>, <span class="num">64</span>)
+])
+<span class="kw">def</span> <span class="fn">test_hash_laenge</span>(tmp_path, algo, expected_len):
+    f = tmp_path / <span class="str">"test.bin"</span>
+    f.write_bytes(b<span class="str">"Testdaten"</span>)
+    ergebnis = <span class="fn">hash_file</span>(f, [algo])
+    <span class="kw">assert</span> <span class="fn">len</span>(ergebnis[algo]) == expected_len</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Hash Inspector vollständig testen (3 Algos, Edge Cases)</li>
+        <li>Secret Detector mocken (kein echtes Dateisystem)</li>
+        <li>Cert Auditor: SSL-Verbindung mocken</li>
+      </ul>
+      <div class="tag-row"><span class="tag">pytest fixtures</span><span class="tag">parametrize</span><span class="tag">tmp_path</span><span class="tag">mock.patch</span><span class="tag">TDD</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m11)">
+      <div class="week-top"><span class="week-num" style="color:var(--m11)">W 42</span><div class="week-title">Code-Qualität</div></div>
+      <ul class="topic-list">
+        <li><code>mypy --strict</code>: alle Type-Fehler aufspüren</li>
+        <li><code>ruff</code>: Linting + Autofix in Millisekunden</li>
+        <li><code>black</code>: deterministisches Formatieren</li>
+        <li><code>pre-commit</code>: Hooks vor jedem Git-Commit</li>
+        <li>Docstrings: Google-Style vs. NumPy-Style</li>
+        <li>MkDocs oder Sphinx: automatische API-Dokumentation</li>
+      </ul>
+      <div class="code-block"><span class="cm"># pyproject.toml</span>
+[tool.mypy]
+strict = true
+python_version = <span class="str">"3.12"</span>
+
+[tool.ruff.lint]
+select = [<span class="str">"E"</span>, <span class="str">"F"</span>, <span class="str">"I"</span>, <span class="str">"B"</span>, <span class="str">"S"</span>]  <span class="cm"># Security!</span>
+
+[tool.ruff.lint.per-file-ignores]
+<span class="str">"tests/*"</span> = [<span class="str">"S101"</span>]  <span class="cm"># assert in Tests OK</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>mypy --strict über alle bisherigen Tools laufen lassen + fixen</li>
+        <li>pre-commit mit mypy + ruff + black einrichten</li>
+        <li>API-Docs für Finance Tracker mit MkDocs</li>
+      </ul>
+      <div class="tag-row"><span class="tag">mypy --strict</span><span class="tag">ruff</span><span class="tag">black</span><span class="tag">pre-commit</span><span class="tag">Docstrings</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m11)">
+      <div class="week-top"><span class="week-num" style="color:var(--m11)">W 43</span><div class="week-title">Packaging &amp; Verteilung</div></div>
+      <ul class="topic-list">
+        <li><code>pyproject.toml</code>: <code>[project]</code>, <code>[build-system]</code>, <code>[project.scripts]</code></li>
+        <li><code>hatchling</code> oder <code>setuptools</code> als Build-Backend</li>
+        <li><code>pip install -e .</code>: editable install für Entwicklung</li>
+        <li><code>pipx install .</code>: isoliertes globales Tool</li>
+        <li>Wheel (<code>.whl</code>) bauen: <code>python -m build</code></li>
+        <li>PyPI-Upload (optional): <code>twine upload dist/*</code></li>
+      </ul>
+      <div class="code-block"><span class="cm"># pyproject.toml</span>
+[project]
+name = <span class="str">"uctl"</span>
+version = <span class="str">"0.1.0"</span>
+requires-python = <span class="str">">=3.11"</span>
+dependencies = [<span class="str">"typer"</span>, <span class="str">"rich"</span>, <span class="str">"httpx"</span>]
+
+[project.scripts]
+uctl = <span class="str">"uctl.cli:app"</span>  <span class="cm"># pipx install . → uctl</span>
+
+[project.entry-points.<span class="str">"uctl.plugins"</span>]
+hash = <span class="str">"uctl.tools.hash:HashTool"</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>uctl als pip-install-bares Package</li>
+        <li>pipx install auf der uConsole testen</li>
+        <li>GitHub Actions: build + upload Workflow</li>
+      </ul>
+      <div class="tag-row"><span class="tag">pyproject.toml</span><span class="tag">pipx</span><span class="tag">wheel</span><span class="tag">entry_points</span><span class="tag">twine</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m11)">
+      <div class="week-top"><span class="week-num" style="color:var(--m11)">W 44</span><div class="week-title">Architektur &amp; Design Patterns</div></div>
+      <ul class="topic-list">
+        <li>Logging: <code>logging.getLogger()</code>, Handler, Formatter, Levels</li>
+        <li>Strategy Pattern: austauschbare Algorithmen</li>
+        <li>Factory Pattern: Objekte zur Laufzeit erstellen</li>
+        <li>Observer Pattern: Events ohne enge Kopplung</li>
+        <li>Plugin-Architektur: <code>importlib.metadata.entry_points</code></li>
+        <li>Konfigurationsmanagement: zentrale Config-Klasse</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> logging
+<span class="kw">from</span> importlib.metadata <span class="kw">import</span> entry_points
+
+<span class="fn">log</span> = logging.getLogger(<span class="str">"uctl"</span>)
+
+<span class="kw">def</span> <span class="fn">lade_plugins</span>() -> <span class="fn">dict</span>:
+    plugins = {}
+    <span class="kw">for</span> ep <span class="kw">in</span> entry_points(group=<span class="str">"uctl.plugins"</span>):
+        plugins[ep.name] = ep.load()
+        <span class="fn">log</span>.debug(<span class="str">f"Plugin geladen: {ep.name}"</span>)
+    <span class="kw">return</span> plugins</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Logging-System für alle uctl-Tools einbauen</li>
+        <li>Strategy: Hash-Algorithmus zur Laufzeit wählen</li>
+        <li>Plugin-System: 2 Tools als entry_points registrieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">logging</span><span class="tag">Strategy/Factory</span><span class="tag">Plugin-System</span><span class="tag">entry_points</span><span class="tag">importlib</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 6 -->
+  <div class="milestone-card" style="border:1px solid var(--m11)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m11)">★ Milestone 6 — Ende Monat 11</div>
+      <div class="milestone-title">Ein früheres Projekt — vollständig neu gebaut</div>
+      <div class="milestone-desc">Nimm Milestone 2 oder 4 und baue es komplett neu: Type Hints überall, mypy-sauber, ruff-sauber, pytest mit 80%+ Coverage, als pip-installable Package mit pyproject.toml, Plugin-Architektur für Erweiterungen, zentrales Logging.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">pytest 80%+ Coverage</span>
+        <span class="milestone-feat">mypy --strict sauber</span>
+        <span class="milestone-feat">ruff + black</span>
+        <span class="milestone-feat">pyproject.toml + pipx</span>
+        <span class="milestone-feat">Zentrales Logging</span>
+        <span class="milestone-feat">Plugin-ready Architektur</span>
+      </div>
+    </div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M11 Skills</span>
+    <span class="tag">pytest fixtures</span><span class="tag">mock.patch</span><span class="tag">mypy/ruff/black</span><span class="tag">pre-commit</span><span class="tag">pyproject.toml</span><span class="tag">pipx</span><span class="tag">logging</span><span class="tag">Design Patterns</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PHASE F — CAPSTONE                                   -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="phase-div" id="phase-f">
+  <div class="phase-div-inner" style="border-left:3px solid var(--m12)">
+    <div class="phase-div-icon">★</div>
+    <div>
+      <div class="phase-div-title" style="color:var(--m12)">Phase F — Abschlussprojekt</div>
+      <div class="phase-div-sub">Ein Monat, ein vollständiges Programm. Planung, Architektur, Implementierung, Tests, Packaging, Dokumentation, Release. Das Ergebnis ist dein Nachweis: du kannst Python — vollständig, professionell, auf eigener Hardware.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MONAT 12 -->
+<section class="month-section" id="m12">
+  <div class="month-hdr">
+    <span class="month-badge" style="color:var(--m12);border-color:var(--m12);background:rgba(255,215,0,.07)">Monat 12</span>
+    <h2 class="month-title">Abschlussprojekt</h2>
+    <span class="month-sub">Design · Implementierung · Tests · Release</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m12)">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">W 45–46</span><div class="week-title">Planung &amp; Architektur</div></div>
+      <ul class="topic-list">
+        <li>Projektidee präzisieren: Problem, Zielgruppe, Scope</li>
+        <li>Architektur-Dokument: Module, Schnittstellen, Datenmodell</li>
+        <li>pyproject.toml Setup, Git-Repo, CI-Pipeline</li>
+        <li>Datenmodell als Dataclasses / Pydantic-Models</li>
+        <li>API-Schnittstellen definieren (intern: Funktions-Signaturen)</li>
+        <li>Test-Plan: welche Teile müssen getestet sein?</li>
+      </ul>
+      <div class="ex-label">Deliverables</div>
+      <ul class="ex-list">
+        <li>README mit Projektbeschreibung + Architekturdiagramm</li>
+        <li>pyproject.toml + Git + GitHub Actions (ruff + mypy + pytest)</li>
+        <li>Datenmodell-Sketch (Dataclasses, keine Implementation)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Architektur</span><span class="tag">Projektplanung</span><span class="tag">Datenmodell</span><span class="tag">CI-Setup</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m12)">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">W 47</span><div class="week-title">Implementierung + Tests</div></div>
+      <ul class="topic-list">
+        <li>TDD-Flow: Test → Implement → Refactor</li>
+        <li>Core-Logik zuerst, dann CLI</li>
+        <li>Integration Tests für Gesamtflüsse</li>
+        <li>Edge Cases dokumentieren und testen</li>
+        <li>Logging einbauen (nicht als Afterthought)</li>
+        <li>Performance-Profiling: mindestens ein Hotspot messen</li>
+      </ul>
+      <div class="ex-label">Deliverables</div>
+      <ul class="ex-list">
+        <li>Funktionierendes MVP der Core-Logik</li>
+        <li>pytest: 75%+ Coverage auf core.py</li>
+        <li>mypy --strict: keine Fehler</li>
+      </ul>
+      <div class="tag-row"><span class="tag">TDD</span><span class="tag">Integration Tests</span><span class="tag">Coverage</span><span class="tag">Logging</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m12)">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">W 48</span><div class="week-title">Packaging, Docs &amp; Release</div></div>
+      <ul class="topic-list">
+        <li>pipx install . auf der uConsole — funktioniert es?</li>
+        <li>README vollständig: Installation, Usage, Beispiele</li>
+        <li>CHANGELOG.md: was ist in v0.1.0?</li>
+        <li>GitHub Release: Tag + Wheel als Artifact</li>
+        <li>Retrospektive: Was hätte ich anders gemacht?</li>
+        <li>Nächste Schritte: Was kommt in v0.2.0?</li>
+      </ul>
+      <div class="ex-label">Deliverables</div>
+      <ul class="ex-list">
+        <li>v0.1.0 Release auf GitHub (Tag + Wheel)</li>
+        <li>pipx install auf uConsole — live demo</li>
+        <li>Retrospektive-Dokument (1 Seite)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Release</span><span class="tag">README</span><span class="tag">CHANGELOG</span><span class="tag">GitHub Release</span><span class="tag">uConsole</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m12)" style="background:linear-gradient(135deg,var(--bg-card),var(--bg-raised))">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">BONUS</span><div class="week-title">Projektideen</div></div>
+      <ul class="topic-list">
+        <li><strong style="color:var(--m12)">uctl</strong> — Security Toolkit (direkte Brücke zum Security Lab)</li>
+        <li><strong style="color:var(--m11)">devlog</strong> — Entwicklertagebuch CLI mit SQLite + Markdown</li>
+        <li><strong style="color:var(--m3)">mkenv</strong> — Projekt-Bootstrap-Tool (venv + pyproject + git)</li>
+        <li><strong style="color:var(--m5)">syncvault</strong> — Lokaler File-Sync mit Hash-Vergleich</li>
+        <li><strong style="color:var(--m8)">apilens</strong> — REST-API-Tester als CLI (wie Postman, nur Terminal)</li>
+        <li><strong style="color:var(--m9)">feedwatch</strong> — RSS-Feed-Monitor mit SQLite + Alerts</li>
+      </ul>
+      <div class="tag-row"><span class="tag">eigene Wahl</span><span class="tag">nach Interesse</span><span class="tag">auf uConsole deploybar</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section class="capstone-full" id="capstone">
+  <div class="sec-hdr" style="margin-bottom:24px">
+    <div class="sec-lbl" style="color:var(--m12)">★ Wo du nach 12 Monaten stehst</div>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="cap-card" style="border:1px solid var(--m12);background:var(--bg-card);position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.06) 0%,transparent 60%);pointer-events:none"></div>
+    <div class="cap-inner">
+      <div class="cap-eye" style="color:var(--m12)">// Nach 12 Monaten Vollzeit</div>
+      <h2 class="cap-title">Du kannst Python.</h2>
+      <p class="cap-desc">Nicht "du kennst die Syntax". Du kannst Probleme analysieren, Architekturen entwerfen, robuste Tools bauen, sie testen, paketieren und auf echter Hardware deployen. Das Security Lab ist jetzt kein Lernprojekt mehr — es ist Anwendung.</p>
+
+      <div class="cap-grid">
+        <div class="cap-box">
+          <div class="cap-box-t" style="color:var(--m3)">Fundament</div>
+          <ul class="topic-list">
+            <li>Variablen, Typen, Operatoren, Collections</li>
+            <li>Funktionen, Scope, Closures, Decorators</li>
+            <li>OOP: Klassen, Vererbung, Dunder, Properties</li>
+            <li>Generatoren, Iteratoren, Context Manager</li>
+            <li>File I/O, pathlib, json, csv, datetime, re</li>
+          </ul>
+        </div>
+        <div class="cap-box">
+          <div class="cap-box-t" style="color:var(--m8)">Tools &amp; Systeme</div>
+          <ul class="topic-list">
+            <li>Type Hints, Dataclasses, mypy, ruff, black</li>
+            <li>Typer + Rich: professionelle CLIs</li>
+            <li>sqlite3, SQL, SQLAlchemy ORM</li>
+            <li>socket, ssl, httpx, REST-APIs</li>
+            <li>subprocess, psutil, Systemintegration</li>
+          </ul>
+        </div>
+        <div class="cap-box">
+          <div class="cap-box-t" style="color:var(--m12)">Engineering</div>
+          <ul class="topic-list">
+            <li>asyncio, ThreadPool, ProcessPool</li>
+            <li>pytest: fixtures, mock, parametrize, TDD</li>
+            <li>pyproject.toml, pipx, wheel, PyPI</li>
+            <li>Plugin-Architektur, Design Patterns</li>
+            <li>Logging, Profiling, CI/CD, pre-commit</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="term-box" style="margin-top:32px">
+        <div class="term-bar">
+          <div class="dot dr"></div><div class="dot dy"></div><div class="dot dg"></div>
+          <span class="tlbl">uConsole — 12 Monate später</span>
+        </div>
+        <span style="display:block;line-height:1.9">
+          <span class="ps">❯</span> <span class="cmd">pipx install uctl</span><br>
+          <span class="out">  ✓  uctl 1.0.0 installed</span><br>
+          <span class="ps">❯</span> <span class="cmd">uctl hash</span> <span class="arg">kali.iso</span>  <span class="cmt"># Lab 01 — dein Code</span><br>
+          <span class="ps">❯</span> <span class="cmd">uctl secrets</span> <span class="arg">~/projects</span>  <span class="cmt"># Lab 06 — dein Code</span><br>
+          <span class="ps">❯</span> <span class="cmd">uctl cert</span> <span class="arg">github.com</span>  <span class="cmt"># Lab 07 — dein Code</span><br>
+          <span class="ps">❯</span> <span class="cmd">uctl entropy</span> <span class="arg">~/Downloads</span>  <span class="cmt"># Lab 03 — dein Code</span><br>
+          <span class="out" style="margin-top:4px;display:block;color:var(--m12)">  → 18 Labs. 1 Tool. 100% eigene Entwicklung.</span>
+        </span>
+      </div>
+
+      <div class="seclab-box" style="margin-top:20px">
+        <div><strong>→ Direkte Brücke:</strong> Das uConsole Security Lab Curriculum ist jetzt kein "lernen" mehr — es ist die <em>Anwendung</em> aller 12 Monate. Jedes Lab dort setzt exakt die Werkzeuge ein, die du in den Monaten 03–11 gelernt hast.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-brand">the<span>layer0</span>guide</div>
+  <div class="foot-meta">
+    Python Vollzeit-Jahreskurs<br>
+    12 Monate · 48 Wochen · 7 Milestones · Zero to Pro
+  </div>
+</footer>
+
+<script>
+// Nav active state
+const secs = document.querySelectorAll('section[id], header');
+const pills = document.querySelectorAll('.nav-pill');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      pills.forEach(p => p.classList.remove('active'));
+      const m = document.querySelector(`.nav-pill[href="#${e.target.id}"]`);
+      if (m) m.classList.add('active');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '-52px 0px -65% 0px' });
+document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
