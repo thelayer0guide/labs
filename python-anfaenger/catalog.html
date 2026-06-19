@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python für Anfänger — TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+  /* TOPNAV */
+  .topnav{height:46px;padding:0 48px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-here{font-family:'JetBrains Mono',monospace;font-size:11px;color:#58a6ff}
+
+  /* HEADER */
+  header{background:linear-gradient(135deg,#0d1117 0%,#0a1020 60%,#0d1117 100%);border-bottom:1px solid var(--border);padding:48px 48px 40px;position:relative;overflow:hidden;text-align:center}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(88,166,255,0.05),transparent)}
+  h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--text);margin-bottom:8px;position:relative}
+  .header-brand{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--muted);margin-bottom:18px;position:relative;letter-spacing:0.5px}
+  .header-sub{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.6;position:relative}
+  .header-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:20px;position:relative}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:4px 14px;color:var(--muted)}
+  .chip span{color:var(--text);font-weight:700}
+
+  /* MAIN */
+  main{flex:1;padding:48px;max-width:1200px;margin:0 auto;width:100%}
+
+  /* PHASE SECTIONS */
+  .phase-section{margin-bottom:52px}
+  .phase-header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+  .phase-pill{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 14px;border-radius:20px}
+  .phase-title{font-size:18px;font-weight:800;color:var(--text)}
+  .phase-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto}
+
+  /* PHASE COLORS */
+  .pa .phase-pill{color:#58a6ff;background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.25)}
+  .pb .phase-pill{color:#3fb950;background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.25)}
+  .pc .phase-pill{color:#d2a8ff;background:rgba(210,168,255,.12);border:1px solid rgba(210,168,255,.25)}
+
+  /* MODULE CARDS */
+  .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+
+  .card{
+    display:block;text-decoration:none;
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    overflow:hidden;position:relative;transition:transform .15s,box-shadow .15s,border-color .15s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4);border-color:var(--ac)}
+  .card-accent{height:3px;background:var(--ac)}
+  .card-body{padding:16px 18px 14px}
+
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+  .module-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);background:var(--acs);border:1px solid var(--acb);border-radius:3px;padding:2px 8px}
+  .diff-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+  .diff-star-on{color:#e3b341}
+  .diff-star-off{color:var(--border)}
+
+  .card-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px}
+  .card-tagline{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+  .card-footer{display:flex;justify-content:space-between;align-items:center}
+  .time-badge{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:3px;padding:2px 8px}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 7px;border-radius:3px;background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
+
+  /* PHASE A — blue */
+  .ma1,.ma2,.ma3,.ma4{--ac:#58a6ff;--acs:rgba(88,166,255,.1);--acb:rgba(88,166,255,.22)}
+  /* PHASE B — green */
+  .mb1,.mb2,.mb3,.mb4,.mb5,.mb6{--ac:#3fb950;--acs:rgba(63,185,80,.1);--acb:rgba(63,185,80,.22)}
+  /* PHASE C — purple */
+  .mc1,.mc2,.mc3,.mc4{--ac:#d2a8ff;--acs:rgba(210,168,255,.1);--acb:rgba(210,168,255,.22)}
+
+  /* DIFF LEGEND */
+  .diff-legend{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:20px 24px;margin-top:16px}
+  .diff-legend-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .diff-levels{display:flex;flex-wrap:wrap;gap:16px}
+  .diff-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+  .diff-stars{letter-spacing:1px}
+  .diff-star-on2{color:#e3b341}
+  .diff-star-off2{color:var(--border)}
+  .diff-name{color:var(--text);font-weight:700;margin-right:2px}
+
+  @media(max-width:700px){main{padding:32px 24px}.topnav,.header{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here">Python für Anfänger</span>
+</nav>
+
+<header>
+  <h1>Python für Anfänger</h1>
+  <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
+  <p class="header-sub">14 Module, 3 Phasen. Keine Programmierkenntnisse vorausgesetzt — Bash- und Linux-Grundkenntnisse genügen. Praxisaufgaben aus dem Admin-Alltag.</p>
+  <div class="header-chips">
+    <div class="chip"><span>3</span> Phasen</div>
+    <div class="chip"><span>14</span> Module</div>
+    <div class="chip"><span>50–90 h</span> Gesamtaufwand</div>
+    <div class="chip">stdlib-first</div>
+    <div class="chip">Admin-fokussiert</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- PHASE A: GRUNDLAGEN -->
+  <div class="phase-section pa">
+    <div class="phase-header">
+      <div class="phase-pill">Phase A</div>
+      <div class="phase-title">Grundlagen</div>
+      <div class="phase-sub">Modul 01–04 · Einsteiger bis Grundkenntnisse</div>
+    </div>
+    <div class="modules-grid">
+
+      <a href="html/modul-01.html" class="card ma1">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 01</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Python & Umgebung einrichten</div>
+          <div class="card-tagline">Installation, venv, pip, VS Code. Erstes eigenes Skript schreiben und ausführen.</div>
+          <div class="card-footer">
+            <span class="time-badge">2–3 h</span>
+            <div class="card-tags"><span class="tag">Setup</span><span class="tag">venv</span><span class="tag">pip</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-02.html" class="card ma2">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 02</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Datentypen & Kontrollstrukturen</div>
+          <div class="card-tagline">Strings, Listen, Dicts, Tupel, Sets. if/for/while, Comprehensions, Pattern Matching.</div>
+          <div class="card-footer">
+            <span class="time-badge">4–6 h</span>
+            <div class="card-tags"><span class="tag">Strings</span><span class="tag">Listen</span><span class="tag">Dicts</span><span class="tag">Schleifen</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-03.html" class="card ma3">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 03</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Funktionen & Wiederverwendbarkeit</div>
+          <div class="card-tagline">def, Parameter, Rückgabewerte, Default-Argumente, Keyword-Args. Modularer Code.</div>
+          <div class="card-footer">
+            <span class="time-badge">3–4 h</span>
+            <div class="card-tags"><span class="tag">def</span><span class="tag">return</span><span class="tag">Parameter</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-04.html" class="card ma4">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 04</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Module, Pakete & Projektstruktur</div>
+          <div class="card-tagline">import, __init__.py, Pakete, sys.path. Skripte in wartbare Projektstrukturen aufteilen.</div>
+          <div class="card-footer">
+            <span class="time-badge">3–4 h</span>
+            <div class="card-tags"><span class="tag">import</span><span class="tag">Pakete</span><span class="tag">Struktur</span></div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- PHASE B: WERKZEUGE -->
+  <div class="phase-section pb">
+    <div class="phase-header">
+      <div class="phase-pill">Phase B</div>
+      <div class="phase-title">Werkzeuge & Daten</div>
+      <div class="phase-sub">Modul 05–10 · Grundkenntnisse bis Fortgeschritten</div>
+    </div>
+    <div class="modules-grid">
+
+      <a href="html/modul-05.html" class="card mb1">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 05</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">OOP: Klassen & Dataclasses</div>
+          <div class="card-tagline">Eigene Klassen mit Attributen und Methoden. @dataclass für kompakte Datenobjekte. Wann OOP sinnvoll ist.</div>
+          <div class="card-footer">
+            <span class="time-badge">4–6 h</span>
+            <div class="card-tags"><span class="tag">class</span><span class="tag">@dataclass</span><span class="tag">OOP</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-06.html" class="card mb2">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 06</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Werkzeuge der Standardbibliothek</div>
+          <div class="card-tagline">pathlib, shutil, os, subprocess, argparse, datetime, platform, ipaddress. Kein Drittpaket notwendig.</div>
+          <div class="card-footer">
+            <span class="time-badge">5–7 h</span>
+            <div class="card-tags"><span class="tag">pathlib</span><span class="tag">subprocess</span><span class="tag">argparse</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-07.html" class="card mb3">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 07</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Dateien & Daten verarbeiten</div>
+          <div class="card-tagline">Textdateien lesen und schreiben. CSV mit DictReader/DictWriter. JSON laden und speichern.</div>
+          <div class="card-footer">
+            <span class="time-badge">3–5 h</span>
+            <div class="card-tags"><span class="tag">CSV</span><span class="tag">JSON</span><span class="tag">open()</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-08.html" class="card mb4">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 08</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Konfigurationsdateien automatisieren</div>
+          <div class="card-tagline">INI-Dateien mit configparser. YAML mit PyYAML (Docker, Ansible). TOML mit tomllib (pyproject.toml).</div>
+          <div class="card-footer">
+            <span class="time-badge">3–4 h</span>
+            <div class="card-tags"><span class="tag">INI</span><span class="tag">YAML</span><span class="tag">TOML</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-09.html" class="card mb5">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 09</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">HTTP, APIs & Webservices</div>
+          <div class="card-tagline">GET/POST mit requests. REST-APIs abfragen und JSON verarbeiten. API-Keys sicher mit .env speichern.</div>
+          <div class="card-footer">
+            <span class="time-badge">4–6 h</span>
+            <div class="card-tags"><span class="tag">requests</span><span class="tag">REST</span><span class="tag">Auth</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-10.html" class="card mb6">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 10</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Fehlerbehandlung & Logging</div>
+          <div class="card-tagline">try/except/else/finally. logging-Modul mit Handler, Formatter, Log-Level. Rotierende Logdateien.</div>
+          <div class="card-footer">
+            <span class="time-badge">3–5 h</span>
+            <div class="card-tags"><span class="tag">try/except</span><span class="tag">logging</span><span class="tag">Handler</span></div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- PHASE C: PRAXIS -->
+  <div class="phase-section pc">
+    <div class="phase-header">
+      <div class="phase-pill">Phase C</div>
+      <div class="phase-title">Praxis & Projekte</div>
+      <div class="phase-sub">Modul 11–14 · Fortgeschritten bis Erfahren</div>
+    </div>
+    <div class="modules-grid">
+
+      <a href="html/modul-11.html" class="card mc1">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 11</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Datenanalyse mit Pandas</div>
+          <div class="card-tagline">DataFrames aus CSV, Excel und JSON. Filtern, Sortieren, Gruppieren. Berichte automatisch generieren.</div>
+          <div class="card-footer">
+            <span class="time-badge">5–7 h</span>
+            <div class="card-tags"><span class="tag">pandas</span><span class="tag">DataFrame</span><span class="tag">groupby</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-12.html" class="card mc2">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 12</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Python & das Betriebssystem</div>
+          <div class="card-tagline">Prozessmonitoring mit psutil. Umgebungsvariablen, externe Programme, Systeminformationen erfassen.</div>
+          <div class="card-footer">
+            <span class="time-badge">4–6 h</span>
+            <div class="card-tags"><span class="tag">psutil</span><span class="tag">subprocess</span><span class="tag">os</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-13.html" class="card mc3">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 13</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Logdateien & Monitoringdaten</div>
+          <div class="card-tagline">Apache/Nginx-Logs mit Regex parsen. Fehlerquoten berechnen, Schwellenwerte überwachen, Berichte ausgeben.</div>
+          <div class="card-footer">
+            <span class="time-badge">5–7 h</span>
+            <div class="card-tags"><span class="tag">Regex</span><span class="tag">Counter</span><span class="tag">Alerting</span></div>
+          </div>
+        </div>
+      </a>
+
+      <a href="html/modul-14.html" class="card mc4">
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-top">
+            <span class="module-num">Modul 14</span>
+            <span class="diff-badge"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span></span>
+          </div>
+          <div class="card-name">Praxisprojekte: CLI-Tools</div>
+          <div class="card-tagline">Komplettes admin-toolkit mit Subcommands: Systeminventar, URL-Monitor, Report-Generator. Alles zusammen.</div>
+          <div class="card-footer">
+            <span class="time-badge">6–10 h</span>
+            <div class="card-tags"><span class="tag">argparse</span><span class="tag">Integration</span><span class="tag">Capstone</span></div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="diff-legend">
+    <div class="diff-legend-label">Schwierigkeits-Skala</div>
+    <div class="diff-levels">
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on2">★</span><span class="diff-star-off2">★</span><span class="diff-star-off2">★</span><span class="diff-star-off2">★</span><span class="diff-star-off2">★</span></div>
+        <span class="diff-name">Einsteiger</span><span>— Keine Vorkenntnisse, geführt</span>
+      </div>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on2">★</span><span class="diff-star-on2">★</span><span class="diff-star-off2">★</span><span class="diff-star-off2">★</span><span class="diff-star-off2">★</span></div>
+        <span class="diff-name">Grundkenntnisse</span><span>— Python-Grundlagen erforderlich</span>
+      </div>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on2">★</span><span class="diff-star-on2">★</span><span class="diff-star-on2">★</span><span class="diff-star-off2">★</span><span class="diff-star-off2">★</span></div>
+        <span class="diff-name">Fortgeschritten</span><span>— Mehrere Konzepte kombiniert</span>
+      </div>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on2">★</span><span class="diff-star-on2">★</span><span class="diff-star-on2">★</span><span class="diff-star-on2">★</span><span class="diff-star-off2">★</span></div>
+        <span class="diff-name">Erfahren</span><span>— Eigenständige Integration aller Module</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

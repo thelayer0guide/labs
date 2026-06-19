@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 07 — Dateien & Daten verarbeiten - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #3fb950;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 0 48px; height: 46px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-mod { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before { content: counter(item) '.'; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; left: 0; color: var(--accent); }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+  .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .nav-mod-link { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-decoration: none; padding: 5px 0; color: var(--muted); border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .nav-mod-link:last-child { border-bottom: none; }
+  .nav-mod-link:hover { color: var(--accent); }
+  .nav-mod-link.prev::before { content: '← '; }
+  .nav-mod-link.next::after { content: ' →'; }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+    <a href="../catalog.html" class="nav-back">Python für Anfänger</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-crumb">Modul 07 — Dateien & Daten verarbeiten</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-mod">Modul 07</span>
+          <span class="badge badge-phase">Phase B — Werkzeuge & Daten</span>
+          <span class="badge badge-time">3–5 h</span>
+          <span class="badge" style="color:#3fb950;background:rgba(0,0,0,0);border:1px solid #3fb95088;font-size:11px;letter-spacing:0.5px"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Grundkenntnisse</span>
+        </div>
+        <h1>Dateien & Daten verarbeiten</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>Modul 04</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+                <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-lnk">json</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li>Dateien mit Context Manager (<code>with open()</code>) sicher öffnen und schließen</li>
+          <li>Große Dateien zeilenweise lesen ohne alles in den RAM zu laden</li>
+          <li>CSV-Dateien mit <code>csv.DictReader</code> und <code>csv.DictWriter</code> verarbeiten</li>
+          <li>JSON mit <code>json.load()</code> und <code>json.dump(indent=2)</code> lesen und schreiben</li>
+          <li>UTF-8-Kodierung explizit setzen</li>
+          <li>Mehrere Dateien zusammenführen (merge)</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Dateien sind das universelle Interface in der Systemadministration: Logdateien, Konfigurationen, Exporte. Die wichtigste Regel: immer den Context Manager (<code>with</code>) verwenden — er stellt sicher, dass Dateien auch bei Ausnahmen korrekt geschlossen werden.</p>
+        <p>CSV-Dateien ohne Header sind schwer zu lesen. <code>csv.DictReader</code> macht Spaltennamen zum Dict-Schlüssel — das macht den Code lesbar und robust gegenüber Spaltenverschiebungen.</p>
+      </div>
+
+      <div class="lab-section" id="konzepte">
+        <div class="sec-heading">Schlüsselkonzepte</div>
+        <h3>Zeilenweises Lesen</h3>
+        <pre><code>from pathlib import Path
+
+def count_errors(log_path: Path) -> int:
+    count = 0
+    with log_path.open(encoding="utf-8") as f:
+        for line in f:  # nie f.read() bei großen Dateien!
+            if "ERROR" in line:
+                count += 1
+    return count</code></pre>
+        <h3>CSV DictReader</h3>
+        <pre><code>import csv
+from pathlib import Path
+
+def read_server_inventory(path: Path) -> list[dict]:
+    with path.open(newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+# CSV-Header: hostname,ip,os,role
+servers = read_server_inventory(Path("servers.csv"))</code></pre>
+        <h3>JSON schreiben</h3>
+        <pre><code>import json
+from pathlib import Path
+
+def save_report(data: dict, path: Path) -> None:
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)</code></pre>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Schreibe <code>log_aggregator.py</code>:</p>
+        <ol>
+          <li>Erstelle drei Test-CSV-Dateien (<code>logs_jan.csv</code>, <code>logs_feb.csv</code>, <code>logs_mar.csv</code>) mit Spalten: <code>timestamp,level,service,message</code></li>
+          <li>Schreibe <code>merge_csv_logs(paths: list[Path]) -&gt; list[dict]</code>: liest alle CSVs und gibt eine zusammengeführte Liste zurück</li>
+          <li>Schreibe <code>filter_by_level(entries: list[dict], level: str) -&gt; list[dict]</code></li>
+          <li>Schreibe <code>summary_report(entries: list[dict]) -&gt; dict</code>: gibt <code>{"total": N, "by_level": {...}, "by_service": {...}}</code> zurück</li>
+          <li>Speichere den Report als <code>report.json</code> mit <code>indent=2</code></li>
+        </ol>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <ul>
+          <li class="task"><span class="chk"></span>Alle CSV-Dateien mit <code>newline=''</code> und <code>encoding='utf-8'</code> geöffnet
+          </li>
+          <li class="task"><span class="chk"></span><code>merge_csv_logs</code> akzeptiert beliebig viele Pfade
+          </li>
+          <li class="task"><span class="chk"></span><code>summary_report</code> gibt korrekte Zählungen für alle Level und Services zurück
+          </li>
+          <li class="task"><span class="chk"></span>report.json enthält gültiges JSON mit <code>indent=2</code>
+          </li>
+          <li class="task"><span class="chk"></span>Kein <code>f.read()</code> ohne Größenangabe — zeilenweises Lesen bei Textdateien
+          </li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="akzeptanz">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <pre><code>python log_aggregator.py
+
+# report.json muss gültiges JSON sein:
+python -c "import json; json.load(open('report.json'))"
+# → kein Fehler
+
+cat report.json
+# {
+#   "total": 30,
+#   "by_level": {"INFO": 15, "WARNING": 8, "ERROR": 7},
+#   "by_service": {"nginx": 12, "db": 10, "auth": 8}
+# }</code></pre>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#konzepte" class="toc-lnk">Konzepte</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#akzeptanz" class="toc-lnk">Akzeptanz</a>
+      </div>
+      <div class="nav-card">
+        <div class="sidebar-lbl">Navigation</div>
+        <a href="modul-06.html" class="nav-mod-link prev">Modul 06</a>
+        <a href="modul-08.html" class="nav-mod-link next">Modul 08</a>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Kurs</div>
+        <a href="../catalog.html" class="toc-lnk">← Übersicht</a>
+        <a href="../../index.html" class="toc-lnk">← Alle Labs</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

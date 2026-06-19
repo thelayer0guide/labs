@@ -23,8 +23,9 @@
   main{flex:1;padding:48px;max-width:1100px;margin:0 auto;width:100%}
 
   /* CURRICULUM CARDS */
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}}
 
   .card{
     display:block;text-decoration:none;
@@ -52,8 +53,10 @@
 
   /* uConsole card */
   .c-uc{--ac:#58a6ff;--acs:rgba(88,166,255,0.12);--acb:rgba(88,166,255,0.25)}
-  /* Python card */
+  /* Python Jahreskurs card */
   .c-py{--ac:#e3b341;--acs:rgba(227,179,65,0.12);--acb:rgba(227,179,65,0.25)}
+  /* Python für Anfänger card */
+  .c-pa{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
 
   .card .card-accent{background:var(--ac)}
   .card:hover{border-color:var(--ac)}
@@ -80,8 +83,8 @@
 <header>
   <h1>Labs</h1>
   <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
-  <p class="header-sub">Zwei Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
-  <div class="header-count"><span>2</span> Curricula &nbsp;·&nbsp; <span>31</span> Labs &amp; Module &nbsp;·&nbsp; <span>70–125 h</span></div>
+  <p class="header-sub">Drei Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
+  <div class="header-count"><span>3</span> Curricula &nbsp;·&nbsp; <span>45</span> Labs &amp; Module &nbsp;·&nbsp; <span>120–215 h</span></div>
 </header>
 
 <main>
@@ -136,6 +139,33 @@
           <span class="tag">Asyncio</span>
           <span class="tag">Testing</span>
           <span class="tag">Packaging</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="python-anfaenger/catalog.html" class="card c-pa">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">🐍</div>
+          <div class="card-name">Python für<br>Anfänger</div>
+        </div>
+        <p class="card-tagline">14 Module, 3 Phasen. Keine Programmierkenntnisse vorausgesetzt — Bash-Grundkenntnisse genügen. Praxisaufgaben aus dem Admin-Alltag. Basiert auf <em>python-admins.friendlybytes.net</em>.</p>
+        <div class="card-stats">
+          <span class="stat"><strong>14</strong> Module</span>
+          <span class="stat"><strong>3</strong> Phasen</span>
+          <span class="stat"><strong>50–90 h</strong></span>
+          <span class="stat"><strong>stdlib-first</strong></span>
+        </div>
+        <div class="card-tags">
+          <span class="tag">Grundlagen</span>
+          <span class="tag">OOP</span>
+          <span class="tag">CSV/JSON</span>
+          <span class="tag">HTTP/APIs</span>
+          <span class="tag">Logging</span>
+          <span class="tag">Pandas</span>
+          <span class="tag">CLI-Tools</span>
         </div>
         <span class="card-arrow">→</span>
       </div>

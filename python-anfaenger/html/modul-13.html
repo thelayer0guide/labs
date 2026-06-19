@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 13 — Logdateien & Monitoringdaten analysieren - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #d2a8ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 0 48px; height: 46px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-mod { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before { content: counter(item) '.'; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; left: 0; color: var(--accent); }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+  .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .nav-mod-link { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-decoration: none; padding: 5px 0; color: var(--muted); border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .nav-mod-link:last-child { border-bottom: none; }
+  .nav-mod-link:hover { color: var(--accent); }
+  .nav-mod-link.prev::before { content: '← '; }
+  .nav-mod-link.next::after { content: ' →'; }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+    <a href="../catalog.html" class="nav-back">Python für Anfänger</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-crumb">Modul 13 — Logdateien & Monitoringdaten analysieren</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-mod">Modul 13</span>
+          <span class="badge badge-phase">Phase C — Praxis & Projekte</span>
+          <span class="badge badge-time">5–7 h</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+        </div>
+        <h1>Logdateien & Monitoringdaten analysieren</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>Modul 07, Modul 10</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+                <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="sheet-lnk">regex</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li>Reguläre Ausdrücke mit <code>re.compile()</code> und <code>re.match()</code>/<code>re.search()</code> einsetzen</li>
+          <li>Apache/Nginx-Logformat mit Regex-Gruppen parsen</li>
+          <li>Häufigkeiten mit <code>collections.Counter</code> effizient zählen</li>
+          <li>Zeitstempel aus Logs parsen und in <code>datetime</code>-Objekte umwandeln</li>
+          <li>Stundenbezogene Statistiken berechnen</li>
+          <li>Alarme bei Schwellenwertüberschreitung auslösen</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Logs sind strukturierte Daten im Plaintext-Format. Apache und Nginx nutzen das Combined Log Format — ein bekanntes Muster, das sich gut mit einem einzigen regulären Ausdruck parsen lässt. Der Schlüssel: <code>re.compile()</code> einmal außerhalb der Schleife aufrufen, nicht bei jedem Aufruf.</p>
+        <p><code>collections.Counter</code> ist für Häufigkeitszählungen optimiert und bietet <code>.most_common(N)</code> direkt an — kein manuelles Dict-Befüllen und Sortieren nötig.</p>
+      </div>
+
+      <div class="lab-section" id="konzepte">
+        <div class="sec-heading">Schlüsselkonzepte</div>
+        <h3>Apache Combined Log Format Regex</h3>
+        <pre><code>import re
+
+LOG_PATTERN = re.compile(
+    r'(?P<ip>\S+) \S+ \S+ \[(?P<time>[^\]]+)\] '
+    r'"(?P<method>\S+) (?P<path>\S+) \S+" '
+    r'(?P<status>\d{3}) (?P<size>\d+|-)'
+)
+
+def parse_line(line: str) -> dict | None:
+    m = LOG_PATTERN.match(line)
+    return m.groupdict() if m else None</code></pre>
+        <h3>Counter für Häufigkeiten</h3>
+        <pre><code>from collections import Counter
+
+def top_ips(log_path: str, n: int = 10) -> list[tuple[str, int]]:
+    counter: Counter[str] = Counter()
+    with open(log_path) as f:
+        for line in f:
+            entry = parse_line(line)
+            if entry:
+                counter[entry["ip"]] += 1
+    return counter.most_common(n)</code></pre>
+        <h3>Schwellenwert-Alarm</h3>
+        <pre><code>def check_error_rate(entries: list[dict], threshold: float = 0.05) -> bool:
+    total = len(entries)
+    errors = sum(1 for e in entries if e["status"].startswith("5"))
+    rate = errors / total if total else 0
+    if rate > threshold:
+        logger.warning("Error-Rate %.1f%% überschreitet Schwelle %.1f%%", rate*100, threshold*100)
+        return True
+    return False</code></pre>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Erstelle eine realistische Beispiel-Logdatei <code>access.log</code> mit mindestens 500 Zeilen im Apache Combined Log Format. Schreibe dann <code>log_analyzer.py</code>:</p>
+        <ol>
+          <li><code>parse_log(path: Path) -&gt; list[dict]</code>: parst alle Zeilen, überspringt fehlerhafte</li>
+          <li><code>requests_per_hour(entries: list[dict]) -&gt; dict[int, int]</code>: Anfragen je Stunde (0–23)</li>
+          <li><code>top_paths(entries, n=10) -&gt; list[tuple[str, int]]</code>: meistangeforderte URLs</li>
+          <li><code>error_summary(entries) -&gt; dict[str, int]</code>: Anzahl je HTTP-Status (200, 404, 500, ...)</li>
+          <li><code>generate_report(path: Path, out: Path) -&gt; None</code>: schreibt Textbericht</li>
+          <li>CLI: <code>--top N</code> (Default 10), <code>--warn-errors PROZENT</code> (Default 5.0)</li>
+        </ol>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <ul>
+          <li class="task"><span class="chk"></span>Beispiel-Logdatei vorhanden, mindestens 500 Zeilen, diverse IPs/Status-Codes/Pfade
+          </li>
+          <li class="task"><span class="chk"></span><code>re.compile()</code> außerhalb der Parse-Schleife
+          </li>
+          <li class="task"><span class="chk"></span>Zeitstempel korrekt als <code>datetime</code> geparst: <code>strptime(..., '%d/%b/%Y:%H:%M:%S %z')</code>
+          </li>
+          <li class="task"><span class="chk"></span>Fehlerhafte Zeilen zählen und am Ende als INFO loggen
+          </li>
+          <li class="task"><span class="chk"></span>Bericht enthält: Gesamtanfragen, Zeitraum, Top-IPs, Top-Paths, Status-Verteilung, Error-Rate
+          </li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="akzeptanz">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <pre><code>python log_analyzer.py access.log --top 5
+
+# Ausgabe enthält:
+# Gesamt: 523 Anfragen (2026-01-01 bis 2026-01-31)
+# Top-5 Pfade:
+#   1. /api/status   (142)
+#   ...
+# Status-Verteilung:
+#   200: 412  404: 67  500: 44
+# Error-Rate: 8.4% — WARNING: über Schwelle (5.0%)</code></pre>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#konzepte" class="toc-lnk">Konzepte</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#akzeptanz" class="toc-lnk">Akzeptanz</a>
+      </div>
+      <div class="nav-card">
+        <div class="sidebar-lbl">Navigation</div>
+        <a href="modul-12.html" class="nav-mod-link prev">Modul 12</a>
+        <a href="modul-14.html" class="nav-mod-link next">Modul 14</a>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Kurs</div>
+        <a href="../catalog.html" class="toc-lnk">← Übersicht</a>
+        <a href="../../index.html" class="toc-lnk">← Alle Labs</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

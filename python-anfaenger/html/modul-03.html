@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 03 — Funktionen & Wiederverwendbarkeit - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #58a6ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 0 48px; height: 46px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-mod { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before { content: counter(item) '.'; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; left: 0; color: var(--accent); }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+  .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .nav-mod-link { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-decoration: none; padding: 5px 0; color: var(--muted); border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .nav-mod-link:last-child { border-bottom: none; }
+  .nav-mod-link:hover { color: var(--accent); }
+  .nav-mod-link.prev::before { content: '← '; }
+  .nav-mod-link.next::after { content: ' →'; }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+    <a href="../catalog.html" class="nav-back">Python für Anfänger</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-crumb">Modul 03 — Funktionen & Wiederverwendbarkeit</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-mod">Modul 03</span>
+          <span class="badge badge-phase">Phase A — Grundlagen</span>
+          <span class="badge badge-time">3–4 h</span>
+          <span class="badge" style="color:#58a6ff;background:rgba(0,0,0,0);border:1px solid #58a6ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Grundkenntnisse</span>
+        </div>
+        <h1>Funktionen & Wiederverwendbarkeit</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>Modul 02</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+                <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li>Funktionen mit <code>def</code> definieren und aufrufen</li>
+          <li>Pflicht-, Default- und Keyword-Argumente unterscheiden und kombinieren</li>
+          <li>Type Hints für Parameter und Rückgabewerte schreiben (<code>str</code>, <code>int</code>, <code>list[str]</code>)</li>
+          <li>Mehrere Rückgabewerte via Tuple-Unpacking nutzen</li>
+          <li>Docstrings sinnvoll — aber knapp — einsetzen</li>
+          <li>Code-Duplikate durch Funktionen eliminieren</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Funktionen sind das wichtigste Strukturierungsmittel in Python. Eine Funktion sollte genau eine Sache tun, die ihr Name beschreibt. Die Grenze: wenn du eine Funktion nicht in einem Satz erklären kannst, ist sie zu groß.</p>
+        <p>Type Hints (eingeführt in Python 3.5, vollständig seit 3.9) werden zur Laufzeit nicht erzwungen — sie sind Dokumentation für den Leser und das IDE. <code>mypy</code> kann sie statisch prüfen. In Admin-Skripten genügt oft <code>str</code>, <code>int</code>, <code>Path</code>, <code>list[str]</code>.</p>
+      </div>
+
+      <div class="lab-section" id="konzepte">
+        <div class="sec-heading">Schlüsselkonzepte</div>
+        <h3>Funktionssignatur mit Type Hints</h3>
+        <pre><code>def scan_directory(path: str, extension: str = ".log") -> list[str]:
+    """Gibt alle Dateien mit gegebener Endung zurück."""
+    from pathlib import Path
+    return [str(f) for f in Path(path).rglob(f"*{extension}")]</code></pre>
+        <h3>Mehrere Rückgabewerte</h3>
+        <pre><code>def file_stats(path: str) -> tuple[int, int, int]:
+    """Gibt (Zeilen, Wörter, Bytes) zurück."""
+    text = open(path).read()
+    return len(text.splitlines()), len(text.split()), len(text.encode())
+
+lines, words, size = file_stats("server.log")</code></pre>
+        <h3>Keyword-Only Args</h3>
+        <pre><code>def backup(source: str, dest: str, *, dry_run: bool = False) -> None:
+    if dry_run:
+        print(f"[DRY] {source} → {dest}")
+        return
+    # ... echtes Backup
+
+backup("/data", "/backup", dry_run=True)</code></pre>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Schreibe <code>file_report.py</code>: ein Skript, das ein Verzeichnis analysiert und einen Bericht ausgibt.</p>
+        <p>Das Skript soll folgende Funktionen enthalten:</p>
+        <ul>
+          <li><code>count_files_by_extension(path: str) -&gt; dict[str, int]</code></li>
+          <li><code>total_size_bytes(path: str) -&gt; int</code></li>
+          <li><code>find_largest_file(path: str) -&gt; tuple[str, int]</code></li>
+          <li><code>format_bytes(n: int) -&gt; str</code> — gibt "1.4 MB", "320 KB" etc. zurück</li>
+          <li><code>print_report(path: str) -&gt; None</code> — ruft alle anderen auf und gibt den Bericht aus</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <ul>
+          <li class="task"><span class="chk"></span>Alle fünf Funktionen implementiert mit korrekten Type Hints
+          </li>
+          <li class="task"><span class="chk"></span><code>pathlib.Path.rglob()</code> für rekursives Verzeichnis-Scanning
+          </li>
+          <li class="task"><span class="chk"></span><code>format_bytes</code> gibt korrekte Einheiten aus: B, KB, MB, GB
+          </li>
+          <li class="task"><span class="chk"></span>Jede Funktion ist eigenständig testbar — kein globaler State
+          </li>
+          <li class="task"><span class="chk"></span><code>print_report</code> ruft nur die anderen Funktionen auf, führt selbst keine Berechnungen durch
+          </li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="akzeptanz">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <pre><code>python file_report.py /etc
+
+# Beispiel-Ausgabe:
+# Verzeichnis: /etc
+# Dateien nach Typ:
+#   .conf : 42
+#   .d    : 18
+#   (kein Typ): 31
+# Gesamt: 1.2 MB in 91 Dateien
+# Größte Datei: /etc/services — 19.4 KB</code></pre>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#konzepte" class="toc-lnk">Konzepte</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#akzeptanz" class="toc-lnk">Akzeptanz</a>
+      </div>
+      <div class="nav-card">
+        <div class="sidebar-lbl">Navigation</div>
+        <a href="modul-02.html" class="nav-mod-link prev">Modul 02</a>
+        <a href="modul-04.html" class="nav-mod-link next">Modul 04</a>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Kurs</div>
+        <a href="../catalog.html" class="toc-lnk">← Übersicht</a>
+        <a href="../../index.html" class="toc-lnk">← Alle Labs</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

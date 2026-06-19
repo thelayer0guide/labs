@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 14 — Praxisprojekte: CLI-Tools - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #d2a8ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 0 48px; height: 46px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-mod { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  ol { counter-reset: item; }
+  ol li { counter-increment: item; }
+  ol li::before { content: counter(item) '.'; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; left: 0; color: var(--accent); }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+  .nav-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .nav-mod-link { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-decoration: none; padding: 5px 0; color: var(--muted); border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .nav-mod-link:last-child { border-bottom: none; }
+  .nav-mod-link:hover { color: var(--accent); }
+  .nav-mod-link.prev::before { content: '← '; }
+  .nav-mod-link.next::after { content: ' →'; }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+    <a href="../catalog.html" class="nav-back">Python für Anfänger</a>
+    <span class="nav-sep">/</span>
+    <span class="nav-crumb">Modul 14 — Praxisprojekte: CLI-Tools</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-mod">Modul 14</span>
+          <span class="badge badge-phase">Phase C — Praxis & Projekte</span>
+          <span class="badge badge-time">6–10 h</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#30363d">★</span> Erfahren</span>
+        </div>
+        <h1>Praxisprojekte: CLI-Tools</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>Modul 10, Modul 12, Modul 13</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+                <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-lnk">json</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li>Ein vollständiges CLI-Projekt mit mehreren Modulen aufbauen</li>
+          <li>Alle bisher gelernten Konzepte (OOP, Logging, Fehlerbehandlung, APIs, Dateien) kombinieren</li>
+          <li>Saubere Projektstruktur mit <code>__main__.py</code> für <code>python -m toolkit</code></li>
+          <li>Exit-Codes konsequent für Skript-Verkettung einsetzen</li>
+          <li>Konfiguration über <code>.env</code> und CLI-Argumente kombinieren</li>
+          <li>Das Tool dokumentieren und ein einfaches <code>--help</code> bereitstellen</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Dieses Modul ist das Capstone des Kurses: Hier werden alle 13 vorherigen Module integriert. Ein echtes CLI-Tool für den Admin-Alltag bauen — das ist das Ziel von Anfang an gewesen.</p>
+        <p>Guter Admin-Code läuft unbeaufsichtigt. Das bedeutet: Exit-Codes für Shell-Verkettung (<code>&amp;&amp;</code>, <code>||</code>), Logging in Dateien statt <code>print()</code>, saubere Fehlerbehandlung ohne Stack-Traces auf der Konsole, Timeout bei Netzwerkoperationen.</p>
+      </div>
+
+      <div class="lab-section" id="konzepte">
+        <div class="sec-heading">Schlüsselkonzepte</div>
+        <h3>Projektstruktur mit __main__.py</h3>
+        <pre><code>admin-toolkit/
+├── .env
+├── .gitignore         ← enthält .env
+├── requirements.txt
+├── toolkit/
+│   ├── __init__.py
+│   ├── __main__.py    ← python -m toolkit
+│   ├── cli.py         ← argparse-Setup
+│   ├── inventory.py
+│   ├── monitor.py
+│   └── report.py
+└── tests/</code></pre>
+        <h3>__main__.py Muster</h3>
+        <pre><code>import sys
+from toolkit.cli import build_parser
+from toolkit import inventory, monitor, report
+
+def main() -> int:
+    parser = build_parser()
+    args = parser.parse_args()
+    if args.cmd is None:
+        parser.print_help()
+        return 2
+    return args.func(args)  # jeder Subparser setzt args.func
+
+if __name__ == "__main__":
+    sys.exit(main())</code></pre>
+        <h3>Subcommand-Dispatch</h3>
+        <pre><code># In cli.py:
+inv_p = sub.add_parser("inventory", help="Systeminventar als JSON")
+inv_p.add_argument("--output", "-o", default="inventory.json")
+inv_p.set_defaults(func=inventory.run)
+
+mon_p = sub.add_parser("monitor", help="URL auf Verfügbarkeit prüfen")
+mon_p.add_argument("url")
+mon_p.add_argument("--interval", type=int, default=60)
+mon_p.set_defaults(func=monitor.run)</code></pre>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Baue <code>admin-toolkit</code> mit drei Subcommands. Jeder muss <code>int</code> zurückgeben (0 = OK, 1 = Fehler).</p>
+        <p><strong><code>toolkit inventory [--output FILE]</code></strong></p>
+        <ul><li>Erfasst: Hostname, OS, CPU-Kerne, RAM, Disk, Python-Version, laufende Prozesse (Top-5 CPU), Netzwerk-IPs</li><li>Speichert als JSON in <code>--output</code> (Default: <code>inventory.json</code>)</li></ul>
+        <p><strong><code>toolkit monitor URL [--interval N] [--log FILE]</code></strong></p>
+        <ul><li>Prüft URL alle N Sekunden (Default: 60), misst Antwortzeit</li><li>Loggt Ergebnis (OK/FAIL + Antwortzeit) als CSV in <code>--log</code> (Default: <code>monitor.csv</code>)</li><li>Ctrl+C beendet sauber mit Zusammenfassung</li></ul>
+        <p><strong><code>toolkit report CSV [--format text|json]</code></strong></p>
+        <ul><li>Liest <code>monitor.csv</code>, berechnet: Uptime-%, mittlere Antwortzeit, Ausfallzeiten</li><li>Ausgabe als Textbericht oder JSON (<code>--format</code>)</li></ul>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <ul>
+          <li class="task"><span class="chk"></span>Alle drei Subcommands implementiert mit korrekten Exit-Codes
+          </li>
+          <li class="task"><span class="chk"></span><code>python -m toolkit --help</code> zeigt alle Subcommands
+          </li>
+          <li class="task"><span class="chk"></span><code>inventory.json</code> ist valid JSON mit allen geforderten Feldern
+          </li>
+          <li class="task"><span class="chk"></span><code>monitor</code>: Ctrl+C gibt Zusammenfassung aus (N checks, X OK, Y FAIL)
+          </li>
+          <li class="task"><span class="chk"></span><code>report</code>: Uptime-% korrekt berechnet; bei leerem CSV Exit-Code 1 + Fehlermeldung
+          </li>
+          <li class="task"><span class="chk"></span>Logging in Datei <code>toolkit.log</code> (DEBUG), Konsole (INFO) — keine unbehandelten Exceptions
+          </li>
+          <li class="task"><span class="chk"></span><code>.gitignore</code> enthält <code>.env</code>, <code>*.log</code>, <code>__pycache__/</code>, <code>.venv/</code>
+          </li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="akzeptanz">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <pre><code>python -m toolkit inventory
+# → inventory.json erzeugt
+
+python -m toolkit monitor https://example.com --interval 5
+# → alle 5s: 2026-06-19 14:30:05, OK, 0.234s
+# (Ctrl+C) → Zusammenfassung: 4/4 OK, ø 0.218s
+
+python -m toolkit report monitor.csv
+# Uptime: 100.0% | Ø 0.218s | 0 Ausfälle
+
+python -m toolkit report monitor.csv --format json
+# {"uptime_pct": 100.0, "avg_response_s": 0.218, "failures": 0}</code></pre>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#konzepte" class="toc-lnk">Konzepte</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#akzeptanz" class="toc-lnk">Akzeptanz</a>
+      </div>
+      <div class="nav-card">
+        <div class="sidebar-lbl">Navigation</div>
+        <a href="modul-13.html" class="nav-mod-link prev">Modul 13</a>
+      </div>
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Kurs</div>
+        <a href="../catalog.html" class="toc-lnk">← Übersicht</a>
+        <a href="../../index.html" class="toc-lnk">← Alle Labs</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
