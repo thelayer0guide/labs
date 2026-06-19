@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monat 03 — Dateiarbeit & Stdlib — Python Jahreskurs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --bg-raised: #1c2128;
+  --bg-code:   #0a0e14;
+  --border:    #30363d;
+  --border-s:  #21262d;
+  --tx:        #e6edf3;
+  --tx-sec:    #8b949e;
+  --tx-muted:  #6e7681;
+  --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+  --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+  --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r: 6px; --rl: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.topnav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);padding:0 32px;display:flex;align-items:center;height:48px;gap:8px}
+.nav-back{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--tx)}
+.nav-sep{color:var(--border-s);font-size:16px}
+.nav-here{font-family:var(--fm);font-size:11px}
+.nav-spacer{flex:1}
+.nav-adj{display:flex;gap:8px}
+.nav-adj a{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:3px 10px;border:1px solid var(--border-s);border-radius:3px;transition:color .15s,border-color .15s}
+.nav-adj a:hover{color:var(--tx);border-color:var(--border)}
+.page-header{border-bottom:2px solid var(--ac,#58a6ff);padding:32px 32px 28px;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 600px 200px at 50% 50%,rgba(var(--ac-raw,88,166,255),.06),transparent)}
+.ph-row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.ph-main{flex:1;min-width:280px}
+.ph-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ph-badge{font-family:var(--fm);font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;border:1px solid}
+.ph-title{font-family:var(--fd);font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px;color:var(--tx)}
+.ph-sub{font-size:12px;color:var(--tx-muted)}
+.sheets-panel{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);padding:14px 18px;min-width:160px;flex-shrink:0}
+.sheets-label{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tx-muted);margin-bottom:10px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:4px 0;border-bottom:1px solid var(--border-s);transition:color .15s}
+.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'→';color:var(--ac,#58a6ff);opacity:.5;transition:opacity .15s}
+.sheet-lnk:hover{color:var(--ac,#58a6ff)}
+.sheet-lnk:hover::before{opacity:1}
+.page-content{padding:0 32px 80px;max-width:1280px;margin:0 auto}
+.month-section{padding:48px 0 0}
+.month-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-s)}
+.month-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+.month-title{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.02em}
+.month-sub{font-size:11.5px;color:var(--tx-muted);margin-left:auto;white-space:nowrap}
+.week-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.week-grid{grid-template-columns:1fr}}
+.week-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);border-left-width:3px;padding:18px 20px}
+.week-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.week-num{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg-code)}
+.week-title{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2}
+.topic-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.topic-list li{font-size:11.5px;color:var(--tx-sec);display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.topic-list li::before{content:'›';color:inherit;opacity:.6;flex-shrink:0}
+.ex-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-bottom:6px}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ex-list li{font-size:11px;color:var(--tx-muted);display:flex;gap:7px;line-height:1.35}
+.ex-list li::before{content:'→';flex-shrink:0}
+.code-block{background:var(--bg-code);border:1px solid var(--border-s);border-radius:var(--r);padding:12px 16px;font-family:var(--fm);font-size:11.5px;line-height:1.7;margin:10px 0;overflow-x:auto}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg-code);border:1px solid var(--border-s);color:var(--tx-muted)}
+.milestone-card{background:var(--bg-card);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;position:relative}
+.milestone-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.milestone-inner{padding:28px 32px;position:relative;z-index:1}
+.milestone-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.milestone-title{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.milestone-desc{font-size:12px;color:var(--tx-sec);line-height:1.65;max-width:600px;margin-bottom:18px}
+.milestone-feats{display:flex;flex-wrap:wrap;gap:8px}
+.milestone-feat{font-size:11px;background:var(--bg-raised);border:1px solid var(--border-s);border-radius:4px;padding:4px 10px;color:var(--tx-sec)}
+.milestone-code{margin-top:20px}
+.seclab-box{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:var(--r);padding:12px 16px;font-size:11px;color:#58a6ff99;line-height:1.55;display:flex;gap:8px;margin-top:14px}
+.seclab-box::before{content:'⬡';color:var(--m1);flex-shrink:0;font-size:13px}
+.seclab-box strong{color:var(--m1)}
+.hint-box{border-left:2px solid;background:var(--bg-code);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--tx-muted);line-height:1.55;margin-top:12px}
+.diff{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
+.diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:currentColor}
+.skills-row{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.skills-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-right:8px;white-space:nowrap}
+.kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
+@media(max-width:768px){.topnav{padding:0 16px}.page-header{padding:24px 16px}.page-content{padding:0 16px 60px}}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav" style="--ac:#3fb950">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Jahreskurs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here" style="color:#3fb950">Monat 03</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-adj">
+    <a href="monat-02.html">← M02</a>
+    <a href="monat-04.html">M04 →</a>
+  </div>
+</nav>
+
+<div class="page-header" style="--ac:#3fb950">
+  <div class="ph-row">
+    <div class="ph-main">
+      <div class="ph-badges">
+        <span class="ph-badge" style="color:#3fb950;border-color:#3fb95055;background:#3fb95011">Phase B</span>
+        <span class="ph-badge" style="color:#3fb950;border-color:#3fb95055;background:#3fb95011">Monat 03</span>
+        <span class="ph-badge" style="color:var(--tx-muted);border-color:var(--border-s);background:transparent">Wochen 09–12</span>
+        <span class="ph-badge" style="color:#58a6ff;border-color:#58a6ff55;background:#58a6ff11"><span style="color:#58a6ff">★</span><span style="color:#58a6ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Grundkenntnisse</span>
+      </div>
+      <div class="ph-title">Dateiarbeit &amp; Stdlib</div>
+      <div class="ph-sub">File I/O · pathlib · json · csv · datetime · Module</div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="month-section">
+<div class="month-hdr">
+    <span class="month-badge" style="color:var(--m3);border-color:var(--m3);background:rgba(63,185,80,.07)">Monat 03</span>
+    <h2 class="month-title">Dateiarbeit &amp; Stdlib</h2>
+    <span class="month-sub">File I/O · pathlib · json · csv · datetime · Module</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 09</span><div class="week-title">File I/O</div></div>
+      <ul class="topic-list">
+        <li><code>open()</code> mit Moden: <code>'r'</code>, <code>'w'</code>, <code>'a'</code>, <code>'rb'</code></li>
+        <li><code>with</code>-Statement: warum immer <code>with open(...) as f</code></li>
+        <li><code>f.read()</code>, <code>f.readline()</code>, <code>f.readlines()</code>, Iteration</li>
+        <li>Encoding: <code>utf-8</code>, <code>latin-1</code>, <code>errors='replace'</code></li>
+        <li>Binärdateien lesen (erste Bytes einer Datei)</li>
+      </ul>
+      <div class="code-block"><span class="kw">with</span> <span class="fn">open</span>(<span class="str">"logfile.txt"</span>, encoding=<span class="str">"utf-8"</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> zeile <span class="kw">in</span> f:          <span class="cm"># memory-efficient</span>
+        <span class="kw">if</span> <span class="str">"ERROR"</span> <span class="kw">in</span> zeile:
+            <span class="fn">print</span>(zeile.strip())</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Logdatei nach ERROR-Zeilen filtern + in neue Datei schreiben</li>
+        <li>Datei zeilenweise nummeriert ausgeben (wie <code>cat -n</code>)</li>
+        <li>Wortfrequenz aus Textdatei (Milestone 1 erweitert)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">open()</span><span class="tag">with-Statement</span><span class="tag">Encoding</span><span class="tag">readline</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 10</span><div class="week-title">pathlib &amp; os</div></div>
+      <ul class="topic-list">
+        <li><code>pathlib.Path</code>: plattformunabhängige Pfade</li>
+        <li><code>Path.cwd()</code>, <code>.home()</code>, <code>.parent</code>, <code>.stem</code>, <code>.suffix</code></li>
+        <li><code>.exists()</code>, <code>.is_file()</code>, <code>.is_dir()</code>, <code>.stat()</code></li>
+        <li><code>.mkdir(parents=True)</code>, <code>.rename()</code>, <code>.unlink()</code></li>
+        <li><code>.glob()</code>, <code>.rglob()</code> für Verzeichnissuche</li>
+        <li><code>os.environ</code>, <code>os.getenv()</code>, <code>sys.argv</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="fn">logs</span> = Path(<span class="str">"/var/log"</span>)
+<span class="kw">for</span> datei <span class="kw">in</span> <span class="fn">logs</span>.rglob(<span class="str">"*.log"</span>):
+    <span class="fn">size</span> = datei.stat().st_size
+    <span class="fn">print</span>(<span class="str">f"{datei.name}: {size:,} bytes"</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Alle .py-Dateien in einem Verzeichnis listen</li>
+        <li>Ordnerstruktur anlegen (mkdir parents)</li>
+        <li>Alle Dateien nach Extension gruppieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">pathlib.Path</span><span class="tag">.glob()/.rglob()</span><span class="tag">os.environ</span><span class="tag">sys.argv</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 11</span><div class="week-title">json, csv &amp; datetime</div></div>
+      <ul class="topic-list">
+        <li><code>json.load()</code>, <code>json.dump()</code>, <code>json.loads()</code>, <code>json.dumps()</code></li>
+        <li>JSON pretty-print: <code>indent=2, ensure_ascii=False</code></li>
+        <li><code>csv.reader()</code>, <code>csv.DictReader()</code>, <code>csv.writer()</code></li>
+        <li><code>datetime.datetime.now()</code>, <code>.strftime()</code>, <code>.strptime()</code></li>
+        <li>Zeitdifferenzen: <code>timedelta</code></li>
+        <li><code>pathlib.Path.read_text()</code>, <code>.write_text()</code> als Kurzweg</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> json
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="fn">eintrag</span> = {<span class="str">"ts"</span>: datetime.now().isoformat(), <span class="str">"msg"</span>: <span class="str">"OK"</span>}
+Path(<span class="str">"log.json"</span>).write_text(
+    json.dumps(<span class="fn">eintrag</span>, indent=<span class="num">2</span>), encoding=<span class="str">"utf-8"</span>
+)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Config-Datei als JSON laden und zurückschreiben</li>
+        <li>CSV-Tabelle in eine Liste von Dicts umwandeln</li>
+        <li>Wie viele Tage bis Silvester? (timedelta)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">json</span><span class="tag">csv</span><span class="tag">datetime</span><span class="tag">timedelta</span><span class="tag">ISO 8601</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m3)">
+      <div class="week-top"><span class="week-num" style="color:var(--m3)">W 12</span><div class="week-title">Module &amp; Packages</div></div>
+      <ul class="topic-list">
+        <li>Eigenes Modul erstellen: einfach eine <code>.py</code>-Datei</li>
+        <li><code>import</code>, <code>from X import Y</code>, <code>as</code>-Alias</li>
+        <li><code>if __name__ == "__main__":</code> — warum und wie</li>
+        <li>Package: Ordner mit <code>__init__.py</code></li>
+        <li><code>re</code>-Modul Einstieg: <code>re.search()</code>, <code>re.findall()</code>, Gruppen</li>
+        <li><code>sys.path</code> — wie Python Module findet</li>
+      </ul>
+      <div class="code-block"><span class="cm"># mein_tool/utils.py</span>
+<span class="kw">def</span> <span class="fn">lade_json</span>(pfad: <span class="fn">str</span>) -> <span class="fn">dict</span>:
+    <span class="kw">with</span> <span class="fn">open</span>(pfad) <span class="kw">as</span> f:
+        <span class="kw">return</span> json.load(f)
+
+<span class="cm"># mein_tool/main.py</span>
+<span class="kw">from</span> mein_tool.utils <span class="kw">import</span> <span class="fn">lade_json</span>
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    <span class="fn">print</span>(<span class="fn">lade_json</span>(<span class="str">"config.json"</span>))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Bisherige Funktionen in ein eigenes Modul auslagern</li>
+        <li>Regex: IPs aus einem Text extrahieren</li>
+        <li>Package mit <code>__init__.py</code> anlegen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">import</span><span class="tag">__name__</span><span class="tag">packages</span><span class="tag">re.findall</span><span class="tag">sys.path</span></div>
+    </div>
+  </div>
+
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W09 (File I/O) + W10 (pathlib.rglob) + W11 (json/datetime) + W12 (re-Modul) sind exakt die Bausteine für <strong>Lab 01 (Hash Inspector)</strong>, <strong>Lab 03 (Entropy Scanner)</strong> und <strong>Lab 04 (Log Forensics)</strong>.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M03 Skills</span>
+    <span class="tag">File I/O</span><span class="tag">with-Statement</span><span class="tag">pathlib</span><span class="tag">json/csv</span><span class="tag">datetime</span><span class="tag">eigene Module</span><span class="tag">re-Einstieg</span>
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monat 08 — Netzwerk & Web-APIs — Python Jahreskurs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --bg-raised: #1c2128;
+  --bg-code:   #0a0e14;
+  --border:    #30363d;
+  --border-s:  #21262d;
+  --tx:        #e6edf3;
+  --tx-sec:    #8b949e;
+  --tx-muted:  #6e7681;
+  --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+  --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+  --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r: 6px; --rl: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.topnav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);padding:0 32px;display:flex;align-items:center;height:48px;gap:8px}
+.nav-back{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--tx)}
+.nav-sep{color:var(--border-s);font-size:16px}
+.nav-here{font-family:var(--fm);font-size:11px}
+.nav-spacer{flex:1}
+.nav-adj{display:flex;gap:8px}
+.nav-adj a{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:3px 10px;border:1px solid var(--border-s);border-radius:3px;transition:color .15s,border-color .15s}
+.nav-adj a:hover{color:var(--tx);border-color:var(--border)}
+.page-header{border-bottom:2px solid var(--ac,#58a6ff);padding:32px 32px 28px;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 600px 200px at 50% 50%,rgba(var(--ac-raw,88,166,255),.06),transparent)}
+.ph-row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.ph-main{flex:1;min-width:280px}
+.ph-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ph-badge{font-family:var(--fm);font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;border:1px solid}
+.ph-title{font-family:var(--fd);font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px;color:var(--tx)}
+.ph-sub{font-size:12px;color:var(--tx-muted)}
+.sheets-panel{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);padding:14px 18px;min-width:160px;flex-shrink:0}
+.sheets-label{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tx-muted);margin-bottom:10px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:4px 0;border-bottom:1px solid var(--border-s);transition:color .15s}
+.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'→';color:var(--ac,#58a6ff);opacity:.5;transition:opacity .15s}
+.sheet-lnk:hover{color:var(--ac,#58a6ff)}
+.sheet-lnk:hover::before{opacity:1}
+.page-content{padding:0 32px 80px;max-width:1280px;margin:0 auto}
+.month-section{padding:48px 0 0}
+.month-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-s)}
+.month-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+.month-title{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.02em}
+.month-sub{font-size:11.5px;color:var(--tx-muted);margin-left:auto;white-space:nowrap}
+.week-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.week-grid{grid-template-columns:1fr}}
+.week-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);border-left-width:3px;padding:18px 20px}
+.week-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.week-num{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg-code)}
+.week-title{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2}
+.topic-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.topic-list li{font-size:11.5px;color:var(--tx-sec);display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.topic-list li::before{content:'›';color:inherit;opacity:.6;flex-shrink:0}
+.ex-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-bottom:6px}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ex-list li{font-size:11px;color:var(--tx-muted);display:flex;gap:7px;line-height:1.35}
+.ex-list li::before{content:'→';flex-shrink:0}
+.code-block{background:var(--bg-code);border:1px solid var(--border-s);border-radius:var(--r);padding:12px 16px;font-family:var(--fm);font-size:11.5px;line-height:1.7;margin:10px 0;overflow-x:auto}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg-code);border:1px solid var(--border-s);color:var(--tx-muted)}
+.milestone-card{background:var(--bg-card);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;position:relative}
+.milestone-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.milestone-inner{padding:28px 32px;position:relative;z-index:1}
+.milestone-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.milestone-title{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.milestone-desc{font-size:12px;color:var(--tx-sec);line-height:1.65;max-width:600px;margin-bottom:18px}
+.milestone-feats{display:flex;flex-wrap:wrap;gap:8px}
+.milestone-feat{font-size:11px;background:var(--bg-raised);border:1px solid var(--border-s);border-radius:4px;padding:4px 10px;color:var(--tx-sec)}
+.milestone-code{margin-top:20px}
+.seclab-box{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:var(--r);padding:12px 16px;font-size:11px;color:#58a6ff99;line-height:1.55;display:flex;gap:8px;margin-top:14px}
+.seclab-box::before{content:'⬡';color:var(--m1);flex-shrink:0;font-size:13px}
+.seclab-box strong{color:var(--m1)}
+.hint-box{border-left:2px solid;background:var(--bg-code);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--tx-muted);line-height:1.55;margin-top:12px}
+.diff{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
+.diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:currentColor}
+.skills-row{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.skills-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-right:8px;white-space:nowrap}
+.kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
+@media(max-width:768px){.topnav{padding:0 16px}.page-header{padding:24px 16px}.page-content{padding:0 16px 60px}}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav" style="--ac:#e3a03a">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Jahreskurs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here" style="color:#e3a03a">Monat 08</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-adj">
+    <a href="monat-07.html">← M07</a>
+    <a href="monat-09.html">M09 →</a>
+  </div>
+</nav>
+
+<div class="page-header" style="--ac:#e3a03a">
+  <div class="ph-row">
+    <div class="ph-main">
+      <div class="ph-badges">
+        <span class="ph-badge" style="color:#e3a03a;border-color:#e3a03a55;background:#e3a03a11">Phase D</span>
+        <span class="ph-badge" style="color:#e3a03a;border-color:#e3a03a55;background:#e3a03a11">Monat 08</span>
+        <span class="ph-badge" style="color:var(--tx-muted);border-color:var(--border-s);background:transparent">Wochen 29–32</span>
+        <span class="ph-badge" style="color:#d2a8ff;border-color:#d2a8ff55;background:#d2a8ff11"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <div class="ph-title">Netzwerk &amp; Web-APIs</div>
+      <div class="ph-sub">socket · HTTP · REST-APIs konsumieren · Web Scraping</div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/curl-cheatsheet.html" class="sheet-lnk" target="_blank">curl</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-lnk" target="_blank">json</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="month-section">
+<div class="month-hdr">
+    <span class="month-badge" style="color:var(--m8);border-color:var(--m8);background:rgba(227,160,58,.07)">Monat 08</span>
+    <h2 class="month-title">Netzwerk &amp; Web-APIs</h2>
+    <span class="month-sub">socket · HTTP · REST-APIs konsumieren · Web Scraping</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 29</span><div class="week-title">socket-Programmierung</div></div>
+      <ul class="topic-list">
+        <li><code>socket.socket()</code>, AF_INET vs. AF_INET6, SOCK_STREAM vs. SOCK_DGRAM</li>
+        <li>TCP-Client: <code>connect()</code>, <code>send()</code>, <code>recv()</code></li>
+        <li>TCP-Server: <code>bind()</code>, <code>listen()</code>, <code>accept()</code></li>
+        <li>Context Manager für Sockets: <code>with socket.socket() as s:</code></li>
+        <li><code>ssl.wrap_socket()</code> — TLS über raw Socket</li>
+        <li>UDP: verbindungslos, <code>sendto()</code>, <code>recvfrom()</code></li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> socket, ssl
+
+<span class="kw">def</span> <span class="fn">hole_zertifikat</span>(host: <span class="fn">str</span>, port: <span class="fn">int</span> = <span class="num">443</span>):
+    ctx = ssl.create_default_context()
+    <span class="kw">with</span> socket.socket() <span class="kw">as</span> raw:
+        <span class="kw">with</span> ctx.wrap_socket(raw, server_hostname=host) <span class="kw">as</span> s:
+            s.connect((host, port))
+            <span class="kw">return</span> s.getpeercert()
+<span class="cm"># Basis von Lab 07 (Certificate Auditor)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>TCP-Echo-Server + Client</li>
+        <li>TLS-Zertifikat auslesen (Basis Cert-Auditor)</li>
+        <li>UDP-Zeitserver (RFC 868)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">socket</span><span class="tag">TCP/UDP</span><span class="tag">ssl</span><span class="tag">bind/listen/accept</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 30</span><div class="week-title">HTTP &amp; REST-APIs konsumieren</div></div>
+      <ul class="topic-list">
+        <li><code>urllib.request</code>: HTTP ohne externe Bibliothek</li>
+        <li><code>httpx</code>: modernes HTTP, sync und async</li>
+        <li>GET, POST, PUT, DELETE — mit Headers und Auth</li>
+        <li>JSON-Antworten parsen: <code>response.json()</code></li>
+        <li>Fehlerbehandlung: Status-Codes, <code>raise_for_status()</code></li>
+        <li>Pagination: <code>while next_page:</code>-Muster</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> httpx
+
+<span class="kw">def</span> <span class="fn">pruefe_cves</span>(paket: <span class="fn">str</span>, version: <span class="fn">str</span>) -> <span class="fn">list</span>[<span class="fn">dict</span>]:
+    <span class="fn">resp</span> = httpx.post(
+        <span class="str">"https://api.osv.dev/v1/query"</span>,
+        json={<span class="str">"package"</span>: {<span class="str">"name"</span>: paket, <span class="str">"ecosystem"</span>: <span class="str">"PyPI"</span>}},
+        timeout=<span class="num">10</span>,
+    )
+    <span class="fn">resp</span>.raise_for_status()
+    <span class="kw">return</span> <span class="fn">resp</span>.json().get(<span class="str">"vulns"</span>, [])
+<span class="cm"># Direkt Lab 14 (CVE Auditor)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>OSV.dev CVE-Abfrage (direkte Security-Lab-Verbindung)</li>
+        <li>GitHub-API: eigene Repos listen</li>
+        <li>Pagination: alle Seiten eines API-Endpoints holen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">httpx</span><span class="tag">REST-APIs</span><span class="tag">raise_for_status</span><span class="tag">Pagination</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 31</span><div class="week-title">Web Scraping</div></div>
+      <ul class="topic-list">
+        <li><code>BeautifulSoup</code>: HTML parsen, <code>find()</code>, <code>find_all()</code>, CSS-Selectors</li>
+        <li>XPath-Grundlagen mit <code>lxml</code></li>
+        <li><code>robots.txt</code> respektieren — ethisches Scraping</li>
+        <li>Rate Limiting: <code>time.sleep()</code> und <code>tenacity</code></li>
+        <li>Session-Handling: Cookies, Headers (User-Agent)</li>
+        <li>Encoding-Probleme erkennen und lösen</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> bs4 <span class="kw">import</span> BeautifulSoup
+<span class="kw">import</span> httpx
+
+<span class="fn">html</span> = httpx.get(<span class="str">"https://example.com"</span>).text
+<span class="fn">soup</span> = BeautifulSoup(<span class="fn">html</span>, <span class="str">"html.parser"</span>)
+
+<span class="kw">for</span> link <span class="kw">in</span> <span class="fn">soup</span>.find_all(<span class="str">"a"</span>, href=<span class="kw">True</span>):
+    <span class="fn">print</span>(link[<span class="str">"href"</span>], link.get_text(strip=<span class="kw">True</span>))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Eigene Website scrapen (robots.txt erst prüfen!)</li>
+        <li>CVE-Advisories von einer öffentlichen Seite parsen</li>
+        <li>Link-Extraktor mit Duplikatfilter</li>
+      </ul>
+      <div class="tag-row"><span class="tag">BeautifulSoup</span><span class="tag">HTML-Parsing</span><span class="tag">robots.txt</span><span class="tag">Session</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m8)">
+      <div class="week-top"><span class="week-num" style="color:var(--m8)">W 32</span><div class="week-title">Regex — Mastery</div></div>
+      <ul class="topic-list">
+        <li>Gruppen: <code>(.+?)</code>, benannte Gruppen <code>(?P&lt;name&gt;...)</code></li>
+        <li>Lookahead / Lookbehind: <code>(?=...)</code>, <code>(?&lt;=...)</code></li>
+        <li>Flags: <code>re.IGNORECASE</code>, <code>re.MULTILINE</code>, <code>re.DOTALL</code></li>
+        <li>Kompilierte Patterns: <code>re.compile()</code> für Performance</li>
+        <li>Greedy vs. non-greedy: <code>.*</code> vs. <code>.*?</code></li>
+        <li>Praktische Patterns: IPv4, IPv6, Email, JWT, AWS-Keys</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> re
+
+IP_V4 = re.compile(
+    <span class="str">r'\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}'</span>
+    <span class="str">r'(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b'</span>
+)
+AWS_KEY = re.compile(<span class="str">r'AKIA[0-9A-Z]{16}'</span>)
+JWT     = re.compile(<span class="str">r'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+'</span>)
+<span class="cm"># Exakt die Pattern aus Lab 06 (Secret Detector)!</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Auth-Log-Parser: IPs, Timestamps, Usernamen per Regex</li>
+        <li>Secret-Detector: AWS/JWT/PEM-Pattern</li>
+        <li>Benchmark: compile() vs. inline re.search()</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Regex-Gruppen</span><span class="tag">Lookahead</span><span class="tag">re.compile</span><span class="tag">named groups</span><span class="tag">Security-Pattern</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 5 -->
+  <div class="milestone-card" style="border:1px solid var(--m8)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m8)">★ Milestone 5 — Ende Monat 08</div>
+      <div class="milestone-title">Weather &amp; CVE CLI</div>
+      <div class="milestone-desc">Zwei Mini-Tools: <code>weather Berlin</code> (OpenWeatherMap API, Rich-Ausgabe, Caching in JSON) und <code>cvecheck requests==2.28.1</code> (OSV.dev-API, Severity-Sort, Markdown-Report). Beide kombiniert in einem Typer-App.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">httpx + REST-API</span>
+        <span class="milestone-feat">JSON-Caching mit TTL</span>
+        <span class="milestone-feat">Markdown-Report Generator</span>
+        <span class="milestone-feat">Robuste Fehlerbehandlung</span>
+        <span class="milestone-feat">Environment-Variable für API-Key</span>
+      </div>
+    </div>
+  </div>
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W29 (socket+ssl) ist 1:1 die Basis von <strong>Lab 07 (Certificate Auditor)</strong>. W30 (httpx + OSV.dev) ist <strong>Lab 14 (CVE Auditor)</strong>. W32 (Regex-Mastery) ist <strong>Lab 04 (Log Forensics)</strong> und <strong>Lab 06 (Secret Detector)</strong>.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M08 Skills</span>
+    <span class="tag">socket/ssl</span><span class="tag">httpx</span><span class="tag">BeautifulSoup</span><span class="tag">REST-APIs</span><span class="tag">Regex-Mastery</span><span class="tag">Rate Limiting</span>
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

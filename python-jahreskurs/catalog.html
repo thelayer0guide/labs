@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Jahreskurs — TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590;
+    --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+    --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+    --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+    --d1:#3fb950; --d2:#58a6ff; --d3:#d2a8ff; --d4:#ffa657; --d5:#ff7b72;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* TOPNAV */
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-here { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #e3b341; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d1117 0%, #111820 60%, #0d1117 100%);
+    border-bottom: 1px solid var(--border); padding: 56px 48px 48px;
+    position: relative; overflow: hidden; text-align: center;
+  }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 800px 300px at 50% 50%, rgba(227,179,65,0.04), transparent); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; position: relative; }
+  h1 { font-size: clamp(32px, 5vw, 60px); font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); margin-bottom: 16px; position: relative; }
+  .header-sub { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); max-width: 560px; margin: 0 auto; line-height: 1.7; position: relative; }
+  .header-stats { display: flex; justify-content: center; gap: 12px; margin-top: 28px; position: relative; flex-wrap: wrap; }
+  .stat-chip { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 20px; padding: 5px 16px; color: var(--muted); }
+  .stat-chip span { color: var(--text); font-weight: 700; }
+
+  /* MAIN */
+  main { flex: 1; padding: 48px; max-width: 1340px; margin: 0 auto; width: 100%; }
+
+  /* PHASE SECTION */
+  .phase-section { margin-bottom: 52px; }
+  .phase-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .phase-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
+  .phase-title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .phase-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  /* GRID */
+  .months-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 14px; }
+
+  /* MONTH CARD */
+  .month-card { display: block; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s; position: relative; }
+  .month-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+  .card-accent { height: 3px; width: 100%; }
+  .card-body { padding: 18px 20px 20px; }
+  .card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .month-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; border: 1px solid; letter-spacing: 0.5px; }
+  .month-milestone { font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 2px 7px; border-radius: 3px; border: 1px solid rgba(227,179,65,0.3); color: #e3b341; background: rgba(227,179,65,0.07); letter-spacing: 0.5px; }
+  .month-week-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-left: auto; }
+  .month-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); margin-bottom: 5px; line-height: 1.3; }
+  .month-sub { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); line-height: 1.55; margin-bottom: 12px; }
+
+  /* DIFFICULTY */
+  .month-diff { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .diff-stars { display: flex; gap: 2px; }
+  .diff-star { font-size: 11px; }
+  .diff-star.on { color: var(--ac, #e3b341); }
+  .diff-star.off { color: var(--border); }
+  .diff-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ac, #e3b341); }
+
+  /* CHEAT SHEETS */
+  .month-sheets { display: flex; flex-wrap: wrap; gap: 5px; }
+  .sheet-tag { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; padding: 2px 7px; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); text-decoration: none; transition: color 0.15s, border-color 0.15s; }
+  .sheet-tag:hover { color: var(--text); border-color: #555; background: rgba(255,255,255,0.08); }
+  .card-arrow { position: absolute; bottom: 16px; right: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; opacity: 0.3; transition: opacity 0.18s, transform 0.18s; }
+  .month-card:hover .card-arrow { opacity: 0.8; transform: translateX(3px); }
+
+  /* MILESTONE CARD */
+  .milestone-info { background: rgba(227,179,65,0.05); border: 1px solid rgba(227,179,65,0.2); border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; }
+  .milestone-info-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #e3b341; margin-bottom: 3px; }
+  .milestone-info-name { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); }
+
+  @media (max-width: 768px) { header { padding: 40px 24px 32px; } main { padding: 32px 24px; } .topnav { padding: 14px 24px; } }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here">Python Jahreskurs</span>
+</nav>
+
+<header>
+  <div class="eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide · Python Jahreskurs</div>
+  <h1>Zero to Pro</h1>
+  <p class="header-sub">12 Monate Python — strukturiert, vollzeit, hands-on. Von der ersten Variable bis zum eigenständigen Release. Kein Framework-Cargo-Cult, keine Abkürzungen.</p>
+  <div class="header-stats">
+    <div class="stat-chip"><span>12</span> Monate</div>
+    <div class="stat-chip"><span>48</span> Wochen</div>
+    <div class="stat-chip"><span>7</span> Milestones</div>
+    <div class="stat-chip"><span>6</span> Phasen (A–F)</div>
+    <div class="stat-chip"><span>stdlib-first</span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- PHASE A — GRUNDLAGEN -->
+<section class="phase-section">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:#58a6ff;background:rgba(88,166,255,0.08);border-color:rgba(88,166,255,0.25)">Phase A</span>
+    <span class="phase-title">Grundlagen</span>
+    <span class="phase-count">2 Monate · Wochen 1–8</span>
+  </div>
+  <div class="months-grid">
+
+    <!-- M01 -->
+    <a href="html/monat-01.html" class="month-card" style="--ac:#58a6ff">
+      <div class="card-accent" style="background:#58a6ff"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#58a6ff;border-color:rgba(88,166,255,0.3);background:rgba(88,166,255,0.08)">Monat 01</span>
+          <span class="month-week-badge">W01–W04</span>
+        </div>
+        <div class="month-name">Python Basics I</div>
+        <div class="month-sub">Variablen · Typen · Strings · Control Flow</div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#3fb950">Einsteiger</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- M02 -->
+    <a href="html/monat-02.html" class="month-card" style="--ac:#79c0ff">
+      <div class="card-accent" style="background:#79c0ff"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#79c0ff;border-color:rgba(121,192,255,0.3);background:rgba(121,192,255,0.08)">Monat 02</span>
+          <span class="month-milestone">★ Milestone 1</span>
+          <span class="month-week-badge">W05–W08</span>
+        </div>
+        <div class="month-name">Python Basics II</div>
+        <div class="month-sub">Lists · Dicts · Sets · Funktionen · Comprehensions</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 1</div>
+          <div class="milestone-info-name">Word Counter CLI</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#58a6ff">Grundkenntnisse</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- PHASE B — KERN-PYTHON -->
+<section class="phase-section">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:#3fb950;background:rgba(63,185,80,0.08);border-color:rgba(63,185,80,0.25)">Phase B</span>
+    <span class="phase-title">Kern-Python</span>
+    <span class="phase-count">2 Monate · Wochen 9–16</span>
+  </div>
+  <div class="months-grid">
+
+    <!-- M03 -->
+    <a href="html/monat-03.html" class="month-card" style="--ac:#3fb950">
+      <div class="card-accent" style="background:#3fb950"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#3fb950;border-color:rgba(63,185,80,0.3);background:rgba(63,185,80,0.08)">Monat 03</span>
+          <span class="month-week-badge">W09–W12</span>
+        </div>
+        <div class="month-name">Dateiarbeit &amp; Stdlib</div>
+        <div class="month-sub">File I/O · pathlib · json · csv · datetime · Module</div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#58a6ff">Grundkenntnisse</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- M04 -->
+    <a href="html/monat-04.html" class="month-card" style="--ac:#56d364">
+      <div class="card-accent" style="background:#56d364"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#56d364;border-color:rgba(86,211,100,0.3);background:rgba(86,211,100,0.08)">Monat 04</span>
+          <span class="month-milestone">★ Milestone 2</span>
+          <span class="month-week-badge">W13–W16</span>
+        </div>
+        <div class="month-name">Fehlerbehandlung &amp; OOP I</div>
+        <div class="month-sub">Exceptions · Klassen · Vererbung · Dunder-Methoden</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 2</div>
+          <div class="milestone-info-name">Kontaktbuch CLI</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#d2a8ff">Fortgeschritten</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- PHASE C — FORTGESCHRITTENES PYTHON -->
+<section class="phase-section">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:#d2a8ff;background:rgba(210,168,255,0.08);border-color:rgba(210,168,255,0.25)">Phase C</span>
+    <span class="phase-title">Fortgeschrittenes Python</span>
+    <span class="phase-count">2 Monate · Wochen 17–24</span>
+  </div>
+  <div class="months-grid">
+
+    <!-- M05 -->
+    <a href="html/monat-05.html" class="month-card" style="--ac:#d2a8ff">
+      <div class="card-accent" style="background:#d2a8ff"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#d2a8ff;border-color:rgba(210,168,255,0.3);background:rgba(210,168,255,0.08)">Monat 05</span>
+          <span class="month-week-badge">W17–W20</span>
+        </div>
+        <div class="month-name">OOP II &amp; Fortgeschrittenes</div>
+        <div class="month-sub">Properties · Decorators · Generators · Context Manager · Funktional</div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#d2a8ff">Fortgeschritten</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- M06 -->
+    <a href="html/monat-06.html" class="month-card" style="--ac:#bc8cff">
+      <div class="card-accent" style="background:#bc8cff"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#bc8cff;border-color:rgba(188,140,255,0.3);background:rgba(188,140,255,0.08)">Monat 06</span>
+          <span class="month-milestone">★ Milestone 3</span>
+          <span class="month-week-badge">W21–W24</span>
+        </div>
+        <div class="month-name">Type Hints &amp; CLI-Tools</div>
+        <div class="month-sub">Type Hints · Dataclasses · argparse · Typer · Rich</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 3</div>
+          <div class="milestone-info-name">File Organizer CLI</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#d2a8ff">Fortgeschritten</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- PHASE D — DATEN & NETZWERK -->
+<section class="phase-section">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:#ffa657;background:rgba(255,166,87,0.08);border-color:rgba(255,166,87,0.25)">Phase D</span>
+    <span class="phase-title">Daten &amp; Netzwerk</span>
+    <span class="phase-count">2 Monate · Wochen 25–32</span>
+  </div>
+  <div class="months-grid">
+
+    <!-- M07 -->
+    <a href="html/monat-07.html" class="month-card" style="--ac:#ffa657">
+      <div class="card-accent" style="background:#ffa657"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#ffa657;border-color:rgba(255,166,87,0.3);background:rgba(255,166,87,0.08)">Monat 07</span>
+          <span class="month-milestone">★ Milestone 4</span>
+          <span class="month-week-badge">W25–W28</span>
+        </div>
+        <div class="month-name">Datenbanken &amp; Persistenz</div>
+        <div class="month-sub">sqlite3 · SQL · TOML/YAML · SQLAlchemy-Einstieg</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 4</div>
+          <div class="milestone-info-name">Personal Finance Tracker</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#d2a8ff">Fortgeschritten</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">json</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- M08 -->
+    <a href="html/monat-08.html" class="month-card" style="--ac:#e3a03a">
+      <div class="card-accent" style="background:#e3a03a"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#e3a03a;border-color:rgba(227,160,58,0.3);background:rgba(227,160,58,0.08)">Monat 08</span>
+          <span class="month-milestone">★ Milestone 5</span>
+          <span class="month-week-badge">W29–W32</span>
+        </div>
+        <div class="month-name">Netzwerk &amp; Web-APIs</div>
+        <div class="month-sub">socket · HTTP · REST-APIs konsumieren · Web Scraping</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 5</div>
+          <div class="milestone-info-name">Weather &amp; CVE CLI</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#d2a8ff">Fortgeschritten</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/curl-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">curl</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">json</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- PHASE E — ASYNC & CONCURRENCY -->
+<section class="phase-section">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:#ff7b72;background:rgba(255,123,114,0.08);border-color:rgba(255,123,114,0.25)">Phase E</span>
+    <span class="phase-title">Async &amp; Concurrency</span>
+    <span class="phase-count">2 Monate · Wochen 33–40</span>
+  </div>
+  <div class="months-grid">
+
+    <!-- M09 -->
+    <a href="html/monat-09.html" class="month-card" style="--ac:#ff7b72">
+      <div class="card-accent" style="background:#ff7b72"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#ff7b72;border-color:rgba(255,123,114,0.3);background:rgba(255,123,114,0.08)">Monat 09</span>
+          <span class="month-week-badge">W33–W36</span>
+        </div>
+        <div class="month-name">Asyncio &amp; Web-Backends</div>
+        <div class="month-sub">async/await · aiohttp · Flask · FastAPI · Pydantic</div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#ffa657">Erfahren</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/curl-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">curl</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- M10 -->
+    <a href="html/monat-10.html" class="month-card" style="--ac:#ffa198">
+      <div class="card-accent" style="background:#ffa198"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#ffa198;border-color:rgba(255,161,152,0.3);background:rgba(255,161,152,0.08)">Monat 10</span>
+          <span class="month-week-badge">W37–W40</span>
+        </div>
+        <div class="month-name">Concurrency &amp; Performance</div>
+        <div class="month-sub">threading · multiprocessing · Profiling · Optimierung</div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#ffa657">Erfahren</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- PHASE F — ENGINEERING & ABSCHLUSS -->
+<section class="phase-section">
+  <div class="phase-header">
+    <span class="phase-badge" style="color:#e3b341;background:rgba(227,179,65,0.08);border-color:rgba(227,179,65,0.25)">Phase F</span>
+    <span class="phase-title">Engineering &amp; Abschluss</span>
+    <span class="phase-count">2 Monate · Wochen 41–48</span>
+  </div>
+  <div class="months-grid">
+
+    <!-- M11 -->
+    <a href="html/monat-11.html" class="month-card" style="--ac:#e3b341">
+      <div class="card-accent" style="background:#e3b341"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#e3b341;border-color:rgba(227,179,65,0.3);background:rgba(227,179,65,0.08)">Monat 11</span>
+          <span class="month-milestone">★ Milestone 6</span>
+          <span class="month-week-badge">W41–W44</span>
+        </div>
+        <div class="month-name">Testing, Packaging &amp; Architektur</div>
+        <div class="month-sub">pytest · mypy · ruff · pyproject.toml · Design Patterns · Logging</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 6</div>
+          <div class="milestone-info-name">Früheres Projekt — vollständig neu gebaut</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div>
+          <span class="diff-label" style="color:#ffa657">Erfahren</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">git</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <!-- M12 -->
+    <a href="html/monat-12.html" class="month-card" style="--ac:#ffd700">
+      <div class="card-accent" style="background:linear-gradient(90deg,#e3b341,#ffd700)"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <span class="month-num" style="color:#ffd700;border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.08)">Monat 12</span>
+          <span class="month-milestone">★ Milestone 7</span>
+          <span class="month-week-badge">W45–W48</span>
+        </div>
+        <div class="month-name">Abschlussprojekt</div>
+        <div class="month-sub">Design · Implementierung · Tests · Release</div>
+        <div class="milestone-info">
+          <div class="milestone-info-label">★ Milestone 7 — Abschluss</div>
+          <div class="milestone-info-name">Eigenständiges Open-Source-Projekt</div>
+        </div>
+        <div class="month-diff">
+          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span></div>
+          <span class="diff-label" style="color:#ff7b72">Experte</span>
+        </div>
+        <div class="month-sheets">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">git</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+</main>
+</body>
+</html>

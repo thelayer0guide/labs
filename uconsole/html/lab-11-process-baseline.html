@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 11 — Process &amp; Service Baseline Monitor - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #ff7b72;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-11-process-baseline</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 11</span>
+        <span class="badge badge-phase">Phase 4 — Integrität &amp; Monitoring</span>
+        <span class="badge badge-time">4–6 Stunden</span>
+          <span class="badge" style="color:#ffa657;background:rgba(0,0,0,0);border:1px solid #ffa65788;font-size:11px;letter-spacing:0.5px"><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#30363d">★</span> Erfahren</span>
+      </div>
+      <h1>Process &amp; Service Baseline Monitor</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 09 (psutil), Lab 10 (BaselineStore)</span><br>
+        Externe Dependencies: <span>psutil</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="sheet-lnk">systemd</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li><code>psutil</code> für umfassende Prozess-Informationen einsetzen</li>
+        <li>Das Baseline-Pattern aus Lab 10 auf Prozesse übertragen</li>
+        <li>Linux <code>/proc</code>-Filesystem für ergänzende Informationen nutzen</li>
+        <li>Heuristiken für verdächtige Prozess-Eigenschaften entwickeln</li>
+        <li>Whitelist-Logik für bekannte gute Prozesse implementieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Unbekannte Prozesse auf einem System sind ein klassisches Warnsignal: Malware, Rootkits oder unautorisierte Dienste starten neue Prozesse. Ein Prozess-Monitor mit Baseline ermöglicht es, neue Prozesse seit dem letzten Check zu erkennen.</p>
+      <p>Besonders interessant sind Heuristiken: Ein Prozess, der aus <code>/tmp</code> läuft oder dessen Binary-Pfad als "gelöscht" markiert ist, ist fast immer verdächtig.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>procmon</code> — einen Prozess-Baseline-Monitor der verdächtige Prozesse erkennt und neue Prozesse seit dem letzten Snapshot aufzeigt.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── procmon/
+    ├── __init__.py
+    ├── core.py
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        └── test_core.py</code></pre>
+      <p>Nutze <code>BaselineStore</code> aus <code>shared/baseline.py</code> (Lab 10).</p>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>snapshot_processes() -&gt; dict[str, dict]</code>
+          <ul>
+            <li>Scannt alle laufenden Prozesse via <code>psutil.process_iter()</code></li>
+            <li>Key: <code>str(pid)</code> (String für JSON-Kompatibilität)</li>
+            <li>Für jeden Prozess:</li>
+          </ul>
+          <pre><code>{
+    "pid": int,
+    "name": str,
+    "exe": str | None,           # Pfad zur Binary
+    "cmdline": str,              # erste 200 Zeichen
+    "username": str | None,
+    "create_time": float,        # UNIX-Timestamp
+    "exe_hash": str | None,      # SHA256 der Binary (wenn lesbar)
+    "status": str,               # "running", "sleeping", etc.
+    "suspicious_flags": list[str],  # (zunächst leer, wird von check_heuristics gefüllt)
+}</code></pre>
+          <ul>
+            <li>Bei <code>psutil.AccessDenied</code> oder <code>psutil.NoSuchProcess</code>: Prozess überspringen</li>
+            <li><code>exe_hash</code>: nur wenn Binary &lt; 50 MB (Sicherheitslimit, keine ISO-Dateien hashen)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>check_heuristics(proc: dict) -&gt; list[str]</code>
+          <ul>
+            <li>Prüft einen einzelnen Prozess-Eintrag auf verdächtige Merkmale</li>
+            <li>Gibt Liste von Warnungen zurück (leer = unauffällig):</li>
+            <li><code>"exe_from_tmp"</code>: Binary läuft aus <code>/tmp/</code>, <code>/dev/shm/</code>, <code>/var/tmp/</code></li>
+            <li><code>"exe_deleted"</code>: <code>exe</code> enthält <code>"(deleted)"</code> oder Pfad existiert nicht mehr</li>
+            <li><code>"no_exe"</code>: Prozess hat keine zugehörige Binary (Kernel-Thread ausgenommen: PID &lt; 3)</li>
+            <li><code>"running_as_root_unusual"</code>: läuft als root, Name ist kein bekannter System-Service</li>
+            <li><code>"hidden_pid_gap"</code>: PID-Nummer stark unregelmäßig (möglicher Hinweis auf Rootkits — Low-confidence)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>diff_process_snapshots(old: dict, new: dict, whitelist: set[str]) -&gt; dict</code>
+          <ul>
+            <li>Nutzt das gleiche Diff-Pattern wie <code>diff_baselines</code> aus Lab 10:</li>
+          </ul>
+          <pre><code>{
+    "new_processes":     list[dict],   # neue PIDs
+    "terminated":        list[dict],   # beendete PIDs
+    "suspicious":        list[dict],   # Prozesse mit suspicious_flags
+    "whitelisted_new":   int,          # neue Prozesse in Whitelist (nur Statistik)
+}</code></pre>
+          <ul>
+            <li><code>whitelist</code>: Set von Prozessnamen die ignoriert werden sollen</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>load_whitelist(path: Path) -&gt; set[str]</code>
+          <ul>
+            <li>Liest eine Textdatei: ein Prozessname pro Zeile, Kommentare mit <code>#</code></li>
+            <li>Gibt <code>set[str]</code> zurück</li>
+            <li>Gibt leeres Set zurück wenn Datei nicht existiert</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>procmon snapshot [--baseline DATEI]</code> — Erstellt Baseline aller aktuellen Prozesse</li>
+        <li class="task"><span class="chk"></span><code>procmon scan [--baseline DATEI] [--whitelist DATEI] [--format text|json]</code> — Vergleicht mit Baseline, zeigt neue/verdächtige Prozesse</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>procmon snapshot
+procmon scan
+procmon scan --whitelist whitelist.txt
+procmon scan --format json</code></pre>
+      <p>Beispiel-Output <code>procmon scan</code>:</p>
+      <pre><code>PROCESS BASELINE SCAN
+Baseline vom: 2026-06-19T08:00:00
+══════════════════════════════════════════
+
+NEUE PROZESSE (2)
+────────────────
+  PID 45123  python3   alice   /home/alice/myapp.py
+  PID 45200  node      bob     /home/bob/server.js
+
+VERDÄCHTIG (1)
+──────────────
+  PID 9911   .x        nobody  /tmp/.x
+  [!] exe_from_tmp: Binary läuft aus /tmp/
+  [!] running_as_root_unusual: Prozess läuft als root
+
+BEENDET (3)
+───────────
+  PID 1234  python3    (beendet)
+  PID 1235  bash       (beendet)
+  PID 1236  sleep      (beendet)
+
+══════════════════════════════════════════
+Gesamt: 124 Prozesse · 2 neu · 1 verdächtig · 3 beendet</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Snapshot erstellen
+python -m procmon snapshot --baseline /tmp/proc-baseline.json
+# → Keine Fehler, JSON-Datei erstellt
+
+# Scan direkt danach → kaum Änderungen
+python -m procmon scan --baseline /tmp/proc-baseline.json
+# → "0 neue Prozesse" (oder minimal, je nach System)
+
+# Heuristik-Test (keine echten Malware-Prozesse — nur prüfen ob Logik korrekt)
+python -c "
+from procmon.core import check_heuristics
+
+# Verdächtiger Prozess aus /tmp
+suspicious = {
+    'pid': 99999, 'name': '.x', 'exe': '/tmp/.x', 'cmdline': '',
+    'username': 'nobody', 'create_time': 0, 'exe_hash': None,
+    'status': 'running', 'suspicious_flags': []
+}
+flags = check_heuristics(suspicious)
+assert 'exe_from_tmp' in flags, f'Erwartet exe_from_tmp, bekam {flags}'
+
+# Normaler sshd
+normal = {
+    'pid': 1234, 'name': 'sshd', 'exe': '/usr/sbin/sshd', 'cmdline': 'sshd -D',
+    'username': 'root', 'create_time': 0, 'exe_hash': None,
+    'status': 'sleeping', 'suspicious_flags': []
+}
+flags = check_heuristics(normal)
+assert 'exe_from_tmp' not in flags
+
+print('Heuristiken OK')
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>check_heuristics</code> erkennt <code>exe_from_tmp</code> für Pfade in <code>/tmp/</code>, <code>/dev/shm/</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>check_heuristics</code> erkennt <code>exe_deleted</code> wenn <code>exe</code> den String <code>(deleted)</code> enthält</li>
+        <li class="task"><span class="chk"></span>Test: <code>check_heuristics</code> gibt leere Liste für normalen sshd-Prozess zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>diff_process_snapshots</code> erkennt neuen Prozess korrekt</li>
+        <li class="task"><span class="chk"></span>Test: <code>diff_process_snapshots</code> erkennt beendeten Prozess korrekt</li>
+        <li class="task"><span class="chk"></span>Test: <code>diff_process_snapshots</code> respektiert Whitelist (whitelistete neue Prozesse nicht in <code>new_processes</code>)</li>
+        <li class="task"><span class="chk"></span>Test: <code>load_whitelist</code> ignoriert Kommentarzeilen</li>
+        <li class="task"><span class="chk"></span>Test: <code>load_whitelist</code> auf nicht existierende Datei → leeres Set</li>
+      </ul>
+      <p>Nutze <code>unittest.mock.patch("psutil.process_iter")</code> um <code>snapshot_processes</code> ohne echte Prozesse testen zu können.</p>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Network-Verbindungen pro Prozess:</strong> Zeige welche Netzwerkverbindungen ein Prozess hält (nutze <code>psutil.Process(pid).connections()</code>)</li>
+        <li class="task"><span class="chk"></span><strong>Eltern-Kind-Baum:</strong> Erkenne ungewöhnliche Parent-Child-Beziehungen (z. B. <code>nginx</code> spawnt <code>bash</code>)</li>
+        <li class="task"><span class="chk"></span><strong>Binary-Hash-Vergleich:</strong> Wenn ein bekannter Prozessname (z. B. <code>sshd</code>) mit einem anderen Binary-Hash läuft als in der Baseline, ist das ein starkes Warnsignal</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong><code>psutil.process_iter()</code>:</strong> Nutze <code>attrs</code>-Parameter um nur benötigte Felder zu laden: <code>psutil.process_iter(attrs=["pid", "name", "exe", "username", "status", "create_time", "cmdline"])</code>. Das ist deutlich schneller als alles zu laden.</p>
+      <p><strong><code>/proc/PID/exe</code>:</strong> Wenn eine Binary gelöscht wird während ein Prozess läuft, zeigt <code>/proc/PID/exe</code> den Pfad mit angehängtem <code> (deleted)</code>. <code>psutil.Process(pid).exe()</code> gibt das weiter.</p>
+      <p><strong>Kernel-Threads:</strong> Prozesse mit PID &lt; 10 und ohne exe sind Kernel-Threads — kein Alarm nötig.</p>
+      <p><strong>exe_hash:</strong> Das Hashen großer Binaries kann Zeit kosten. Setze ein Größenlimit (50 MB) und überspinge Dateien die größer sind.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle-uctl">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def snapshot_processes() -&gt; dict[str, dict]:
+    """Erstellt Snapshot aller laufenden Prozesse."""
+
+def diff_process_snapshots(old: dict, new: dict, whitelist: set[str]) -&gt; dict:
+    """Vergleicht zwei Prozess-Snapshots."""</code></pre>
+    </div>
+
+  </div><!-- /content -->
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle-uctl" class="toc-lnk">Schnittstelle uctl</a>
+    </div>
+  </aside>
+</div><!-- /page-body -->
+
+</body>
+</html>

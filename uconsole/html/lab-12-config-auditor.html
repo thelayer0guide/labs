@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 12 — SSH &amp; Firewall Config Auditor - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #ff7b72;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  th { text-align: left; padding: 8px 12px; background: var(--surface); color: var(--accent); border: 1px solid var(--border); font-size: 11px; letter-spacing: 0.5px; }
+  td { padding: 7px 12px; border: 1px solid var(--border); color: #c9d1d9; vertical-align: top; }
+  tr:nth-child(even) td { background: color-mix(in srgb, var(--surface) 50%, transparent); }
+
+  .severity-high { color: #ff7b72; font-weight: 700; }
+  .severity-medium { color: #ffa657; font-weight: 700; }
+  .severity-low { color: #e3b341; font-weight: 700; }
+  .severity-info { color: #7d8590; font-weight: 700; }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-12-config-auditor</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 12</span>
+        <span class="badge badge-phase">Phase 4 — Integrität &amp; Monitoring</span>
+        <span class="badge badge-time">5–7 Stunden</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>SSH &amp; Firewall Config Auditor</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 04 (Parsing-Muster), Lab 06 (Findings-Modell)</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/ssh-cheatsheet.html" class="sheet-lnk">ssh</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/iptables-cheatsheet.html" class="sheet-lnk">iptables</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Konfigurationsdateien ohne fertige Parser-Bibliothek parsen</li>
+        <li>Ein strukturiertes Findings-Modell mit Severity entwerfen</li>
+        <li>Best-Practice-Wissen zu SSH und Firewall-Konfiguration codieren</li>
+        <li>Einen erweiterbaren Regelwerk-Mechanismus implementieren</li>
+        <li>Markdown-Reports mit Severity-Sortierung generieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Fehlkonfigurierte SSH- und Firewall-Einstellungen sind eine der häufigsten Ursachen für Sicherheitsvorfälle. <code>PermitRootLogin yes</code> in <code>sshd_config</code> erlaubt direkten Root-Zugriff. Eine fehlende Default-DROP-Policy in iptables lässt unerwarteten Traffic durch.</p>
+      <p>Dieses Tool codiert Security-Best-Practices in überprüfbare Regeln — genau wie ein Compliance-Scanner, nur selbst gebaut und verstanden.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>configaudit</code> — einen Konfigurationsauditor für SSH und Firewall-Regeln.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── configaudit/
+    ├── __init__.py
+    ├── core.py
+    ├── rules.py        ← Regel-Definitionen
+    ├── parsers/
+    │   ├── __init__.py
+    │   ├── sshd.py     ← sshd_config Parser
+    │   └── firewall.py ← iptables/nft Parser
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        ├── test_core.py
+        └── fixtures/
+            ├── sshd_config_secure
+            ├── sshd_config_insecure
+            ├── iptables_save_good
+            └── iptables_save_bad</code></pre>
+    </div>
+
+    <div class="lab-section" id="findings-modell">
+      <div class="sec-heading">Das Findings-Modell</div>
+      <p>Definiere in <code>core.py</code>:</p>
+      <pre><code>from dataclasses import dataclass
+
+@dataclass
+class Finding:
+    rule_id: str          # z. B. "SSH-001"
+    severity: str         # "HIGH", "MEDIUM", "LOW", "INFO"
+    title: str            # kurze Beschreibung
+    description: str      # ausführliche Erklärung
+    recommendation: str   # konkrete Handlungsempfehlung
+    file: str             # geprüfte Datei
+    line: int | None      # relevante Zeile (wenn anwendbar)
+    current_value: str | None  # aktuell gefundener Wert
+    expected_value: str | None # empfohlener Wert</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>parsers/sshd.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>parse_sshd_config(path: Path) -&gt; dict[str, str]</code>
+          <ul>
+            <li>Parst <code>sshd_config</code> ohne externe Bibliotheken</li>
+            <li>Format: <code>Key Value</code> (durch Leerzeichen getrennt)</li>
+            <li>Ignoriert Kommentarzeilen (<code>#</code>) und leere Zeilen</li>
+            <li>Gibt Dict zurück: <code>{"PermitRootLogin": "yes", "Port": "22", ...}</code></li>
+            <li>Keys und Values als Strings — keine Typkonvertierung</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>parsers/firewall.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>parse_iptables_save(content: str) -&gt; dict</code>
+          <ul>
+            <li>Parst Output von <code>iptables-save</code> (als String, nicht direkt ausgeführt)</li>
+            <li>Gibt zurück:</li>
+          </ul>
+          <pre><code>{
+    "chains": {
+        "INPUT":   {"policy": "ACCEPT"|"DROP"|"REJECT"|None, "rules": list[str]},
+        "OUTPUT":  {...},
+        "FORWARD": {...},
+    },
+    "has_default_drop_input": bool,
+    "wide_open_accepts": list[str],  # Regeln mit -j ACCEPT und -s 0.0.0.0/0
+}</code></pre>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>parse_nft_ruleset(content: str) -&gt; dict</code>
+          <ul>
+            <li>Parst Output von <code>nft list ruleset</code> (vereinfacht: nur Default-Policy und Input-Hooks)</li>
+            <li>Gibt analoges Dict zurück</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>rules.py</h3>
+      <p>Definiere mindestens diese Regeln für SSH (als Funktionen oder Daten):</p>
+      <table>
+        <thead>
+          <tr><th>Rule ID</th><th>Prüfung</th><th>Severity</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SSH-001</td><td><code>PermitRootLogin</code> != <code>no</code></td><td><span class="severity-high">HIGH</span></td></tr>
+          <tr><td>SSH-002</td><td><code>PasswordAuthentication</code> != <code>no</code></td><td><span class="severity-medium">MEDIUM</span></td></tr>
+          <tr><td>SSH-003</td><td><code>Protocol</code> != <code>2</code> (falls gesetzt)</td><td><span class="severity-high">HIGH</span></td></tr>
+          <tr><td>SSH-004</td><td><code>PermitEmptyPasswords</code> == <code>yes</code></td><td><span class="severity-high">HIGH</span></td></tr>
+          <tr><td>SSH-005</td><td><code>X11Forwarding</code> == <code>yes</code></td><td><span class="severity-low">LOW</span></td></tr>
+          <tr><td>SSH-006</td><td><code>MaxAuthTries</code> &gt; 3 (oder nicht gesetzt)</td><td><span class="severity-medium">MEDIUM</span></td></tr>
+          <tr><td>SSH-007</td><td><code>LoginGraceTime</code> &gt; 30 (oder nicht gesetzt)</td><td><span class="severity-low">LOW</span></td></tr>
+          <tr><td>SSH-008</td><td><code>AllowUsers</code> oder <code>AllowGroups</code> nicht gesetzt</td><td><span class="severity-info">INFO</span></td></tr>
+        </tbody>
+      </table>
+      <p>Und für Firewall:</p>
+      <table>
+        <thead>
+          <tr><th>Rule ID</th><th>Prüfung</th><th>Severity</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>FW-001</td><td>INPUT-Policy nicht DROP/REJECT</td><td><span class="severity-high">HIGH</span></td></tr>
+          <tr><td>FW-002</td><td>Weitreichende ACCEPT-Regeln (0.0.0.0/0)</td><td><span class="severity-medium">MEDIUM</span></td></tr>
+          <tr><td>FW-003</td><td>FORWARD-Policy nicht DROP</td><td><span class="severity-medium">MEDIUM</span></td></tr>
+        </tbody>
+      </table>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>audit_sshd_config(path: Path) -&gt; list[Finding]</code>
+          <ul>
+            <li>Parst und wendet alle SSH-Regeln an</li>
+            <li>Gibt Finding für jede verletzte Regel zurück</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>audit_iptables(path: Path) -&gt; list[Finding]</code>
+          <ul>
+            <li>Liest <code>iptables-save</code>-Output aus Datei</li>
+            <li>Wendet Firewall-Regeln an</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>generate_report(findings: list[Finding], fmt: str) -&gt; str</code>
+          <ul>
+            <li>Sortiert Findings nach Severity: HIGH → MEDIUM → LOW → INFO</li>
+            <li><code>fmt == "text"</code>: Terminal-freundlich</li>
+            <li><code>fmt == "markdown"</code>: mit Tabellen und Links zu CIS-Benchmarks</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>configaudit sshd [PFAD] [--format text|markdown|json]</code> — Standard-Pfad: <code>/etc/ssh/sshd_config</code></li>
+        <li class="task"><span class="chk"></span><code>configaudit firewall [PFAD] [--type iptables|nft]</code> — Liest gespeicherten <code>iptables-save</code>-Output aus Datei (kein direktes Ausführen von iptables)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>configaudit sshd
+configaudit sshd /path/to/sshd_config --format markdown
+configaudit firewall iptables-rules.txt --type iptables
+configaudit sshd --format json | python -m json.tool</code></pre>
+      <p>Beispiel-Output (Text):</p>
+      <pre><code>SSH CONFIG AUDIT: /etc/ssh/sshd_config
+════════════════════════════════════════════
+
+[HIGH] SSH-001 — PermitRootLogin
+  Aktuell:     yes
+  Empfohlen:   no
+  Beschreibung: Root-Direktlogin ermöglicht Brute-Force-Angriffe auf den
+                privilegiertesten Account.
+  Empfehlung:  Setze 'PermitRootLogin no' in sshd_config
+
+[MEDIUM] SSH-002 — PasswordAuthentication
+  Aktuell:     yes (Standard)
+  Empfohlen:   no
+  Empfehlung:  Nutze ausschließlich Public-Key-Authentifizierung
+
+[INFO] SSH-008 — AllowUsers/AllowGroups
+  Empfehlung:  Schränke SSH-Zugriff auf bestimmte Nutzer ein
+
+════════════════════════════════════════════
+Findings: 3 total (1 HIGH, 1 MEDIUM, 0 LOW, 1 INFO)</code></pre>
+    </div>
+
+    <div class="lab-section" id="test-fixtures">
+      <div class="sec-heading">Test-Fixtures</div>
+      <p>Erstelle <code>tests/fixtures/sshd_config_insecure</code>:</p>
+      <pre><code>PermitRootLogin yes
+PasswordAuthentication yes
+X11Forwarding yes
+PermitEmptyPasswords no</code></pre>
+      <p>Erstelle <code>tests/fixtures/sshd_config_secure</code>:</p>
+      <pre><code>PermitRootLogin no
+PasswordAuthentication no
+X11Forwarding no
+MaxAuthTries 3
+LoginGraceTime 20
+AllowUsers alice bob</code></pre>
+      <p>Erstelle <code>tests/fixtures/iptables_save_bad</code>:</p>
+      <pre><code>*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Insichere Config → findet Findings
+python -c "
+from configaudit.core import audit_sshd_config
+from pathlib import Path
+findings = audit_sshd_config(Path('tests/fixtures/sshd_config_insecure'))
+high = [f for f in findings if f.severity == 'HIGH']
+assert len(high) >= 1, 'Mindestens 1 HIGH-Finding erwartet'
+print(f'Findings: {len(findings)} ({len(high)} HIGH)')
+"
+
+# Sichere Config → weniger Findings
+python -c "
+from configaudit.core import audit_sshd_config
+from pathlib import Path
+findings = audit_sshd_config(Path('tests/fixtures/sshd_config_secure'))
+high = [f for f in findings if f.severity == 'HIGH']
+assert len(high) == 0, f'Sichere Config sollte keine HIGH-Findings haben, bekam: {high}'
+print('Sichere Config: OK')
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>parse_sshd_config</code> auf insecure-Fixture → korrektes Dict</li>
+        <li class="task"><span class="chk"></span>Test: <code>parse_sshd_config</code> ignoriert Kommentare</li>
+        <li class="task"><span class="chk"></span>Test: <code>parse_sshd_config</code> → <code>PermitRootLogin</code> ist <code>"yes"</code> in insecure-Fixture</li>
+        <li class="task"><span class="chk"></span>Test: <code>audit_sshd_config</code> auf insecure-Fixture → enthält SSH-001 Finding</li>
+        <li class="task"><span class="chk"></span>Test: <code>audit_sshd_config</code> auf secure-Fixture → kein HIGH Finding</li>
+        <li class="task"><span class="chk"></span>Test: <code>parse_iptables_save</code> auf bad-Fixture → <code>has_default_drop_input == False</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>generate_report</code> sortiert nach Severity korrekt</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Eigenes Regelwerk:</strong> Lade zusätzliche Regeln aus einer TOML-Datei:
+          <pre><code>[[rules]]
+id = "CUSTOM-001"
+key = "Banner"
+expected = "/etc/issue.net"
+severity = "LOW"
+title = "Kein Login-Banner"</code></pre>
+        </li>
+        <li class="task"><span class="chk"></span><strong>CIS-Benchmark-Links:</strong> Ergänze jeden Finding mit dem entsprechenden CIS-Benchmark-Referenzlink</li>
+        <li class="task"><span class="chk"></span><strong>nft-Support:</strong> Vollständiger Parser für <code>nft list ruleset</code>-Output</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>sshd_config parsen:</strong> Die Datei hat kein Standard-Format (kein <code>=</code>). Typisches Format ist <code>Schlüssel Wert</code> mit Whitespace-Trennung. Kommentare beginnen mit <code>#</code>. Mehrfache Leerzeichen zwischen Key und Value sind möglich.</p>
+      <p><strong>Standardwerte:</strong> viele sshd_config-Direktiven haben Standardwerte wenn nicht explizit gesetzt. Implementiere eine <code>SSHD_DEFAULTS</code>-Dict mit bekannten Defaults und nutze diese wenn ein Wert nicht in der Config steht.</p>
+      <p><strong>iptables-save Format:</strong> Jede Regel beginnt mit <code>-A CHAIN</code>. Policy-Zeilen: <code>:CHAIN POLICY [packets:bytes]</code>.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle-uctl">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def audit_sshd_config(path: Path) -&gt; list[Finding]:
+    """Auditiert sshd_config und gibt Findings zurück."""
+
+def audit_iptables(path: Path) -&gt; list[Finding]:
+    """Auditiert iptables-save-Output und gibt Findings zurück."""</code></pre>
+    </div>
+
+  </div><!-- /content -->
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#findings-modell" class="toc-lnk">Findings-Modell</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#test-fixtures" class="toc-lnk">Test-Fixtures</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle-uctl" class="toc-lnk">Schnittstelle uctl</a>
+    </div>
+  </aside>
+</div><!-- /page-body -->
+
+</body>
+</html>

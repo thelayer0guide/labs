@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 16 — Testing &amp; CI - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #f0883e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+  td, th { padding: 8px 12px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c9d1d9; text-align: left; }
+  th { color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Lab 16 — Testing &amp; CI</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 16</span>
+        <span class="badge badge-phase">Phase 6 — Engineering &amp; Integration</span>
+        <span class="badge badge-time">6–10 Stunden</span>
+          <span class="badge" style="color:#ffa657;background:rgba(0,0,0,0);border:1px solid #ffa65788;font-size:11px;letter-spacing:0.5px"><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#30363d">★</span> Erfahren</span>
+      </div>
+      <h1>Testing &amp; CI für alle Tools</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>mindestens 5 abgeschlossene Labs (01–15)</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">Python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-lnk">Git</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li><code>pytest</code>-Fixtures und Parametrisierung professionell einsetzen</li>
+        <li>Netzwerkzugriffe und Dateisystem-Operationen korrekt mocken</li>
+        <li>Coverage-Reports interpretieren und sinnvolle Ziele setzen</li>
+        <li>GitHub Actions für automatisierte Tests konfigurieren</li>
+        <li>Testen als Design-Aktivität verstehen: was machst du testbar?</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Tests sind in diesem Projekt nicht der letzte Schritt — sie sind das, was deine Tools erst produktionsreif macht. Wenn du in Lab 17 und im Capstone deine Tools zusammenführst, sind Tests das Sicherheitsnetz.</p>
+      <p>Dieses Lab hat keine neue Kernfunktionalität — es ist das Lab, in dem du die Qualität deiner bisherigen Arbeit überprüfst und systematisch verbesserst.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Für jedes deiner abgeschlossenen Tools (mindestens 5, idealerweise alle):</p>
+      <ol>
+        <li>Vollständige Testabdeckung der Kernlogik (<code>core.py</code>)</li>
+        <li>Mocking für externe Abhängigkeiten</li>
+        <li>Coverage-Report mit Ziel ≥ 80% auf <code>core.py</code></li>
+        <li>CI-Pipeline mit GitHub Actions</li>
+      </ol>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>Teststruktur-Anforderungen</h3>
+      <p>Für <strong>jedes Tool</strong> müssen folgende Test-Kategorien abgedeckt sein:</p>
+
+      <p><strong>Kategorie 1: Happy Path</strong></p>
+      <ul>
+        <li class="task"><span class="chk"></span>Hauptfunktionen mit normalen Inputs</li>
+        <li class="task"><span class="chk"></span>Korrekte Rückgabewerte prüfen</li>
+      </ul>
+
+      <p><strong>Kategorie 2: Edge Cases</strong></p>
+      <ul>
+        <li class="task"><span class="chk"></span>Leere Eingaben (leere Datei, leeres Verzeichnis, leerer String)</li>
+        <li class="task"><span class="chk"></span>Maximale/minimale Werte</li>
+        <li class="task"><span class="chk"></span>Ungültige Inputs (falsche Typen, fehlende Felder)</li>
+        <li class="task"><span class="chk"></span>Dateien, die nicht gelesen werden können (Permission Denied)</li>
+      </ul>
+
+      <p><strong>Kategorie 3: Fehlerbehandlung</strong></p>
+      <ul>
+        <li class="task"><span class="chk"></span>Erwartete Exceptions werden korrekt ausgelöst</li>
+        <li class="task"><span class="chk"></span>Unerwartete Fehler werden nicht stillschweigend verschluckt</li>
+        <li class="task"><span class="chk"></span>Fehlermeldungen sind verständlich</li>
+      </ul>
+
+      <p><strong>Kategorie 4: Boundary Conditions</strong></p>
+      <ul>
+        <li class="task"><span class="chk"></span>Einzelnes Element in einer Liste</li>
+        <li class="task"><span class="chk"></span>Sehr großes Element (wo relevant)</li>
+        <li class="task"><span class="chk"></span>Strings mit Sonderzeichen, Unicode, Nullbytes</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="pflicht-tests">
+      <div class="sec-heading">Pflicht-Tests pro Tool</div>
+
+      <h3>Lab 01 (Hash Inspector)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>hash_file</code> auf einer Datei mit bekanntem SHA256-Hash (Vergleich mit <code>sha256sum</code>-Ausgabe)</li>
+        <li class="task"><span class="chk"></span><code>hash_file</code> auf einer leeren Datei → bekannter SHA256-Hash für leere Datei: <code>e3b0...</code></li>
+        <li class="task"><span class="chk"></span><code>hash_file</code> auf nicht existierender Datei → <code>FileNotFoundError</code></li>
+        <li class="task"><span class="chk"></span><code>hash_file</code> mit ungültigem Algorithmus → <code>ValueError</code></li>
+        <li class="task"><span class="chk"></span><code>parse_checksum_file</code> mit 5 validen Zeilen → korrekte Dict-Länge</li>
+        <li class="task"><span class="chk"></span><code>parse_checksum_file</code> mit Kommentarzeilen → werden ignoriert</li>
+        <li class="task"><span class="chk"></span><code>verify_hashes</code> — case-insensitive, Groß- und Kleinschreibung gemischt</li>
+      </ul>
+
+      <h3>Lab 02 (Base Encoding)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Parametrisierter Roundtrip-Test: <code>for fmt in ["base64", "base32", "hex", "url"]: assert decode(encode(data, fmt), fmt) == data</code></li>
+        <li class="task"><span class="chk"></span>Inputs: leere Bytes, reiner Text, binäre Daten, alle 256 Byte-Werte</li>
+        <li class="task"><span class="chk"></span><code>decode</code> mit ungültigem Base64 → <code>ValueError</code> mit beschreibender Meldung</li>
+        <li class="task"><span class="chk"></span><code>detect_encoding</code> auf eindeutige Inputs</li>
+      </ul>
+
+      <h3>Lab 03 (Entropy Scanner)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>calculate_entropy(b"\x00" * 1000)</code> → 0.0</li>
+        <li class="task"><span class="chk"></span><code>calculate_entropy(bytes(range(256)))</code> → nahe 8.0</li>
+        <li class="task"><span class="chk"></span><code>scan_file</code> — Permission-Denied-Simulation mit Mock</li>
+        <li class="task"><span class="chk"></span><code>scan_directory</code> mit Extension-Filter — nutze <code>tmp_path</code> mit echten Testdateien</li>
+      </ul>
+
+      <h3>Lab 04 (Log Forensics)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>parse_auth_log</code> auf Fixture → korrekte Anzahl <code>LogEntry</code>-Objekte</li>
+        <li class="task"><span class="chk"></span>Zeilen mit falschem Format → werden übersprungen</li>
+        <li class="task"><span class="chk"></span><code>filter_by_time</code> — Grenzfall: Eintrag genau auf der Grenze</li>
+      </ul>
+
+      <h3>Lab 07 (Certificate Auditor)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>evaluate_certificate</code> für alle Status-Kombinationen</li>
+        <li class="task"><span class="chk"></span><code>fetch_certificate</code> mit gemockter TLS-Verbindung</li>
+      </ul>
+
+      <h3>Lab 10 (File Integrity Monitor)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>scan_path</code> → Roundtrip: init + sofortiger scan → 0 Änderungen</li>
+        <li class="task"><span class="chk"></span><code>diff_baselines</code> für alle drei Änderungstypen (added, removed, changed)</li>
+        <li class="task"><span class="chk"></span><code>BaselineStore</code> — save/load/exists</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="mocking-anforderungen">
+      <div class="sec-heading">Mocking-Anforderungen</div>
+      <p>Verwende <code>unittest.mock.patch</code> für:</p>
+      <table>
+        <tr><th>Tool</th><th>Was zu mocken</th></tr>
+        <tr><td>Lab 07</td><td><code>socket.create_connection</code> oder <code>ssl.get_server_certificate</code></td></tr>
+        <tr><td>Lab 09</td><td><code>psutil.net_connections</code></td></tr>
+        <tr><td>Lab 11</td><td><code>psutil.process_iter</code></td></tr>
+        <tr><td>Lab 14</td><td><code>httpx.post</code> oder <code>requests.post</code></td></tr>
+        <tr><td>Lab 15</td><td><code>subprocess.run</code> (für lsusb, lsblk)</td></tr>
+      </table>
+      <p><strong>Beispiel-Pattern:</strong></p>
+      <pre><code>from unittest.mock import patch, MagicMock
+
+def test_fetch_certificate_timeout():
+    with patch("socket.create_connection") as mock_conn:
+        mock_conn.side_effect = TimeoutError("Verbindung abgelaufen")
+        with pytest.raises((TimeoutError, ConnectionError)):
+            fetch_certificate("10.255.255.1", timeout=1.0)</code></pre>
+    </div>
+
+    <div class="lab-section" id="coverage-ziele">
+      <div class="sec-heading">Coverage-Ziele</div>
+      <p>Führe <code>pytest --cov=. --cov-report=term-missing</code> aus und erreich:</p>
+      <table>
+        <tr><th>Modul</th><th>Mindest-Coverage</th></tr>
+        <tr><td>Jedes <code>core.py</code></td><td>≥ 80%</td></tr>
+        <tr><td><code>shared/baseline.py</code></td><td>≥ 90%</td></tr>
+        <tr><td><code>cli.py</code> (optional)</td><td>≥ 40%</td></tr>
+      </table>
+      <p><strong>Ausgeschlossen von Coverage:</strong> <code>if __name__ == "__main__":</code>, reine Stub-Funktionen</p>
+      <p>Füge in <code>pyproject.toml</code> ein:</p>
+      <pre><code>[tool.pytest.ini_options]
+addopts = "--cov=. --cov-report=term-missing --cov-config=.coveragerc"
+
+[tool.coverage.report]
+exclude_lines = [
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+]</code></pre>
+    </div>
+
+    <div class="lab-section" id="github-actions">
+      <div class="sec-heading">GitHub Actions CI</div>
+      <p>Erstelle <code>.github/workflows/ci.yml</code>:</p>
+      <pre><code>name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: make lint
+      - run: make test</code></pre>
+      <p>Anforderungen:</p>
+      <ul>
+        <li class="task"><span class="chk"></span>Workflow läuft bei jedem Push und Pull Request</li>
+        <li class="task"><span class="chk"></span>Testet gegen Python 3.11 und 3.12</li>
+        <li class="task"><span class="chk"></span>Führt <code>ruff check .</code> aus (Lint)</li>
+        <li class="task"><span class="chk"></span>Führt <code>pytest</code> aus</li>
+        <li class="task"><span class="chk"></span>Schlägt fehl wenn Tests fehlschlagen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="conftest">
+      <div class="sec-heading">conftest.py (Shared Fixtures)</div>
+      <p>Erstelle <code>conftest.py</code> im Root des Repos mit gemeinsamen Fixtures:</p>
+      <pre><code>import pytest
+from pathlib import Path
+
+@pytest.fixture
+def sample_dir(tmp_path):
+    """Kleines Testverzeichnis mit bekannten Dateien."""
+    (tmp_path / "clean.txt").write_text("Hello World")
+    (tmp_path / "binary.bin").write_bytes(bytes(range(256)))
+    subdir = tmp_path / "sub"
+    subdir.mkdir()
+    (subdir / "config.txt").write_text("key=value")
+    return tmp_path
+
+@pytest.fixture
+def known_hash_file(tmp_path):
+    """Datei mit bekanntem SHA256-Hash."""
+    data = b"security-lab-test-data-2026"
+    path = tmp_path / "known.bin"
+    path.write_bytes(data)
+    return path, data</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Alle Tests laufen durch
+make test
+# → 0 Failures, 0 Errors
+
+# Coverage-Report
+pytest --cov=. --cov-report=term-missing | grep "core.py"
+# → Jedes core.py: ≥ 80%
+
+# Lint sauber
+make lint
+# → 0 Fehler
+
+# CI-Konfiguration valide
+python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
+# → kein Fehler</code></pre>
+    </div>
+
+    <div class="lab-section" id="was-testen">
+      <div class="sec-heading">Was zu testen IST und was NICHT</div>
+      <p><strong>Testen:</strong></p>
+      <ul>
+        <li>Reine Logik in <code>core.py</code></li>
+        <li>Korrekte Fehlermeldungen</li>
+        <li>Grenzfälle der Eingabe</li>
+        <li>Korrektheit von Berechnungen (Entropie, Hashes, Parsing)</li>
+      </ul>
+      <p><strong>Nicht testen:</strong></p>
+      <ul>
+        <li>Echte Netzwerkverbindungen (mocken stattdessen)</li>
+        <li>Ausgabe-Formatierung (zu brittle)</li>
+        <li>Integration mit echten System-Tools (mocken)</li>
+        <li>Was Python/externe Libraries selbst testen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Hypothesis:</strong> Nutze <code>hypothesis</code>-Bibliothek für Property-based Testing bei Lab 01 (Hash) und Lab 02 (Encoding): <code>@given(st.binary())</code> — automatisch generierte Testdaten</li>
+        <li class="task"><span class="chk"></span><strong>ARM64-CI:</strong> Füge einen CI-Job hinzu, der auf <code>ubuntu-22.04-arm64</code> (GitHub-hosted runner) läuft — prüft ob alle Pakete für ARM64 verfügbar sind</li>
+        <li class="task"><span class="chk"></span><strong>Test-Report:</strong> <code>pytest --html=test-report.html</code> — lokaler HTML-Report</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong><code>tmp_path</code>-Fixture:</strong> Von pytest bereitgestellt — jeder Test bekommt ein eigenes temporäres Verzeichnis. Wird nach dem Test automatisch gelöscht.</p>
+      <p><strong>Fixture-Scope:</strong> <code>@pytest.fixture(scope="session")</code> für teure Fixtures (z. B. eine Baseline die einmal erstellt wird), <code>scope="function"</code> (Standard) für Fixtures die pro Test frisch sein sollen.</p>
+      <p><strong>parametrize:</strong></p>
+      <pre><code>@pytest.mark.parametrize("algo,expected_len", [
+    ("sha256", 64),
+    ("md5", 32),
+    ("sha1", 40),
+])
+def test_hash_length(algo, expected_len, known_hash_file):
+    path, _ = known_hash_file
+    result = hash_file(path, [algo])
+    assert len(result[algo]) == expected_len</code></pre>
+      <p><strong>Mock-Assertion:</strong> Nutze <code>mock.assert_called_once_with(...)</code> um zu prüfen dass ein Mock korrekt aufgerufen wurde — wichtig für Tests die sicherstellen wollen, dass keine Netzwerkverbindung aufgebaut wird.</p>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#pflicht-tests" class="toc-lnk">Pflicht-Tests pro Tool</a>
+      <a href="#mocking-anforderungen" class="toc-lnk">Mocking-Anforderungen</a>
+      <a href="#coverage-ziele" class="toc-lnk">Coverage-Ziele</a>
+      <a href="#github-actions" class="toc-lnk">GitHub Actions CI</a>
+      <a href="#conftest" class="toc-lnk">conftest.py</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#was-testen" class="toc-lnk">Was zu testen</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

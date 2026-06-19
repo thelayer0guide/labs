@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monat 12 — Abschlussprojekt — Python Jahreskurs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --bg-raised: #1c2128;
+  --bg-code:   #0a0e14;
+  --border:    #30363d;
+  --border-s:  #21262d;
+  --tx:        #e6edf3;
+  --tx-sec:    #8b949e;
+  --tx-muted:  #6e7681;
+  --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+  --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+  --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r: 6px; --rl: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.topnav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);padding:0 32px;display:flex;align-items:center;height:48px;gap:8px}
+.nav-back{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--tx)}
+.nav-sep{color:var(--border-s);font-size:16px}
+.nav-here{font-family:var(--fm);font-size:11px}
+.nav-spacer{flex:1}
+.nav-adj{display:flex;gap:8px}
+.nav-adj a{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:3px 10px;border:1px solid var(--border-s);border-radius:3px;transition:color .15s,border-color .15s}
+.nav-adj a:hover{color:var(--tx);border-color:var(--border)}
+.page-header{border-bottom:2px solid var(--ac,#58a6ff);padding:32px 32px 28px;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 600px 200px at 50% 50%,rgba(var(--ac-raw,88,166,255),.06),transparent)}
+.ph-row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.ph-main{flex:1;min-width:280px}
+.ph-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ph-badge{font-family:var(--fm);font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;border:1px solid}
+.ph-title{font-family:var(--fd);font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px;color:var(--tx)}
+.ph-sub{font-size:12px;color:var(--tx-muted)}
+.sheets-panel{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);padding:14px 18px;min-width:160px;flex-shrink:0}
+.sheets-label{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tx-muted);margin-bottom:10px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:4px 0;border-bottom:1px solid var(--border-s);transition:color .15s}
+.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'→';color:var(--ac,#58a6ff);opacity:.5;transition:opacity .15s}
+.sheet-lnk:hover{color:var(--ac,#58a6ff)}
+.sheet-lnk:hover::before{opacity:1}
+.page-content{padding:0 32px 80px;max-width:1280px;margin:0 auto}
+.month-section{padding:48px 0 0}
+.month-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-s)}
+.month-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+.month-title{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.02em}
+.month-sub{font-size:11.5px;color:var(--tx-muted);margin-left:auto;white-space:nowrap}
+.week-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.week-grid{grid-template-columns:1fr}}
+.week-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);border-left-width:3px;padding:18px 20px}
+.week-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.week-num{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg-code)}
+.week-title{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2}
+.topic-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.topic-list li{font-size:11.5px;color:var(--tx-sec);display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.topic-list li::before{content:'›';color:inherit;opacity:.6;flex-shrink:0}
+.ex-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-bottom:6px}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ex-list li{font-size:11px;color:var(--tx-muted);display:flex;gap:7px;line-height:1.35}
+.ex-list li::before{content:'→';flex-shrink:0}
+.code-block{background:var(--bg-code);border:1px solid var(--border-s);border-radius:var(--r);padding:12px 16px;font-family:var(--fm);font-size:11.5px;line-height:1.7;margin:10px 0;overflow-x:auto}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg-code);border:1px solid var(--border-s);color:var(--tx-muted)}
+.milestone-card{background:var(--bg-card);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;position:relative}
+.milestone-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.milestone-inner{padding:28px 32px;position:relative;z-index:1}
+.milestone-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.milestone-title{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.milestone-desc{font-size:12px;color:var(--tx-sec);line-height:1.65;max-width:600px;margin-bottom:18px}
+.milestone-feats{display:flex;flex-wrap:wrap;gap:8px}
+.milestone-feat{font-size:11px;background:var(--bg-raised);border:1px solid var(--border-s);border-radius:4px;padding:4px 10px;color:var(--tx-sec)}
+.milestone-code{margin-top:20px}
+.seclab-box{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:var(--r);padding:12px 16px;font-size:11px;color:#58a6ff99;line-height:1.55;display:flex;gap:8px;margin-top:14px}
+.seclab-box::before{content:'⬡';color:var(--m1);flex-shrink:0;font-size:13px}
+.seclab-box strong{color:var(--m1)}
+.hint-box{border-left:2px solid;background:var(--bg-code);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--tx-muted);line-height:1.55;margin-top:12px}
+.diff{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
+.diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:currentColor}
+.skills-row{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.skills-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-right:8px;white-space:nowrap}
+.kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
+@media(max-width:768px){.topnav{padding:0 16px}.page-header{padding:24px 16px}.page-content{padding:0 16px 60px}}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav" style="--ac:#ffd700">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Jahreskurs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here" style="color:#ffd700">Monat 12</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-adj">
+    <a href="monat-11.html">← M11</a>
+    
+  </div>
+</nav>
+
+<div class="page-header" style="--ac:#ffd700">
+  <div class="ph-row">
+    <div class="ph-main">
+      <div class="ph-badges">
+        <span class="ph-badge" style="color:#ffd700;border-color:#ffd70055;background:#ffd70011">Phase F</span>
+        <span class="ph-badge" style="color:#ffd700;border-color:#ffd70055;background:#ffd70011">Monat 12</span>
+        <span class="ph-badge" style="color:var(--tx-muted);border-color:var(--border-s);background:transparent">Wochen 45–48</span>
+        <span class="ph-badge" style="color:#ff7b72;border-color:#ff7b7255;background:#ff7b7211"><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span> Experte</span>
+      </div>
+      <div class="ph-title">Abschlussprojekt</div>
+      <div class="ph-sub">Design · Implementierung · Tests · Release</div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-lnk" target="_blank">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="month-section">
+<div class="month-hdr">
+    <span class="month-badge" style="color:var(--m12);border-color:var(--m12);background:rgba(255,215,0,.07)">Monat 12</span>
+    <h2 class="month-title">Abschlussprojekt</h2>
+    <span class="month-sub">Design · Implementierung · Tests · Release</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m12)">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">W 45–46</span><div class="week-title">Planung &amp; Architektur</div></div>
+      <ul class="topic-list">
+        <li>Projektidee präzisieren: Problem, Zielgruppe, Scope</li>
+        <li>Architektur-Dokument: Module, Schnittstellen, Datenmodell</li>
+        <li>pyproject.toml Setup, Git-Repo, CI-Pipeline</li>
+        <li>Datenmodell als Dataclasses / Pydantic-Models</li>
+        <li>API-Schnittstellen definieren (intern: Funktions-Signaturen)</li>
+        <li>Test-Plan: welche Teile müssen getestet sein?</li>
+      </ul>
+      <div class="ex-label">Deliverables</div>
+      <ul class="ex-list">
+        <li>README mit Projektbeschreibung + Architekturdiagramm</li>
+        <li>pyproject.toml + Git + GitHub Actions (ruff + mypy + pytest)</li>
+        <li>Datenmodell-Sketch (Dataclasses, keine Implementation)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Architektur</span><span class="tag">Projektplanung</span><span class="tag">Datenmodell</span><span class="tag">CI-Setup</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m12)">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">W 47</span><div class="week-title">Implementierung + Tests</div></div>
+      <ul class="topic-list">
+        <li>TDD-Flow: Test → Implement → Refactor</li>
+        <li>Core-Logik zuerst, dann CLI</li>
+        <li>Integration Tests für Gesamtflüsse</li>
+        <li>Edge Cases dokumentieren und testen</li>
+        <li>Logging einbauen (nicht als Afterthought)</li>
+        <li>Performance-Profiling: mindestens ein Hotspot messen</li>
+      </ul>
+      <div class="ex-label">Deliverables</div>
+      <ul class="ex-list">
+        <li>Funktionierendes MVP der Core-Logik</li>
+        <li>pytest: 75%+ Coverage auf core.py</li>
+        <li>mypy --strict: keine Fehler</li>
+      </ul>
+      <div class="tag-row"><span class="tag">TDD</span><span class="tag">Integration Tests</span><span class="tag">Coverage</span><span class="tag">Logging</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m12)">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">W 48</span><div class="week-title">Packaging, Docs &amp; Release</div></div>
+      <ul class="topic-list">
+        <li>pipx install . auf der uConsole — funktioniert es?</li>
+        <li>README vollständig: Installation, Usage, Beispiele</li>
+        <li>CHANGELOG.md: was ist in v0.1.0?</li>
+        <li>GitHub Release: Tag + Wheel als Artifact</li>
+        <li>Retrospektive: Was hätte ich anders gemacht?</li>
+        <li>Nächste Schritte: Was kommt in v0.2.0?</li>
+      </ul>
+      <div class="ex-label">Deliverables</div>
+      <ul class="ex-list">
+        <li>v0.1.0 Release auf GitHub (Tag + Wheel)</li>
+        <li>pipx install auf uConsole — live demo</li>
+        <li>Retrospektive-Dokument (1 Seite)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Release</span><span class="tag">README</span><span class="tag">CHANGELOG</span><span class="tag">GitHub Release</span><span class="tag">uConsole</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m12)" style="background:linear-gradient(135deg,var(--bg-card),var(--bg-raised))">
+      <div class="week-top"><span class="week-num" style="color:var(--m12)">BONUS</span><div class="week-title">Projektideen</div></div>
+      <ul class="topic-list">
+        <li><strong style="color:var(--m12)">uctl</strong> — Security Toolkit (direkte Brücke zum Security Lab)</li>
+        <li><strong style="color:var(--m11)">devlog</strong> — Entwicklertagebuch CLI mit SQLite + Markdown</li>
+        <li><strong style="color:var(--m3)">mkenv</strong> — Projekt-Bootstrap-Tool (venv + pyproject + git)</li>
+        <li><strong style="color:var(--m5)">syncvault</strong> — Lokaler File-Sync mit Hash-Vergleich</li>
+        <li><strong style="color:var(--m8)">apilens</strong> — REST-API-Tester als CLI (wie Postman, nur Terminal)</li>
+        <li><strong style="color:var(--m9)">feedwatch</strong> — RSS-Feed-Monitor mit SQLite + Alerts</li>
+      </ul>
+      <div class="tag-row"><span class="tag">eigene Wahl</span><span class="tag">nach Interesse</span><span class="tag">auf uConsole deploybar</span></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

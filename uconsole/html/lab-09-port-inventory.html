@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 09 — Local Port Inventory - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #ffa657;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-09-port-inventory</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 09</span>
+        <span class="badge badge-phase">Phase 3 — Krypto &amp; Netzwerk</span>
+        <span class="badge badge-time">3–5 Stunden</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>Local Port Inventory</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 00 (Projektstruktur)</span><br>
+        Externe Dependencies: <span>psutil</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="sheet-lnk">systemd</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li><code>psutil</code> für Prozess- und Netzwerk-Informationen einsetzen</li>
+        <li>Socket-zu-Prozess-Mapping verstehen</li>
+        <li>Strukturierte Filter- und Exportlogik implementieren</li>
+        <li>Whitelist-basierte Anomalie-Erkennung als Vorstufe zu Lab 10/11</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Welche Ports lauschen auf meinem System? Welcher Prozess öffnet Port 8080? Seit wann läuft dieser Service? Diese Fragen sind bei der Härtung von Systemen, nach einer Systemkompromittierung oder schlicht beim Verstehen der eigenen Maschine zentral.</p>
+      <p><code>ss -tlnp</code> oder <code>netstat -tlnp</code> zeigen das auf der Kommandozeile — du baust die Python-Version, die die Daten strukturiert und filterbar macht.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>portinv</code> — ein Tool, das listening TCP/UDP-Ports inventarisiert, zugehörige Prozesse anzeigt und gegen eine Whitelist prüft.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── portinventory/
+    ├── __init__.py
+    ├── core.py
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        └── test_core.py</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>list_listening_ports() -&gt; list[dict]</code>
+          <ul>
+            <li>Nutzt <code>psutil.net_connections(kind="inet")</code> und <code>psutil.net_connections(kind="inet6")</code></li>
+            <li>Filtert auf <code>status == "LISTEN"</code> (TCP) und Ports ohne Verbindungsstatus (UDP)</li>
+            <li>Für jeden Port:</li>
+          </ul>
+          <pre><code>{
+    "protocol":  str,       # "tcp" oder "udp"
+    "local_ip":  str,       # gebundene IP oder "0.0.0.0" / "::"
+    "local_port": int,
+    "pid":       int | None,
+    "process_name": str | None,
+    "process_path": str | None,
+    "process_user": str | None,
+    "process_cmdline": str | None,   # erster Teil der Kommandozeile
+    "ipv6": bool,
+}</code></pre>
+          <ul>
+            <li>Bei <code>pid=None</code> (kein Prozess zugeordnet): Felder als <code>None</code></li>
+            <li>Bei Berechtigungsfehlern beim Prozess-Lookup: Felder mit <code>"&lt;permission denied&gt;"</code> befüllen</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>filter_ports(ports: list[dict], protocol: str | None, port_range: tuple[int, int] | None) -&gt; list[dict]</code>
+          <ul>
+            <li><code>protocol</code>: <code>"tcp"</code>, <code>"udp"</code> oder <code>None</code> (alle)</li>
+            <li><code>port_range</code>: <code>(1, 1024)</code> für well-known ports, <code>None</code> für alle</li>
+            <li>Gibt gefilterte Liste zurück (keine Mutation der Eingabe)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>load_whitelist(path: Path) -&gt; dict</code>
+          <ul>
+            <li>Parst eine TOML-Datei (nutze <code>tomllib</code> aus der Stdlib ab Python 3.11):</li>
+          </ul>
+          <pre><code>[[ports]]
+port = 22
+protocol = "tcp"
+description = "SSH"
+
+[[ports]]
+port = 80
+protocol = "tcp"
+description = "HTTP"</code></pre>
+          <ul>
+            <li>Gibt zurück: <code>{(port, protocol): description}</code></li>
+            <li>Gibt leeres Dict zurück wenn Datei nicht existiert</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>check_against_whitelist(ports: list[dict], whitelist: dict) -&gt; list[dict]</code>
+          <ul>
+            <li>Fügt jedem Port <code>"whitelisted": bool</code> und <code>"whitelist_note": str | None</code> hinzu</li>
+            <li>Nicht-whitelistete Ports sind potenzielle Anomalien</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>portinv [--proto tcp|udp] [--range 1-1024] [--whitelist ports.toml] [--format text|json] [--only-unknown]</code>
+          <ul>
+            <li><code>--only-unknown</code>: zeigt nur nicht-whitelistete Ports</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>portinv
+portinv --proto tcp
+portinv --range 1-1024
+portinv --whitelist ~/ports.toml --only-unknown
+portinv --format json > ports.json</code></pre>
+      <p>Beispiel-Output (Text):</p>
+      <pre><code>LOCAL PORT INVENTORY
+═══════════════════════════════════════════════════
+PROTO  PORT   IP              PROZESS        USER
+───────────────────────────────────────────────────
+tcp    22     0.0.0.0         sshd           root
+tcp    80     0.0.0.0         nginx          www-data
+tcp    3000   127.0.0.1       node           alice    [!] nicht whitelisted
+udp    53     0.0.0.0         systemd-r...   systemd-resolve
+tcp6   443    ::              nginx          www-data
+═══════════════════════════════════════════════════
+Gesamt: 5 Ports (1 nicht whitelisted)</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Grundfunktion (erfordert laufendes System)
+python -m portinventory
+# → mind. Port 22 (SSH) sollte erscheinen wenn SSH läuft
+
+# Filter
+python -m portinventory --proto tcp
+# → nur TCP-Ports
+
+# JSON-Export
+python -m portinventory --format json | python -m json.tool
+# → valides JSON ohne Fehler
+
+# Kern-Logik unit-testbar
+python -c "
+from portinventory.core import filter_ports
+test_ports = [
+    {'protocol': 'tcp', 'local_port': 22, 'local_ip': '0.0.0.0', 'pid': None,
+     'process_name': 'sshd', 'process_path': None, 'process_user': 'root',
+     'process_cmdline': None, 'ipv6': False},
+    {'protocol': 'udp', 'local_port': 53, 'local_ip': '0.0.0.0', 'pid': None,
+     'process_name': 'systemd-resolved', 'process_path': None, 'process_user': 'systemd-resolve',
+     'process_cmdline': None, 'ipv6': False},
+]
+tcp_only = filter_ports(test_ports, 'tcp', None)
+assert len(tcp_only) == 1
+assert tcp_only[0]['local_port'] == 22
+print('Filter OK')
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>filter_ports</code> mit <code>protocol="tcp"</code> → nur TCP-Einträge</li>
+        <li class="task"><span class="chk"></span>Test: <code>filter_ports</code> mit <code>port_range=(1, 1024)</code> → nur Ports ≤ 1024</li>
+        <li class="task"><span class="chk"></span>Test: <code>filter_ports</code> mit <code>protocol=None, port_range=None</code> → alle Einträge unverändert</li>
+        <li class="task"><span class="chk"></span>Test: <code>load_whitelist</code> mit valider TOML-Datei → korrektes Dict</li>
+        <li class="task"><span class="chk"></span>Test: <code>load_whitelist</code> mit nicht existierender Datei → leeres Dict (kein Absturz)</li>
+        <li class="task"><span class="chk"></span>Test: <code>check_against_whitelist</code> markiert whitelistete Ports korrekt</li>
+        <li class="task"><span class="chk"></span>Test: <code>check_against_whitelist</code> markiert unbekannte Ports korrekt</li>
+      </ul>
+      <p>Für <code>list_listening_ports</code>: Nutze <code>unittest.mock.patch("psutil.net_connections")</code> mit vorgefertigten Mock-Daten.</p>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Baseline-Integration:</strong> <code>portinv --save baseline.json</code> speichert aktuellen Zustand. <code>portinv --diff baseline.json</code> zeigt neue/verschwundene Ports seit dem Snapshot — direkte Brücke zu Lab 10.</li>
+        <li class="task"><span class="chk"></span><strong>Prozess-Uptime:</strong> Zeige wie lange der Prozess läuft (<code>psutil.Process(pid).create_time()</code>)</li>
+        <li class="task"><span class="chk"></span><strong>Wiederholtes Scannen:</strong> <code>portinv --watch 5s</code> — alle 5 Sekunden neu scannen und Änderungen hervorheben (ohne Busy-Loop: <code>time.sleep()</code> zwischen Scans)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <h3>psutil und Berechtigungen</h3>
+      <p>Auf Linux benötigt <code>psutil</code> erhöhte Rechte um Prozessinformationen für alle Prozesse zu sehen. Wenn du als normaler Nutzer läufst, siehst du nur deine eigenen Prozesse — handle <code>psutil.AccessDenied</code> entsprechend.</p>
+      <h3>UDP-Ports</h3>
+      <p><code>psutil.net_connections(kind="udp")</code> gibt UDP-Verbindungen zurück. UDP hat keinen "LISTEN"-Status — alle UDP-Sockets sind potenziell lauschend. Filtere nach <code>laddr.port &gt; 0</code>.</p>
+      <h3>IPv6</h3>
+      <p><code>::</code> bedeutet "alle Adressen" (wie <code>0.0.0.0</code> für IPv4). <code>::1</code> ist Loopback. Zeige IPv6-Einträge deutlich markiert.</p>
+      <h3>Prozess-Cmdline</h3>
+      <p><code>psutil.Process(pid).cmdline()</code> gibt eine Liste zurück — join mit Space, aber kürze auf sinnvolle Länge für die Ausgabe.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def list_listening_ports() -> list[dict]:
+    """Listet alle lauschenden TCP/UDP-Ports mit Prozess-Informationen."""
+
+def filter_ports(ports: list[dict], protocol: str | None, port_range: tuple[int, int] | None) -> list[dict]:
+    """Filtert Port-Liste nach Protokoll und Port-Range."""</code></pre>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle uctl</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

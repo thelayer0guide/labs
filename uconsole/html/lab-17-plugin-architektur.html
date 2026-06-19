@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 17 — Plugin-Architektur - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #f0883e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+  td, th { padding: 8px 12px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c9d1d9; text-align: left; }
+  th { color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Lab 17 — Plugin-Architektur</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 17</span>
+        <span class="badge badge-phase">Phase 6 — Engineering &amp; Integration</span>
+        <span class="badge badge-time">4–6 Stunden</span>
+          <span class="badge" style="color:#ff7b72;background:rgba(0,0,0,0);border:1px solid #ff7b7288;font-size:11px;letter-spacing:0.5px"><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span> Experte</span>
+      </div>
+      <h1>Plugin-Architektur Prototyp</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 16 (alle Tests grün)</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">Python</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Abstrakte Basisklassen (<code>ABC</code>, <code>abstractmethod</code>) als Interface-Mechanismus nutzen</li>
+        <li><code>importlib.metadata.entry_points</code> für Plugin-Discovery verstehen</li>
+        <li><code>pyproject.toml</code> mit <code>entry_points</code>/<code>project.entry-points</code> konfigurieren</li>
+        <li>Dynamisches Laden von Modulen mit <code>importlib.import_module</code></li>
+        <li>Das eigene Tool-Ökosystem in ein einheitliches System überführen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Im Capstone werden alle 15+ Tools zu <code>uctl</code> zusammengeführt. Die Plugin-Architektur ist das Bindeglied: Anstatt alle Tools hart in <code>uctl</code> zu codieren, entdeckt <code>uctl</code> sie dynamisch über den <code>entry_points</code>-Mechanismus von Python.</p>
+      <p>Das bedeutet: Neue Tools können hinzugefügt werden ohne <code>uctl</code>'s Code zu ändern — sie registrieren sich einfach als Plugin.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Definiere das Plugin-Interface, konvertiere 3 bestehende Tools in Plugins, und implementiere den Plugin-Loader.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+├── shared/
+│   ├── __init__.py
+│   ├── baseline.py
+│   └── plugin.py       ← Plugin-Interface (ABC)
+├── hashinspect/
+│   ├── ...
+│   └── plugin.py       ← Plugin-Implementierung
+├── entropyscanner/
+│   └── plugin.py
+├── certaudit/
+│   └── plugin.py
+└── pyproject.toml      ← entry_points konfigurieren</code></pre>
+    </div>
+
+    <div class="lab-section" id="plugin-interface">
+      <div class="sec-heading">Das Plugin-Interface</div>
+      <p>Definiere in <code>shared/plugin.py</code>:</p>
+      <pre><code>from abc import ABC, abstractmethod
+import argparse
+from typing import Any
+
+class SecurityTool(ABC):
+    """Basisklasse für alle uctl-Plugins."""
+
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        """Kurzer Name des Subcommands (z. B. 'hash', 'cert')."""
+        ...
+
+    @property
+    @abstractmethod
+    def description(self) -> str:
+        """Eine-Zeile-Beschreibung für die CLI-Hilfe."""
+        ...
+
+    @abstractmethod
+    def register_args(self, subparser: argparse.ArgumentParser) -> None:
+        """Registriert alle CLI-Argumente für diesen Subcommand."""
+        ...
+
+    @abstractmethod
+    def run(self, args: argparse.Namespace) -> int:
+        """Führt das Tool aus. Gibt Exit-Code zurück (0=OK, 1=Fehler/Fund)."""
+        ...
+
+    def validate_args(self, args: argparse.Namespace) -> list[str]:
+        """Optionale Argument-Validierung vor run(). Gibt Fehlermeldungen zurück."""
+        return []</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>shared/plugin.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>SecurityTool</code>-ABC wie oben definiert</li>
+        <li class="task"><span class="chk"></span>Funktion <code>load_plugins(group: str = "uctl.plugins") -> list[SecurityTool]</code>
+          <ul>
+            <li>Nutzt <code>importlib.metadata.entry_points(group=group)</code></li>
+            <li>Lädt jedes Plugin, instanziiert es</li>
+            <li>Ignoriert (mit Warnung) Plugins die <code>SecurityTool</code> nicht korrekt implementieren</li>
+            <li>Gibt sortierte Liste nach <code>plugin.name</code> zurück</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>load_plugin_from_module(module_path: str) -> SecurityTool | None</code>
+          <ul>
+            <li>Lädt ein Plugin direkt per Modul-Pfad: <code>"hashinspect.plugin:HashInspectPlugin"</code></li>
+            <li>Nützlich für Testing und manuelle Registration</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Plugin-Implementierungen</h3>
+      <p>Implementiere <code>SecurityTool</code> für <strong>mindestens 3 Tools</strong>:</p>
+
+      <h3>hashinspect/plugin.py</h3>
+      <pre><code>class HashInspectPlugin(SecurityTool):
+
+    @property
+    def name(self) -> str:
+        return "hash"
+
+    @property
+    def description(self) -> str:
+        return "Berechnet kryptografische Hashes für Dateien"
+
+    def register_args(self, subparser: argparse.ArgumentParser) -> None:
+        subparser.add_argument("files", nargs="+", type=Path)
+        subparser.add_argument("--algo", default="sha256")
+        # ...
+
+    def run(self, args: argparse.Namespace) -> int:
+        # Nutzt hash_file aus hashinspect.core
+        # Gibt 0 oder 1 zurück
+        ...</code></pre>
+      <p>Implementiere entsprechend für 2 weitere Tools deiner Wahl.</p>
+
+      <h3>pyproject.toml</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>entry_points</code> für alle implementierten Plugins konfigurieren:
+          <pre><code>[project.entry-points."uctl.plugins"]
+hash    = "hashinspect.plugin:HashInspectPlugin"
+entropy = "entropyscanner.plugin:EntropyScannerPlugin"
+cert    = "certaudit.plugin:CertAuditPlugin"</code></pre>
+        </li>
+      </ul>
+
+      <h3>uctl_proto.py (Mini-Dispatcher)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Erstelle eine einfache <code>uctl_proto.py</code> im Root als Proof-of-Concept:
+          <ul>
+            <li>Lädt alle Plugins via <code>load_plugins()</code></li>
+            <li>Baut einen <code>argparse</code>-Parser mit einem Subparser pro Plugin</li>
+            <li>Dispatcht auf das richtige Plugin</li>
+            <li>Zeigt <code>--help</code> mit allen registrierten Tools</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>python uctl_proto.py --help
+python uctl_proto.py hash datei.iso
+python uctl_proto.py entropy ~/Downloads
+python uctl_proto.py cert github.com</code></pre>
+      <p>Beispiel-Output <code>uctl_proto.py --help</code>:</p>
+      <pre><code>uctl — Unified Security Toolkit (Prototyp)
+
+Subcommands:
+  cert      Auditiert TLS-Zertifikate
+  entropy   Scannt Verzeichnisse auf Shannon-Entropie
+  hash      Berechnet kryptografische Hashes für Dateien
+
+Optionen:
+  --help    Zeigt diese Hilfe</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Plugin-Loading funktioniert
+pip install -e .   # installiert entry_points
+python -c "
+from shared.plugin import load_plugins
+plugins = load_plugins()
+names = [p.name for p in plugins]
+print('Geladene Plugins:', names)
+assert 'hash' in names
+assert len(plugins) >= 3
+"
+
+# Dispatcher funktioniert
+python uctl_proto.py hash --help
+# → zeigt argparse-Hilfe für hash-Plugin
+
+python uctl_proto.py hash /dev/null --algo sha256
+# → gibt SHA256 für leere/null-Input aus (je nach OS)
+
+# entry_points korrekt konfiguriert
+python -c "
+from importlib.metadata import entry_points
+eps = entry_points(group='uctl.plugins')
+print('entry_points:', list(eps))
+assert len(list(eps)) >= 3
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <p>Erstelle <code>shared/tests/test_plugin.py</code>:</p>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>SecurityTool</code> kann nicht direkt instanziiert werden (ist ABC)</li>
+        <li class="task"><span class="chk"></span>Test: Konkrete Plugin-Implementierung instanziiert sich korrekt</li>
+        <li class="task"><span class="chk"></span>Test: <code>plugin.name</code> gibt String zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>plugin.run(args)</code> gibt int zurück (0 oder 1)</li>
+        <li class="task"><span class="chk"></span>Test: <code>load_plugin_from_module("hashinspect.plugin:HashInspectPlugin")</code> gibt Instanz zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>load_plugins()</code> gibt mindestens 3 Plugins zurück (nach <code>pip install -e .</code>)</li>
+        <li class="task"><span class="chk"></span>Test: Plugins haben eindeutige Namen (kein Duplikat)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Konfigurations-Weitergabe:</strong> <code>SecurityTool</code> erhält beim Aufruf auch eine <code>config: dict</code> aus der zentralen <code>uctl.toml</code> — Plugins können Defaults daraus lesen</li>
+        <li class="task"><span class="chk"></span><strong>Versionierung:</strong> Jedes Plugin deklariert <code>min_uctl_version: str</code> — der Loader warnt bei inkompatiblen Versionen</li>
+        <li class="task"><span class="chk"></span><strong>Lazy Loading:</strong> Plugins werden erst importiert wenn sie aufgerufen werden — reduziert Startup-Zeit</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>entry_points Installation:</strong> Plugins werden über <code>entry_points</code> registriert, aber die <code>entry_points</code>-Konfiguration wird erst nach <code>pip install -e .</code> aktiv. Für Tests kannst du <code>load_plugin_from_module()</code> direkt nutzen.</p>
+      <p><strong>ABC und abstractmethod:</strong></p>
+      <pre><code>from abc import ABC, abstractmethod
+
+class MyABC(ABC):
+    @abstractmethod
+    def my_method(self): ...
+
+# MyABC() → TypeError: Can't instantiate abstract class</code></pre>
+      <p><strong>importlib.metadata (Python 3.9+):</strong></p>
+      <pre><code>from importlib.metadata import entry_points
+eps = entry_points(group="uctl.plugins")
+for ep in eps:
+    cls = ep.load()  # gibt die Klasse zurück
+    plugin = cls()</code></pre>
+      <p><strong>Robustheit:</strong> Wenn ein Plugin-Import fehlschlägt (z. B. fehlende Dependency), soll der Loader das Plugin überspringen und eine Warnung ausgeben — nicht den gesamten Start von <code>uctl</code> blockieren.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für den Capstone</div>
+      <pre><code>from shared.plugin import SecurityTool, load_plugins
+
+# Im Capstone:
+plugins = load_plugins()
+# → alle registrierten Tools als fertige SecurityTool-Instanzen</code></pre>
+      <p>Das ist die Brücke: Der Capstone muss für das Hinzufügen eines weiteren Tools nur <code>entry_points</code> erweitern — kein Code-Änderung in <code>uctl</code> selbst.</p>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#plugin-interface" class="toc-lnk">Plugin-Interface</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle Capstone</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

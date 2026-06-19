@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 04 — Log Forensics Toolkit - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #d2a8ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; position: relative; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-align: left; color: var(--muted); padding: 8px 12px; border-bottom: 2px solid var(--border); letter-spacing: 0.5px; text-transform: uppercase; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-04-log-forensics</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 04</span>
+        <span class="badge badge-phase">Phase 2 — Parsing &amp; Forensik</span>
+        <span class="badge badge-time">5–8 Stunden</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>Log Forensics Toolkit</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 03 (Projektstruktur, Verzeichnisiteration)</span><br>
+        Modul: <span>logaudit</span><br>
+        Befehl: <span>logaudit</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="regex-cheatsheet.html" class="sheet-lnk">regex-cheatsheet</a>
+      <a href="bash-cheatsheet.html" class="sheet-lnk">bash-cheatsheet</a>
+      <a href="python-cheatsheet.html" class="sheet-lnk">python-cheatsheet</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <main class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Regex-Gruppen für strukturiertes Parsing einsetzen</li>
+        <li><code>datetime</code>-Parsing und Zeitraum-Filterung implementieren</li>
+        <li><code>collections.Counter</code> für Häufigkeitsanalysen nutzen</li>
+        <li>Ein Datenmodell mit <code>dataclass</code> entwerfen (Parser → Modell → Aggregation → Report)</li>
+        <li>Maschinenlesbare Ausgabe (JSON) neben menschenlesbarer Ausgabe implementieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Log-Dateien sind die Hauptquelle forensischer Analyse auf Linux-Systemen. <code>auth.log</code> (oder <code>secure</code> auf Fedora/RHEL) enthält SSH-Logins, sudo-Nutzung und Authentifizierungsversuche. Webserver-Logs zeigen Zugriffsmuster. Wer schnell erkennt, welche IP-Adressen besonders aggressiv scannen, kann reagieren.</p>
+      <p>Das wichtigste Architekturmuster dieses Labs ist die klare Trennung:<br>
+      <strong>Parser → Datenmodell → Aggregation → Report</strong></p>
+      <p>Dieses Muster zieht sich durch fast alle folgenden Labs. Lerne es hier sauber.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>logaudit</code> — ein Tool zur forensischen Analyse von <code>auth.log</code>-Dateien und (als Bonus) nginx-Access-Logs.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── logaudit/
+    ├── __init__.py
+    ├── core.py
+    ├── models.py     ← Datenmodell (dataclasses)
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        ├── test_core.py
+        └── fixtures/
+            ├── sample_auth.log
+            └── sample_nginx.log</code></pre>
+    </div>
+
+    <div class="lab-section" id="das-datenmodell">
+      <div class="sec-heading">Das Datenmodell</div>
+      <p>Definiere in <code>models.py</code>:</p>
+      <pre><code>from dataclasses import dataclass
+from datetime import datetime
+
+@dataclass
+class LogEntry:
+    timestamp: datetime
+    host: str
+    service: str
+    pid: int | None
+    message: str
+    ip: str | None          # extrahierte IP-Adresse, falls vorhanden
+    event_type: str         # "ssh_fail", "ssh_success", "sudo", "other"
+    username: str | None    # betroffener Nutzer, falls erkennbar</code></pre>
+      <p>Du kannst das Modell erweitern, aber diese Felder müssen vorhanden sein.</p>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>parse_auth_log(path: Path) -> list[LogEntry]</code>
+          <ul>
+            <li>Parst eine <code>auth.log</code>-Datei zeilenweise</li>
+            <li>Erkennt das Standard-Syslog-Format: <code>Mmm DD HH:MM:SS hostname service[pid]: message</code></li>
+            <li>Extrahiert IP-Adressen per Regex aus der <code>message</code> (IPv4 + IPv6)</li>
+            <li>Klassifiziert <code>event_type</code>:
+              <ul>
+                <li><code>ssh_fail</code>: Zeilen mit "Failed password" oder "Invalid user"</li>
+                <li><code>ssh_success</code>: Zeilen mit "Accepted password" oder "Accepted publickey"</li>
+                <li><code>sudo</code>: Zeilen mit "sudo:"</li>
+                <li><code>other</code>: alles andere</li>
+              </ul>
+            </li>
+            <li>Zeilen, die nicht dem Format entsprechen, werden übersprungen (nicht geworfen)</li>
+            <li>Bei Parse-Fehler eines Timestamps: Zeile überspringen, Warnung auf stderr</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>filter_by_time(entries: list[LogEntry], since: datetime | None, until: datetime | None) -> list[LogEntry]</code>
+          <ul>
+            <li>Filtert Einträge nach Zeitraum</li>
+            <li><code>since</code> und <code>until</code> können unabhängig <code>None</code> sein (kein Filter in die Richtung)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>aggregate_ssh_failures(entries: list[LogEntry]) -> dict</code>
+          <ul>
+            <li>Gibt zurück: <code>{ip: count}</code> für alle SSH-Fehlversuche, sortiert nach Count (absteigend)</li>
+            <li>Nur Einträge mit <code>event_type == "ssh_fail"</code> und vorhandener IP</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>hourly_distribution(entries: list[LogEntry]) -> dict[int, int]</code>
+          <ul>
+            <li>Gibt zurück: <code>{stunde: anzahl}</code> für alle Einträge (0–23)</li>
+            <li>Nützlich zur Erkennung von Angriffszeiten</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>login_success_rate(entries: list[LogEntry]) -> float</code>
+          <ul>
+            <li>Berechnet: erfolgreiche Logins / (erfolgreiche + fehlgeschlagene) × 100</li>
+            <li>Gibt <code>0.0</code> zurück wenn kein Login-Versuch vorhanden</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>logaudit FILE [--since DATUM] [--until DATUM] [--top N] [--format text|json]</code>
+          <ul>
+            <li><code>--since "2026-06-01"</code> oder <code>--since "2026-06-01T12:00:00"</code></li>
+            <li><code>--top 10</code>: zeigt Top-10-IPs (Standard: 10)</li>
+            <li><code>--format json</code>: maschinenlesbarer Output</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>logaudit /var/log/auth.log
+logaudit /var/log/auth.log --since "2026-06-01"
+logaudit /var/log/auth.log --top 5 --format json
+logaudit /var/log/auth.log --since "2026-06-01" --until "2026-06-30"</code></pre>
+      <p>Beispiel-Output (Text):</p>
+      <pre><code>LOG FORENSICS: /var/log/auth.log
+Zeitraum: 2026-06-01 — 2026-06-19
+Analysiert: 15.234 Einträge
+
+TOP-10 SSH-ANGREIFER
+────────────────────────────────
+185.220.101.47    1.842 Versuche
+193.32.162.9        923 Versuche
+198.51.100.1        441 Versuche
+
+STUNDEN-HISTOGRAMM
+00: ██░░░░░░░░░░░░░░░░░░ 12%
+01: █░░░░░░░░░░░░░░░░░░░  6%
+...
+23: ████████████░░░░░░░░ 61%
+
+Login-Erfolgsquote: 3.2%</code></pre>
+    </div>
+
+    <div class="lab-section" id="test-fixtures">
+      <div class="sec-heading">Test-Fixtures</div>
+      <p>Erstelle <code>tests/fixtures/sample_auth.log</code> mit mindestens 20 Zeilen — echtes Format, anonymisierte IPs:</p>
+      <pre><code>Jun  1 03:14:15 hostname sshd[12345]: Failed password for invalid user admin from 192.168.1.1 port 45678 ssh2
+Jun  1 03:14:16 hostname sshd[12345]: Failed password for root from 192.168.1.1 port 45679 ssh2
+Jun  1 03:14:17 hostname sshd[12345]: Accepted publickey for alice from 10.0.0.5 port 52341 ssh2
+Jun  1 04:00:01 hostname sudo:  alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/bin/ls</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Parst ohne Fehler
+python -m logaudit tests/fixtures/sample_auth.log
+
+# JSON-Output ist valides JSON
+python -m logaudit tests/fixtures/sample_auth.log --format json | python -m json.tool
+
+# Zeitraum-Filter funktioniert
+python -m logaudit tests/fixtures/sample_auth.log --since "2026-06-01" --until "2026-06-01"
+# → Nur Einträge vom 1. Juni</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>parse_auth_log</code> auf dem Sample-Fixture → korrekte Anzahl Einträge</li>
+        <li class="task"><span class="chk"></span>Test: Event-Typ-Klassifizierung korrekt für bekannte Log-Zeilen</li>
+        <li class="task"><span class="chk"></span>Test: IP-Extraktion aus einer "Failed password"-Zeile</li>
+        <li class="task"><span class="chk"></span>Test: <code>filter_by_time</code> mit <code>since</code>-Filter</li>
+        <li class="task"><span class="chk"></span>Test: <code>filter_by_time</code> mit <code>until</code>-Filter</li>
+        <li class="task"><span class="chk"></span>Test: <code>filter_by_time</code> mit <code>since=None, until=None</code> → alle Einträge</li>
+        <li class="task"><span class="chk"></span>Test: <code>aggregate_ssh_failures</code> sortiert korrekt nach Häufigkeit</li>
+        <li class="task"><span class="chk"></span>Test: <code>hourly_distribution</code> gibt Dict mit Keys 0–23 zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>login_success_rate</code> bei 0 Logins → 0.0</li>
+        <li class="task"><span class="chk"></span>Test: Zeilen mit falschem Format werden übersprungen (keine Exception)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>nginx-Support:</strong> <code>--format nginx</code> parst Access-Logs (<code>$remote_addr - - [$time_local] "$request" $status $body_bytes_sent</code>)</li>
+        <li class="task"><span class="chk"></span><strong>GeoIP-Lookup:</strong> Mit lokaler MaxMind-GeoLite2-DB (<code>geoip2</code>-Paket) — kein API-Call, komplett offline</li>
+        <li class="task"><span class="chk"></span><strong>Mehrere Dateien:</strong> <code>logaudit auth.log.1 auth.log.2 auth.log</code> kombiniert alle zu einer Analyse</li>
+        <li class="task"><span class="chk"></span><strong>Komprimierte Logs:</strong> <code>auth.log.gz</code> on-the-fly mit <code>gzip.open()</code> lesen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>Syslog-Timestamp:</strong> Das Format ist <code>Mmm DD HH:MM:SS</code> ohne Jahr — nutze das aktuelle Jahr als Fallback. Regex: <code>r"^(\w+)\s+(\d+)\s+(\d{2}:\d{2}:\d{2})"</code>. <code>datetime.strptime()</code> mit <code>"%b %d %H:%M:%S"</code>.</p>
+      <p><strong>IPv4-Regex:</strong> <code>r"\b(\d{1,3}\.){3}\d{1,3}\b"</code> — ist vereinfacht und matched auch <code>999.999.999.999</code>. Eine strikte Version prüft jeden Oktett: <code>r"\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b"</code>. Entscheide welche du nimmst und warum.</p>
+      <p><strong>Sortierung:</strong> <code>sorted(d.items(), key=lambda x: x[1], reverse=True)</code> sortiert ein Dict nach Wert absteigend.</p>
+      <p><strong>JSON-Output:</strong> <code>json.dumps(data, indent=2, default=str)</code> — <code>default=str</code> serialisiert <code>datetime</code>-Objekte als Strings.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def parse_auth_log(path: Path) -> list[LogEntry]:
+    """Parst auth.log und gibt strukturierte Einträge zurück."""
+
+def aggregate_ssh_failures(entries: list[LogEntry]) -> dict[str, int]:
+    """Zählt SSH-Fehlversuche pro IP, sortiert nach Häufigkeit."""</code></pre>
+    </div>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#das-datenmodell" class="toc-lnk">Das Datenmodell</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#test-fixtures" class="toc-lnk">Test-Fixtures</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle für uctl</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

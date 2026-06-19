@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monat 07 — Datenbanken & Persistenz — Python Jahreskurs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --bg-raised: #1c2128;
+  --bg-code:   #0a0e14;
+  --border:    #30363d;
+  --border-s:  #21262d;
+  --tx:        #e6edf3;
+  --tx-sec:    #8b949e;
+  --tx-muted:  #6e7681;
+  --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+  --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+  --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r: 6px; --rl: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.topnav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);padding:0 32px;display:flex;align-items:center;height:48px;gap:8px}
+.nav-back{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--tx)}
+.nav-sep{color:var(--border-s);font-size:16px}
+.nav-here{font-family:var(--fm);font-size:11px}
+.nav-spacer{flex:1}
+.nav-adj{display:flex;gap:8px}
+.nav-adj a{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:3px 10px;border:1px solid var(--border-s);border-radius:3px;transition:color .15s,border-color .15s}
+.nav-adj a:hover{color:var(--tx);border-color:var(--border)}
+.page-header{border-bottom:2px solid var(--ac,#58a6ff);padding:32px 32px 28px;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 600px 200px at 50% 50%,rgba(var(--ac-raw,88,166,255),.06),transparent)}
+.ph-row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.ph-main{flex:1;min-width:280px}
+.ph-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ph-badge{font-family:var(--fm);font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;border:1px solid}
+.ph-title{font-family:var(--fd);font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px;color:var(--tx)}
+.ph-sub{font-size:12px;color:var(--tx-muted)}
+.sheets-panel{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);padding:14px 18px;min-width:160px;flex-shrink:0}
+.sheets-label{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tx-muted);margin-bottom:10px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:4px 0;border-bottom:1px solid var(--border-s);transition:color .15s}
+.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'→';color:var(--ac,#58a6ff);opacity:.5;transition:opacity .15s}
+.sheet-lnk:hover{color:var(--ac,#58a6ff)}
+.sheet-lnk:hover::before{opacity:1}
+.page-content{padding:0 32px 80px;max-width:1280px;margin:0 auto}
+.month-section{padding:48px 0 0}
+.month-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-s)}
+.month-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+.month-title{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.02em}
+.month-sub{font-size:11.5px;color:var(--tx-muted);margin-left:auto;white-space:nowrap}
+.week-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.week-grid{grid-template-columns:1fr}}
+.week-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);border-left-width:3px;padding:18px 20px}
+.week-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.week-num{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg-code)}
+.week-title{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2}
+.topic-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.topic-list li{font-size:11.5px;color:var(--tx-sec);display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.topic-list li::before{content:'›';color:inherit;opacity:.6;flex-shrink:0}
+.ex-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-bottom:6px}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ex-list li{font-size:11px;color:var(--tx-muted);display:flex;gap:7px;line-height:1.35}
+.ex-list li::before{content:'→';flex-shrink:0}
+.code-block{background:var(--bg-code);border:1px solid var(--border-s);border-radius:var(--r);padding:12px 16px;font-family:var(--fm);font-size:11.5px;line-height:1.7;margin:10px 0;overflow-x:auto}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg-code);border:1px solid var(--border-s);color:var(--tx-muted)}
+.milestone-card{background:var(--bg-card);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;position:relative}
+.milestone-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.milestone-inner{padding:28px 32px;position:relative;z-index:1}
+.milestone-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.milestone-title{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.milestone-desc{font-size:12px;color:var(--tx-sec);line-height:1.65;max-width:600px;margin-bottom:18px}
+.milestone-feats{display:flex;flex-wrap:wrap;gap:8px}
+.milestone-feat{font-size:11px;background:var(--bg-raised);border:1px solid var(--border-s);border-radius:4px;padding:4px 10px;color:var(--tx-sec)}
+.milestone-code{margin-top:20px}
+.seclab-box{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:var(--r);padding:12px 16px;font-size:11px;color:#58a6ff99;line-height:1.55;display:flex;gap:8px;margin-top:14px}
+.seclab-box::before{content:'⬡';color:var(--m1);flex-shrink:0;font-size:13px}
+.seclab-box strong{color:var(--m1)}
+.hint-box{border-left:2px solid;background:var(--bg-code);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--tx-muted);line-height:1.55;margin-top:12px}
+.diff{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
+.diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:currentColor}
+.skills-row{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.skills-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-right:8px;white-space:nowrap}
+.kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
+@media(max-width:768px){.topnav{padding:0 16px}.page-header{padding:24px 16px}.page-content{padding:0 16px 60px}}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav" style="--ac:#ffa657">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Jahreskurs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here" style="color:#ffa657">Monat 07</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-adj">
+    <a href="monat-06.html">← M06</a>
+    <a href="monat-08.html">M08 →</a>
+  </div>
+</nav>
+
+<div class="page-header" style="--ac:#ffa657">
+  <div class="ph-row">
+    <div class="ph-main">
+      <div class="ph-badges">
+        <span class="ph-badge" style="color:#ffa657;border-color:#ffa65755;background:#ffa65711">Phase D</span>
+        <span class="ph-badge" style="color:#ffa657;border-color:#ffa65755;background:#ffa65711">Monat 07</span>
+        <span class="ph-badge" style="color:var(--tx-muted);border-color:var(--border-s);background:transparent">Wochen 25–28</span>
+        <span class="ph-badge" style="color:#d2a8ff;border-color:#d2a8ff55;background:#d2a8ff11"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <div class="ph-title">Datenbanken &amp; Persistenz</div>
+      <div class="ph-sub">sqlite3 · SQL · TOML/YAML · SQLAlchemy-Einstieg</div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-lnk" target="_blank">json</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="month-section">
+<div class="month-hdr">
+    <span class="month-badge" style="color:var(--m7);border-color:var(--m7);background:rgba(255,166,87,.07)">Monat 07</span>
+    <h2 class="month-title">Datenbanken &amp; Persistenz</h2>
+    <span class="month-sub">sqlite3 · SQL · TOML/YAML · SQLAlchemy-Einstieg</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 25</span><div class="week-title">sqlite3 Grundlagen</div></div>
+      <ul class="topic-list">
+        <li><code>sqlite3.connect()</code>, <code>cursor()</code>, <code>execute()</code>, <code>commit()</code></li>
+        <li>CREATE TABLE, INSERT, SELECT, UPDATE, DELETE</li>
+        <li>Parameterized queries (<code>?</code>) — SQL Injection verhindern</li>
+        <li><code>fetchone()</code>, <code>fetchall()</code>, <code>fetchmany()</code></li>
+        <li><code>row_factory = sqlite3.Row</code> für dict-ähnlichen Zugriff</li>
+        <li>In-Memory-DB: <code>":memory:"</code> für Tests</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> sqlite3
+<span class="kw">from</span> contextlib <span class="kw">import</span> closing
+
+<span class="kw">with</span> sqlite3.connect(<span class="str">"kontakte.db"</span>) <span class="kw">as</span> conn:
+    conn.row_factory = sqlite3.Row
+    <span class="kw">with</span> closing(conn.cursor()) <span class="kw">as</span> cur:
+        cur.execute(<span class="str">"SELECT * FROM kontakte WHERE name LIKE ?"</span>, (<span class="str">"%Ada%"</span>,))
+        <span class="kw">for</span> row <span class="kw">in</span> cur.fetchall():
+            <span class="fn">print</span>(<span class="fn">dict</span>(row))</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch auf SQLite umstellen (Milestone 2 v2)</li>
+        <li>Aufgabenliste mit done/pending Status</li>
+        <li>Parameterized queries: SQL Injection demonstrieren</li>
+      </ul>
+      <div class="tag-row"><span class="tag">sqlite3</span><span class="tag">cursor</span><span class="tag">parameterized queries</span><span class="tag">row_factory</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 26</span><div class="week-title">SQL vertiefen</div></div>
+      <ul class="topic-list">
+        <li>JOINs: INNER, LEFT, RIGHT — mit Beispielen</li>
+        <li>Aggregatfunktionen: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>GROUP BY</code></li>
+        <li>Indizes: <code>CREATE INDEX</code>, wann hilft ein Index?</li>
+        <li>Transaktionen: <code>BEGIN</code>, <code>COMMIT</code>, <code>ROLLBACK</code></li>
+        <li>Migrations-Konzept: Schema versionieren</li>
+        <li><code>PRAGMA</code>: <code>foreign_keys=ON</code>, <code>journal_mode=WAL</code></li>
+      </ul>
+      <div class="code-block"><span class="cm">-- Ausgaben pro Kategorie</span>
+SELECT kategorie,
+       COUNT(*) AS anzahl,
+       SUM(betrag) AS gesamt,
+       AVG(betrag) AS schnitt
+FROM ausgaben
+GROUP BY kategorie
+ORDER BY gesamt DESC;</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Ausgaben-DB: Kategorien + Beträge, GROUP BY Bericht</li>
+        <li>JOIN: Kontakte ↔ Tags (Many-to-Many)</li>
+        <li>Index hinzufügen und Explain Query Plan lesen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">SQL JOINs</span><span class="tag">GROUP BY</span><span class="tag">Indizes</span><span class="tag">Transaktionen</span><span class="tag">PRAGMA</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 27</span><div class="week-title">Konfigurationsdateien</div></div>
+      <ul class="topic-list">
+        <li>TOML: <code>tomllib</code> (3.11+) oder <code>tomli</code>, lesen und verstehen</li>
+        <li>YAML: <code>PyYAML</code>, Sicherheit (<code>yaml.safe_load</code>!)</li>
+        <li>INI: <code>configparser</code>, Sektionen, Fallbacks</li>
+        <li>Konfigurationshierarchie: Defaults → Config-Datei → Env-Vars → CLI-Args</li>
+        <li><code>os.environ</code> + <code>python-dotenv</code></li>
+        <li><code>XDG_CONFIG_HOME</code> und plattformübergreifende Config-Pfade</li>
+      </ul>
+      <div class="code-block"><span class="cm"># config.toml</span>
+[tool]
+threshold = 7.5
+output    = <span class="str">"json"</span>
+[tool.exclude]
+dirs = [<span class="str">".git"</span>, <span class="str">"node_modules"</span>]
+
+<span class="cm"># Python</span>
+<span class="kw">import</span> tomllib
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"config.toml"</span>, <span class="str">"rb"</span>) <span class="kw">as</span> f:
+    cfg = tomllib.load(f)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>uctl-Config aus TOML laden mit Fallbacks</li>
+        <li>Env-Var überschreibt TOML-Wert (12-Factor App Prinzip)</li>
+        <li>configparser mit Sektionen für verschiedene Umgebungen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">TOML</span><span class="tag">YAML safe_load</span><span class="tag">configparser</span><span class="tag">dotenv</span><span class="tag">XDG</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m7)">
+      <div class="week-top"><span class="week-num" style="color:var(--m7)">W 28</span><div class="week-title">SQLAlchemy Core</div></div>
+      <ul class="topic-list">
+        <li>Core vs. ORM — Unterschied und wann was</li>
+        <li>Engine, Connection, MetaData, Table</li>
+        <li>Queries mit <code>select()</code>, <code>insert()</code>, <code>update()</code>, <code>delete()</code></li>
+        <li>ORM: <code>DeclarativeBase</code>, <code>Mapped</code>, <code>mapped_column</code></li>
+        <li><code>Session</code>: <code>add()</code>, <code>commit()</code>, <code>query()</code>, <code>filter()</code></li>
+        <li>Alembic (Konzept): automatische Schema-Migrationen</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> sqlalchemy.orm <span class="kw">import</span> DeclarativeBase, Mapped, mapped_column
+
+<span class="kw">class</span> <span class="fn">Base</span>(DeclarativeBase): <span class="kw">pass</span>
+
+<span class="kw">class</span> <span class="fn">Ausgabe</span>(<span class="fn">Base</span>):
+    __tablename__ = <span class="str">"ausgaben"</span>
+    id:        Mapped[<span class="fn">int</span>] = mapped_column(primary_key=<span class="kw">True</span>)
+    kategorie: Mapped[<span class="fn">str</span>]
+    betrag:    Mapped[<span class="fn">float</span>]</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Finance Tracker auf SQLAlchemy ORM umstellen</li>
+        <li>Relationship: Ausgabe → Kategorie (ForeignKey)</li>
+        <li>Session + with-Statement korrekt nutzen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">SQLAlchemy</span><span class="tag">ORM</span><span class="tag">Session</span><span class="tag">Mapped</span><span class="tag">Alembic</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 4 -->
+  <div class="milestone-card" style="border:1px solid var(--m7)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m7)">★ Milestone 4 — Ende Monat 07</div>
+      <div class="milestone-title">Personal Finance Tracker</div>
+      <div class="milestone-desc">Ein vollständiger Finance-Tracker: Ausgaben erfassen, nach Kategorie gruppieren, Monatsreport als Rich-Tabelle, Daten in SQLite persistiert, Konfiguration über TOML, CLI über Typer.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">SQLite + SQLAlchemy ORM</span>
+        <span class="milestone-feat">Typer CLI + Rich Tabelle</span>
+        <span class="milestone-feat">TOML-Konfiguration</span>
+        <span class="milestone-feat">Monatsreport mit GROUP BY</span>
+        <span class="milestone-feat">Dataclasses für Business-Logik</span>
+        <span class="milestone-feat">Export als CSV/JSON</span>
+      </div>
+    </div>
+  </div>
+  <div class="seclab-box">
+    <div><strong>→ Security Lab:</strong> W27 (TOML-Konfiguration) ist die Basis von <code>~/.config/uctl/config.toml</code>. W25/26 (sqlite3) trägt Security-Lab-Findings persistent. W28 (SQLAlchemy ORM) skaliert für größere Projekte.</div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M07 Skills</span>
+    <span class="tag">sqlite3</span><span class="tag">SQL (JOIN/GROUP BY)</span><span class="tag">TOML/YAML/INI</span><span class="tag">SQLAlchemy ORM</span><span class="tag">dotenv</span><span class="tag">Konfigurationshierarchie</span>
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

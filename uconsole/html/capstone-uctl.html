@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capstone — uctl: Unified Security Toolkit - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #e3b341;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+  td, th { padding: 8px 12px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c9d1d9; text-align: left; }
+  th { color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">★ Capstone — uctl</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Capstone</span>
+        <span class="badge badge-phase">★ Capstone</span>
+        <span class="badge badge-time">8–15 Stunden</span>
+          <span class="badge" style="color:#ff7b72;background:rgba(0,0,0,0);border:1px solid #ff7b7288;font-size:11px;letter-spacing:0.5px"><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span><span style="color:#ff7b72">★</span> Experte</span>
+      </div>
+      <h1><code>uctl</code>: Unified Security Toolkit</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 16 (Tests) + Lab 17 (Plugin-Architektur) + mindestens 8 Tools fertig</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">Python</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">Bash</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-lnk">Git</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="sheet-lnk">systemd</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="ueberblick">
+      <div class="sec-heading">Überblick</div>
+      <p><code>uctl</code> ist das Endprodukt aller Labs. Es vereint alle deine Tools unter einer einheitlichen CLI, einer zentralen Konfiguration und einem gemeinsamen Output-Format. Am Ende läuft es auf der uConsole — installierbar via <code>pipx install .</code>, auch offline.</p>
+      <p>Das Capstone ist kein neues Lab — es ist das Zusammenführen von allem, was du gebaut hast.</p>
+    </div>
+
+    <div class="lab-section" id="ziel-vision">
+      <div class="sec-heading">Ziel-Vision</div>
+      <pre><code># Alle deine Tools unter einem Dach
+uctl hash       kali-linux-2026.iso
+uctl enc        decode "SGVsbG8="
+uctl entropy    ~/Downloads --threshold 7.5
+uctl logs       /var/log/auth.log --since 7d
+uctl meta       foto.jpg
+uctl secrets    ~/projects --format md
+uctl cert       github.com
+uctl pw         --stdin
+uctl ports      --proto tcp
+uctl fim        scan /etc
+uctl procs      --diff
+uctl config     /etc/ssh/sshd_config
+uctl pcap       capture.pcap
+uctl cve        --source pip
+uctl hw         --diff</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>CLI-Framework</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Ersetze alle bestehenden <code>argparse</code>-Subcommands durch <strong>Typer</strong>:
+          <ul>
+            <li><code>pip install typer</code></li>
+            <li>Eine <code>uctl/app.py</code> als zentraler Einstiegspunkt</li>
+            <li>Jedes Plugin registriert einen Typer-Subcommand via Plugin-Interface</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Einheitliche Fehlerbehandlung:
+          <ul>
+            <li>Alle unerwarteten Exceptions werden abgefangen, Fehlermeldung auf <code>stderr</code>, Exit-Code 1</li>
+            <li>Bekannte Fehler (z. B. Datei nicht gefunden) mit verständlicher Meldung</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span><code>--verbose</code> / <code>--quiet</code> Flags global (für alle Subcommands):
+          <ul>
+            <li><code>--verbose</code>: Debug-Logging aktivieren</li>
+            <li><code>--quiet</code>: nur Ergebnis, keine Status-Meldungen</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Zentrale Konfiguration</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>~/.config/uctl/config.toml</code> als zentrale Konfigurationsdatei:
+          <pre><code>[defaults]
+output_format = "text"   # "text", "json"
+
+[entropy]
+threshold = 7.5
+
+[cert]
+warn_days = 30
+
+[fim]
+baseline_dir = "~/.local/share/uctl/fim"
+
+[secrets]
+exclude_dirs = ["node_modules", ".venv", "__pycache__"]</code></pre>
+        </li>
+        <li class="task"><span class="chk"></span>Konfiguration wird beim Start geladen und als <code>dict</code> an alle Plugins weitergegeben</li>
+        <li class="task"><span class="chk"></span>CLI-Argumente überschreiben Konfigurationsdatei-Werte (CLI hat höhere Priorität)</li>
+        <li class="task"><span class="chk"></span><code>uctl config --show</code> zeigt aktuelle Konfiguration</li>
+      </ul>
+
+      <h3>Zentrales Logging</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Logging-Setup via <code>logging</code>-Modul:
+          <ul>
+            <li>Konsole: nur WARNING und höher (Standard)</li>
+            <li>Log-Datei: <code>~/.local/share/uctl/uctl.log</code> (alle Level)</li>
+            <li><code>--verbose</code>: setzt Konsolen-Level auf DEBUG</li>
+            <li><code>--quiet</code>: setzt Konsolen-Level auf ERROR</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Format: <code>[2026-06-19 10:00:00] [INFO] cert: Verbinde mit github.com:443</code></li>
+      </ul>
+
+      <h3>Einheitliches Output-Format</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Alle Subcommands unterstützen <code>--json</code> (gibt strukturiertes JSON aus)</li>
+        <li class="task"><span class="chk"></span>Terminal-Output nutzt <code>rich</code> für Tabellen, Farbmarkierungen, Status-Icons</li>
+        <li class="task"><span class="chk"></span>Terminal-Breite dynamisch: <code>shutil.get_terminal_size().columns</code> — nie mehr als diese Breite</li>
+        <li class="task"><span class="chk"></span>Online-Tools sind explizit markiert (<code>[online]</code> im <code>--help</code>)</li>
+      </ul>
+
+      <h3>Plugin-Integration</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Alle fertiggestellten Tools sind als Plugins registriert (aus Lab 17)</li>
+        <li class="task"><span class="chk"></span><code>uctl --list-plugins</code> zeigt alle registrierten Tools mit Kurzbeschreibung</li>
+        <li class="task"><span class="chk"></span>Plugin-Ladezeit ist akzeptabel: <code>uctl --help</code> in &lt; 2 Sekunden</li>
+      </ul>
+
+      <h3>Packaging</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>pyproject.toml</code> vollständig für Distribution:
+          <pre><code>[project]
+name = "uctl"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = ["typer", "rich", "psutil", "cryptography", "httpx", "Pillow", "pypdf", "packaging"]
+
+[project.scripts]
+uctl = "uctl.app:main"</code></pre>
+        </li>
+        <li class="task"><span class="chk"></span><code>pipx install .</code> installiert <code>uctl</code> als eigenständiges CLI-Tool</li>
+        <li class="task"><span class="chk"></span><code>uctl --version</code> gibt Version aus</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="uconsole-test">
+      <div class="sec-heading">uConsole End-to-End-Test</div>
+      <p>Führe nach der Installation auf der uConsole folgende Befehle aus — alle müssen funktionieren:</p>
+      <pre><code># Installation
+pipx install .
+uctl --version
+
+# Offline-fähige Tools (kein Netz nötig)
+uctl hash /etc/hostname
+uctl entropy /etc --min-size 1024
+uctl logs /var/log/auth.log
+uctl meta /boot/config.txt
+uctl ports
+uctl fim init /etc
+uctl fim scan /etc
+uctl procs snapshot
+uctl procs scan
+uctl hw
+uctl config /etc/ssh/sshd_config
+
+# Online-Tools (erfordern Netz)
+uctl cert github.com
+uctl cve --source dpkg
+
+# Skript-Verkettung
+uctl ports --format json | python -m json.tool
+uctl hash /bin/ls --format json | jq .sha256
+
+# Terminal-Breite
+uctl entropy /etc | cat   # muss ohne Umbruchs-Fehler funktionieren</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+
+      <h3>Funktional</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Alle integrierten Tools geben sinnvolle Ergebnisse aus</li>
+        <li class="task"><span class="chk"></span><code>--json</code> funktioniert für alle Tools und gibt valides JSON aus</li>
+        <li class="task"><span class="chk"></span>Fehler-Szenarien (Datei nicht gefunden, Netz nicht verfügbar) werden graceful behandelt</li>
+        <li class="task"><span class="chk"></span>Exit-Code 0 bei Erfolg, 1 bei Fehler</li>
+      </ul>
+
+      <h3>Performance (uConsole)</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>uctl --help</code> startet in &lt; 3 Sekunden auf der uConsole</li>
+        <li class="task"><span class="chk"></span><code>uctl hash /etc/hostname</code> braucht &lt; 1 Sekunde</li>
+        <li class="task"><span class="chk"></span>Kein Tool hält einen dauerhaften CPU-Loop (ohne <code>--watch</code>)</li>
+      </ul>
+
+      <h3>Zuverlässigkeit</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Kein Tool stürzt ab wenn ein Argument fehlt → <code>--help</code> anzeigen</li>
+        <li class="task"><span class="chk"></span>Kein Tool stürzt ab wenn eine Datei nicht lesbar ist</li>
+        <li class="task"><span class="chk"></span>Online-Tools zeigen verständliche Fehlermeldung wenn kein Netz</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="plugin-interface">
+      <div class="sec-heading">Plugin-Interface (finales Design)</div>
+      <pre><code>from shared.plugin import SecurityTool
+import typer
+
+class SecurityToolV2(SecurityTool):
+    """Erweitertes Interface für Typer-Integration."""
+
+    @property
+    @abstractmethod
+    def typer_app(self) -> typer.Typer:
+        """Gibt Typer-App für diesen Subcommand zurück."""
+        ...
+
+    @property
+    def online_only(self) -> bool:
+        """True wenn Tool Internetzugriff benötigt."""
+        return False</code></pre>
+    </div>
+
+    <div class="lab-section" id="architektur">
+      <div class="sec-heading">Architektur-Übersicht</div>
+      <pre><code>uctl/
+├── app.py           ← Typer-App, Plugin-Dispatcher, Config-Loading
+├── config.py        ← Config-Handling (TOML laden, mergen)
+├── logging_setup.py ← Logging-Konfiguration
+└── output.py        ← Einheitliche Output-Utilities (rich-Tabellen, JSON)
+
+shared/
+├── plugin.py        ← SecurityTool ABC
+├── baseline.py      ← BaselineStore
+└── output.py        ← Output-Utils (gemeinsam)
+
+hashinspect/
+entropyscanner/
+... (alle Tools)</code></pre>
+    </div>
+
+    <div class="lab-section" id="bonus-anforderungen">
+      <div class="sec-heading">Bonus-Anforderungen</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Offline-Markierung:</strong> <code>uctl ports [online]</code> — Tools die Internet brauchen sind in <code>--help</code> markiert</li>
+        <li class="task"><span class="chk"></span><strong>Alias-Support:</strong> <code>uctl h</code> als Alias für <code>uctl hash</code></li>
+        <li class="task"><span class="chk"></span><strong>Autocomplete:</strong> <code>uctl --install-completion</code> installiert Shell-Completion (Typer bietet das out-of-the-box)</li>
+        <li class="task"><span class="chk"></span><strong>Colored Output unterdrücken:</strong> <code>NO_COLOR=1 uctl hash file.iso</code> oder <code>--no-color</code> für Terminal-Pipes</li>
+        <li class="task"><span class="chk"></span><strong>ARM64 Wheel-Cache:</strong> Erstelle ein <code>scripts/build-wheels-arm64.sh</code> das alle Dependencies als Wheels baut und cached — so kann <code>pipx install .</code> auch ohne Internet funktionieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>Typer-Integration:</strong> Typer und argparse können koexistieren. Du kannst bestehende argparse-basierte Plugins auch ohne Umbau integrieren, indem du einen Typer-Callback erzeugst der <code>argparse.parse_args()</code> intern aufruft.</p>
+      <p><strong>rich.console:</strong> Erstelle eine einzelne <code>Console</code>-Instanz in <code>uctl/output.py</code> und importiere sie überall — das verhindert mehrere Konsolen-Initialisierungen.</p>
+      <p><strong>TOML mit tomllib:</strong></p>
+      <pre><code>import tomllib
+from pathlib import Path
+
+config_path = Path.home() / ".config" / "uctl" / "config.toml"
+if config_path.exists():
+    with open(config_path, "rb") as f:
+        config = tomllib.load(f)
+else:
+    config = {}</code></pre>
+      <p><strong>pipx auf ARM64:</strong> Teste <code>pipx install .</code> früh auf der uConsole. Manche Dependencies (z. B. <code>Pillow</code>, <code>cryptography</code>) müssen aus dem Source kompiliert werden wenn kein ARM64-Wheel verfügbar ist.</p>
+    </div>
+
+    <div class="lab-section" id="was-capstone-beweist">
+      <div class="sec-heading">Was das Capstone beweist</div>
+      <p>Wenn <code>uctl</code> läuft, hast du:</p>
+      <ol>
+        <li><strong>15+ eigenständige Security-Tools</strong> gebaut</li>
+        <li><strong>Plugin-Architektur</strong> designed und implementiert</li>
+        <li><strong>Testen</strong> professionell betrieben (≥ 80% Coverage)</li>
+        <li><strong>ARM64-Deployment</strong> auf echter Hardware gemeistert</li>
+        <li><strong>CLI-Ergonomie</strong> durchgehend gedacht (Exit-Codes, JSON, --help)</li>
+        <li><strong>Offline-first-Design</strong> als Constraint ernst genommen</li>
+      </ol>
+      <blockquote><p>Das ist kein Tutorial-Ergebnis — das ist ein echtes Werkzeug.</p></blockquote>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#ueberblick" class="toc-lnk">Überblick</a>
+      <a href="#ziel-vision" class="toc-lnk">Ziel-Vision</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#uconsole-test" class="toc-lnk">uConsole E2E-Test</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#plugin-interface" class="toc-lnk">Plugin-Interface</a>
+      <a href="#architektur" class="toc-lnk">Architektur</a>
+      <a href="#bonus-anforderungen" class="toc-lnk">Bonus-Anforderungen</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#was-capstone-beweist" class="toc-lnk">Was es beweist</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

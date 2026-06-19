@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 02 — Base Encoding Toolkit - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #3fb950;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); text-decoration: none; transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid {
+    display: grid; grid-template-columns: 1fr auto;
+    align-items: start; gap: 32px; position: relative; max-width: 1240px;
+  }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 3px;
+  }
+  .badge-lab {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 {
+    font-size: clamp(24px, 3.5vw, 44px); font-weight: 800;
+    letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px;
+  }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; min-width: 180px;
+  }
+  .sheets-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+  }
+  .sheet-lnk {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    color: var(--muted); text-decoration: none;
+    padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s;
+  }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body {
+    display: grid; grid-template-columns: 1fr 220px;
+    gap: 40px; max-width: 1240px; margin: 0 auto;
+    padding: 48px; align-items: start;
+  }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading {
+    font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--accent); padding-bottom: 8px; margin-bottom: 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk {
+    display: inline-block; width: 14px; height: 14px;
+    border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    position: absolute; left: 0; top: 6px;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    padding: 1px 5px; border-radius: 3px; color: #e6edf3;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 6px;
+    padding: 18px 20px; overflow-x: auto; margin: 14px 0; position: relative;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote {
+    border-left: 3px solid var(--accent); padding: 12px 16px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    border-radius: 0 6px 6px 0; margin: 14px 0;
+  }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk {
+    display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); text-decoration: none; padding: 5px 0;
+    border-bottom: 1px solid var(--border); transition: color 0.15s;
+  }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Lab 02 — Base Encoding Toolkit</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-lab">Lab 02</span>
+          <span class="badge badge-phase">Phase 1 — Daten &amp; Dateien</span>
+          <span class="badge badge-time">3–5 Stunden</span>
+          <span class="badge" style="color:#58a6ff;background:rgba(0,0,0,0);border:1px solid #58a6ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#58a6ff">★</span><span style="color:#58a6ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Grundkenntnisse</span>
+        </div>
+        <h1>Base Encoding Toolkit</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>Lab 01 (Projektstruktur)</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="sheet-lnk">regex</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li>Den Unterschied zwischen <code>str</code> (Unicode) und <code>bytes</code> (Rohdaten) wirklich verstehen</li>
+          <li><code>base64</code>, <code>base32</code>, <code>binascii</code> und <code>urllib.parse</code> aus der Stdlib anwenden</li>
+          <li>Robuste Fehlermeldungen bei ungültigem Input produzieren</li>
+          <li><code>@pytest.mark.parametrize</code> für tabellengestützte Tests einsetzen</li>
+          <li>Das Konzept von Encoding-Ketten (Pipelines) verstehen</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Base64, Hex und URL-Encoding begegnen dir täglich: in HTTP-Headern, JWT-Tokens, Dateiübertragungen, CTF-Challenges und forensischen Analysen. Der entscheidende Unterschied zu einfachem Text: Du arbeitest mit Bytes, nicht mit Strings — und dieser Unterschied hat in Python 3 konkrete Konsequenzen.</p>
+        <p>Dieses Lab ist auch dein erster echter Einstieg in systematisches Testen: Die Kernlogik ist reine Transformation (Input → Output), ideal für parametrisierte Tests mit Dutzenden von Testfällen.</p>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Implementiere <code>enc</code> — ein CLI-Tool für Encoding und Decoding verschiedener Formate, sowohl für Strings als auch für Binärdateien.</p>
+        <h3>Projektstruktur</h3>
+        <pre><code>security-lab/
+└── encodingtool/
+    ├── __init__.py
+    ├── core.py
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        └── test_core.py</code></pre>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <h3>core.py</h3>
+        <ul>
+          <li class="task"><span class="chk"></span>Funktion <code>encode(data: bytes, fmt: str) -&gt; bytes</code>
+            <ul>
+              <li>Unterstützte Formate: <code>base64</code>, <code>base32</code>, <code>hex</code>, <code>url</code></li>
+              <li><code>base64</code>: Standard Base64 (<code>+/=</code>), Output als ASCII-Bytes</li>
+              <li><code>base32</code>: Standard Base32 mit Padding</li>
+              <li><code>hex</code>: Lowercase Hex-Darstellung (<code>deadbeef</code>, nicht <code>DEADBEEF</code>)</li>
+              <li><code>url</code>: URL-Encoding (Leerzeichen → <code>%20</code>, nicht <code>+</code>)</li>
+              <li>Wirft <code>ValueError</code> bei unbekanntem Format</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Funktion <code>decode(data: bytes, fmt: str) -&gt; bytes</code>
+            <ul>
+              <li>Inverse Operationen zu <code>encode</code></li>
+              <li>Bei <code>base64</code>: toleriert fehlendes Padding (füge es intern hinzu)</li>
+              <li>Bei <code>hex</code>: akzeptiert sowohl Groß- als auch Kleinbuchstaben</li>
+              <li>Wirft <code>ValueError</code> bei ungültigem Input (fehlerhaftes Padding, ungültige Zeichen)</li>
+              <li>Fehlermeldung muss konkret sein: nicht nur "invalid" sondern z. B. "ungültiges Base64: Länge 5 ist nicht durch 4 teilbar"</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Funktion <code>detect_encoding(data: bytes) -&gt; str | None</code>
+            <ul>
+              <li>Heuristik: Versuche zu erkennen, welches Format vorliegt</li>
+              <li>Prüft: Zeichensatz, Länge/Padding, Präfixe</li>
+              <li>Gibt das wahrscheinlichste Format zurück oder <code>None</code> wenn unklar</li>
+              <li>Muss keine 100%-Trefferquote haben — aber für eindeutige Fälle (reines Hex, klares Base64) korrekt sein</li>
+            </ul>
+          </li>
+        </ul>
+        <h3>cli.py</h3>
+        <ul>
+          <li class="task"><span class="chk"></span><code>enc encode [--format FORMAT] TEXT_ODER_STDIN</code></li>
+          <li class="task"><span class="chk"></span><code>enc decode [--format FORMAT] [--auto] TEXT_ODER_STDIN</code>
+            <ul>
+              <li><code>--auto</code>: versucht Format automatisch zu erkennen (nutzt <code>detect_encoding</code>)</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span><code>enc encode --file DATEI --format base64</code>: liest Binärdatei, gibt Base64 aus</li>
+          <li class="task"><span class="chk"></span><code>enc decode --file DATEI --format hex --out ausgabe.bin</code>: dekodiert in Datei</li>
+          <li class="task"><span class="chk"></span>Wenn kein Argument übergeben: liest von <code>stdin</code> (Pipeline-freundlich)</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="cli-schnittstelle">
+        <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+        <pre><code>enc encode --format base64 "Hello, World!"
+enc decode --format base64 "SGVsbG8sIFdvcmxkIQ=="
+enc encode --format hex --file bild.png
+enc decode --format hex "48656c6c6f"
+enc decode --auto "SGVsbG8="
+enc encode --format url "hello world &amp; more"
+enc encode --format base64,hex "hello"   (Bonus: Ketten)</code></pre>
+        <p>Beispiel-Output:</p>
+        <pre><code>$ enc encode --format base64 "Hello"
+SGVsbG8=
+
+$ enc decode --format base64 "SGVsbG8="
+Hello
+
+$ enc decode --auto "48656c6c6f"
+[hex erkannt]
+Hello</code></pre>
+      </div>
+
+      <div class="lab-section" id="akzeptanzkriterien">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <pre><code># Roundtrip: encode dann decode muss original ergeben
+python -c "
+from encodingtool.core import encode, decode
+original = b'Test \x00\x01\x02 binary data'
+for fmt in ['base64', 'base32', 'hex']:
+    assert decode(encode(original, fmt), fmt) == original, f'Roundtrip failed: {fmt}'
+print('Alle Roundtrips OK')
+"
+
+# Fehlerbehandlung
+python -c "
+from encodingtool.core import decode
+try:
+    decode(b'!!!not-valid-base64!!!', 'base64')
+    assert False, 'Hätte ValueError werfen müssen'
+except ValueError as e:
+    print(f'OK: {e}')
+"
+
+# CLI-Pipeline
+echo "Hello World" | python -m encodingtool encode --format base64 | \
+  python -m encodingtool decode --format base64
+# → Hello World</code></pre>
+      </div>
+
+      <div class="lab-section" id="tests">
+        <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+        <p>Nutze <code>@pytest.mark.parametrize</code> für alle Roundtrip-Tests:</p>
+        <ul>
+          <li class="task"><span class="chk"></span>Parametrisierter Roundtrip-Test: mindestens 5 verschiedene Inputs × alle Formate
+            <ul>
+              <li>Leerer String <code>b""</code></li>
+              <li>Reiner ASCII-Text <code>b"Hello, World!"</code></li>
+              <li>Binärdaten mit Nullbytes <code>b"\x00\x01\x02\x03"</code></li>
+              <li>Alle 256 Byte-Werte <code>bytes(range(256))</code></li>
+              <li>Langer Text (&gt;1000 Zeichen)</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Test: <code>decode</code> mit ungültigem Base64 → <code>ValueError</code></li>
+          <li class="task"><span class="chk"></span>Test: <code>decode</code> mit ungültigem Hex (ungerade Länge) → <code>ValueError</code></li>
+          <li class="task"><span class="chk"></span>Test: <code>decode</code> akzeptiert Base64 ohne Padding-<code>=</code></li>
+          <li class="task"><span class="chk"></span>Test: <code>encode</code> mit unbekanntem Format → <code>ValueError</code></li>
+          <li class="task"><span class="chk"></span>Test: <code>detect_encoding</code> erkennt klares Base64 korrekt</li>
+          <li class="task"><span class="chk"></span>Test: <code>detect_encoding</code> erkennt reines Hex korrekt</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="bonus-aufgaben">
+        <div class="sec-heading">Bonus-Aufgaben</div>
+        <ul>
+          <li class="task"><span class="chk"></span><code>--chain base64,hex</code>: mehrfaches Encoding in einer Pipeline — Output von Schritt 1 ist Input von Schritt 2</li>
+          <li class="task"><span class="chk"></span><code>base58</code>-Format hinzufügen (ohne externe Lib: eigene Implementierung)</li>
+          <li class="task"><span class="chk"></span>Beim Dekodieren von URL-Encoding: sowohl <code>%XX</code> als auch <code>+</code> für Leerzeichen akzeptieren</li>
+          <li class="task"><span class="chk"></span><code>--stats</code>-Flag: zeigt Länge vor/nach Encoding, Overhead in Prozent</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hinweise">
+        <div class="sec-heading">Hinweise</div>
+        <p><strong>Bytes vs. Strings:</strong> <code>base64.b64encode()</code> nimmt <code>bytes</code> und gibt <code>bytes</code> zurück. Strings müssen erst encoded werden: <code>text.encode("utf-8")</code>. Beim Ausgeben: <code>decoded.decode("utf-8", errors="replace")</code> — <code>errors="replace"</code> verhindert Abstürze bei Binärdaten.</p>
+        <p><strong>URL-Encoding:</strong> <code>urllib.parse.quote()</code> arbeitet mit Strings, <code>urllib.parse.quote_from_bytes()</code> mit Bytes. Für vollständige Encoding (auch <code>/</code> und <code>?</code>): <code>safe=""</code> als Parameter.</p>
+        <p><strong>Padding bei Base64:</strong> Valides Base64 hat immer eine Länge, die durch 4 teilbar ist. Fehlendes Padding kannst du intern hinzufügen: <code>data + b"=" * (-len(data) % 4)</code>.</p>
+        <p><strong>detect_encoding Heuristik:</strong> Prüfe in dieser Reihenfolge:</p>
+        <ol>
+          <li>Enthält nur <code>0-9a-fA-F</code> und gerade Länge → wahrscheinlich Hex</li>
+          <li>Enthält nur Base64-Zeichen (<code>A-Za-z0-9+/=</code>) und Länge % 4 == 0 → wahrscheinlich Base64</li>
+          <li>Enthält <code>%XX</code>-Muster → wahrscheinlich URL-encoded</li>
+        </ol>
+      </div>
+
+      <div class="lab-section" id="schnittstelle-fur-uctl">
+        <div class="sec-heading">Schnittstelle für uctl</div>
+        <pre><code>def encode(data: bytes, fmt: str) -> bytes:
+    """Kodiert Bytes in das angegebene Format."""
+
+def decode(data: bytes, fmt: str) -> bytes:
+    """Dekodiert Bytes aus dem angegebenen Format."""</code></pre>
+        <p>Diese Funktionen werden als <code>uctl enc encode</code> / <code>uctl enc decode</code> verwendet.</p>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+        <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+        <a href="#tests" class="toc-lnk">Tests</a>
+        <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+        <a href="#hinweise" class="toc-lnk">Hinweise</a>
+        <a href="#schnittstelle-fur-uctl" class="toc-lnk">Schnittstelle für uctl</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

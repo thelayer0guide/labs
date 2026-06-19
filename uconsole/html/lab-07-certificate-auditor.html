@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 07 — Certificate Auditor - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #ffa657;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-07-certificate-auditor</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 07</span>
+        <span class="badge badge-phase">Phase 3 — Krypto &amp; Netzwerk</span>
+        <span class="badge badge-time">4–6 Stunden</span>
+          <span class="badge" style="color:#ffa657;background:rgba(0,0,0,0);border:1px solid #ffa65788;font-size:11px;letter-spacing:0.5px"><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#ffa657">★</span><span style="color:#30363d">★</span> Erfahren</span>
+      </div>
+      <h1>Certificate Auditor</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 00 (Projektstruktur)</span><br>
+        Externe Dependencies: <span>cryptography</span><br>
+        Kann parallel zu Phase 2 begonnen werden
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/openssl-cheatsheet.html" class="sheet-lnk">openssl</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>TLS-Verbindungen programmatisch aufbauen mit <code>socket</code> und <code>ssl</code></li>
+        <li>X.509-Zertifikatsstruktur verstehen und parsen</li>
+        <li><code>datetime</code>-Vergleiche für Ablauf-Warnungen implementieren</li>
+        <li>Netzwerkprogrammierung mit korrektem Timeout-Handling</li>
+        <li>Zertifikatsketten inspizieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>TLS-Zertifikate sind das Fundament verschlüsselter Kommunikation. Sie laufen ab, werden falsch konfiguriert oder nutzen veraltete Algorithmen. Als Security-Analyst oder Sysadmin willst du schnell prüfen können: Läuft dieses Zertifikat bald ab? Welche Domains sind abgedeckt? Ist die Kette vollständig?</p>
+      <p>Auf der uConsole ist dieses Tool besonders nützlich: Du kannst Heimnetz-Dienste (Router, NAS, selbst gehostete Services) schnell prüfen, auch ohne Browser.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>certaudit</code> — ein Tool, das TLS-Zertifikate von Hosts abruft, analysiert und bewertet.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── certaudit/
+    ├── __init__.py
+    ├── core.py
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        └── test_core.py</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>fetch_certificate(host: str, port: int = 443, timeout: float = 10.0) -&gt; dict</code>
+          <ul>
+            <li>Baut TLS-Verbindung auf mit <code>ssl.create_default_context()</code> und <code>socket.create_connection()</code></li>
+            <li>Ruft Zertifikat ab <strong>ohne</strong> vollständige Validierung (nutze <code>ssl.get_server_certificate()</code> oder <code>SSLSocket.getpeercert(binary_form=True)</code>)</li>
+            <li>Parst Zertifikat mit <code>cryptography.x509.load_der_x509_certificate()</code> oder <code>load_pem_x509_certificate()</code></li>
+            <li>Gibt folgendes Dict zurück:</li>
+          </ul>
+          <pre><code>{
+    "host": str,
+    "port": int,
+    "subject_cn": str,          # Common Name
+    "issuer_cn": str,           # Issuer Common Name
+    "issuer_org": str | None,
+    "not_before": str,          # ISO 8601
+    "not_after": str,           # ISO 8601
+    "days_until_expiry": int,   # negativ wenn abgelaufen
+    "san_domains": list[str],   # Subject Alternative Names
+    "signature_algorithm": str, # z. B. "sha256WithRSAEncryption"
+    "serial_number": str,       # Hex
+    "chain_length": int,        # Anzahl Zertifikate in der Kette
+}</code></pre>
+          <ul>
+            <li>Wirft <code>ConnectionError</code> bei Verbindungsproblemen</li>
+            <li>Wirft <code>TimeoutError</code> bei Timeout</li>
+            <li>Wirft <code>ssl.SSLError</code> bei TLS-Fehlern (nicht selbst fangen)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>evaluate_certificate(cert: dict, warn_days: int = 30) -&gt; dict</code>
+          <ul>
+            <li>Fügt Bewertungsfelder hinzu:</li>
+          </ul>
+          <pre><code>{
+    ...alle cert-Felder...,
+    "status": "OK" | "WARNING" | "CRITICAL" | "EXPIRED",
+    "warnings": list[str],   # Liste von Warnungen
+}</code></pre>
+          <ul>
+            <li><code>EXPIRED</code> wenn <code>days_until_expiry &lt;= 0</code></li>
+            <li><code>CRITICAL</code> wenn <code>days_until_expiry &lt;= 7</code></li>
+            <li><code>WARNING</code> wenn <code>days_until_expiry &lt;= warn_days</code></li>
+            <li><code>OK</code> sonst</li>
+            <li>Warnungen für: SHA1-Signaturalgorithmus, kein SAN-Eintrag für den angefragten Host</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>batch_audit(hosts: list[str], port: int, warn_days: int, timeout: float) -&gt; list[dict]</code>
+          <ul>
+            <li>Prüft alle Hosts nacheinander</li>
+            <li>Fehler pro Host werden als <code>{"host": str, "error": str}</code> in die Liste aufgenommen</li>
+            <li>Kein Absturz bei einzelnem fehlerhaften Host</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>certaudit HOST [HOST ...] [--port 443] [--warn-days 30] [--format text|json] [--file host-liste.txt]</code>
+          <ul>
+            <li><code>--file host-liste.txt</code>: eine Domain pro Zeile, Kommentarzeilen (#) ignorieren</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>certaudit github.com
+certaudit github.com gitlab.com codeberg.org
+certaudit --file hosts.txt --warn-days 14 --format json
+certaudit 192.168.1.1 --port 8443    (Heimnetz-Gerät)</code></pre>
+      <p>Beispiel-Output (Text):</p>
+      <pre><code>CERTIFICATE AUDIT
+═══════════════════════════════════════════════════
+
+HOST: github.com:443                         [OK]
+─────────────────────────────────────────────────
+  Subject    github.com
+  Issuer     DigiCert TLS RSA SHA256 2020 CA1
+  Gültig     2025-03-14 — 2026-09-17
+  Restlaufzeit  91 Tage
+  Algorithmus   sha256WithRSAEncryption
+  SAN-Einträge  github.com, www.github.com
+
+HOST: expired.example.com:443           [EXPIRED]
+─────────────────────────────────────────────────
+  Zertifikat ist seit 14 Tagen abgelaufen!
+  [!] Zertifikat abgelaufen am 2026-06-05
+
+═══════════════════════════════════════════════════
+Zusammenfassung: 2 Hosts · 1 OK · 0 WARNING · 1 EXPIRED</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Grundlegende Funktion (erfordert Internetzugang)
+python -m certaudit github.com
+# → Muss Zertifikat-Info anzeigen ohne Absturz
+
+# Timeout-Verhalten
+python -m certaudit 10.255.255.1 --port 443
+# → Muss nach timeout_seconds mit Fehlermeldung enden, kein Hang
+
+# Exit-Code
+python -m certaudit github.com; echo "Exit: $?"
+# → Exit 0 wenn OK
+
+# Kern-Logik ohne Netzwerk testbar
+python -c "
+from certaudit.core import evaluate_certificate
+cert = {'days_until_expiry': 5, 'signature_algorithm': 'sha256WithRSAEncryption',
+        'san_domains': ['github.com'], 'host': 'github.com',
+        'subject_cn': 'github.com', 'issuer_cn': 'DigiCert',
+        'issuer_org': 'DigiCert Inc.', 'not_before': '2025-01-01T00:00:00',
+        'not_after': '2026-01-01T00:00:00', 'serial_number': 'deadbeef',
+        'chain_length': 2}
+result = evaluate_certificate(cert, warn_days=30)
+assert result['status'] == 'CRITICAL'
+print('evaluate_certificate: OK')
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <p>Da echte Netzwerkzugriffe in Tests vermieden werden sollten, mocke die TLS-Verbindung:</p>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>evaluate_certificate</code> mit <code>days_until_expiry &gt; 30</code> → <code>status == "OK"</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>evaluate_certificate</code> mit <code>days_until_expiry = 20</code> → <code>status == "WARNING"</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>evaluate_certificate</code> mit <code>days_until_expiry = 3</code> → <code>status == "CRITICAL"</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>evaluate_certificate</code> mit <code>days_until_expiry = -1</code> → <code>status == "EXPIRED"</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>evaluate_certificate</code> mit SHA1-Algorithmus → enthält Warnung in <code>warnings</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>batch_audit</code> mit fehlschlagendem Host → kein Absturz, Fehler im Ergebnis</li>
+      </ul>
+      <p>Für Netzwerk-Tests: nutze <code>unittest.mock.patch</code> um <code>socket.create_connection</code> zu mocken, oder einen lokalen Test-HTTPS-Server (Bonus).</p>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Schwache Algorithmen:</strong> Erkenne und flagge: SHA1, MD5, RSA &lt; 2048 Bit, EC-Kurven unter 256 Bit</li>
+        <li class="task"><span class="chk"></span><strong>OCSP-Check:</strong> Prüfe ob Zertifikat widerrufen wurde (erfordert Netzwerkzugriff)</li>
+        <li class="task"><span class="chk"></span><strong>Export als PEM:</strong> <code>--save cert.pem</code> speichert das Zertifikat lokal</li>
+        <li class="task"><span class="chk"></span><strong>Parallele Prüfung:</strong> <code>batch_audit</code> nutzt <code>concurrent.futures.ThreadPoolExecutor</code> für mehrere Hosts gleichzeitig</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <h3>TLS ohne vollständige Validierung</h3>
+      <p>Für reine Inspektion (kein echter Request) nutze:</p>
+      <pre><code>import ssl, socket
+context = ssl.create_default_context()
+context.check_hostname = False
+context.verify_mode = ssl.CERT_NONE</code></pre>
+      <p>Dies erlaubt dir auch selbst-signierte Zertifikate zu inspizieren.</p>
+      <h3>Zertifikat parsen</h3>
+      <p><code>ssl.get_server_certificate((host, port))</code> gibt PEM-String zurück. Mit <code>cryptography.x509.load_pem_x509_certificate(pem.encode())</code> kommst du an alle X.509-Felder.</p>
+      <h3>SAN-Einträge</h3>
+      <p><code>cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value.get_values_for_type(x509.DNSName)</code> gibt Liste der DNS-Namen zurück.</p>
+      <h3>Timeout</h3>
+      <p><code>socket.create_connection((host, port), timeout=10)</code> — der Timeout gilt nur für den Connect. Setze zusätzlich <code>sock.settimeout(10)</code>.</p>
+      <h3>uConsole-Tipp</h3>
+      <p>Gegen lokale IPs (Router, NAS) funktioniert das Tool auch ohne Internet. Test: <code>certaudit 192.168.1.1 --port 443</code> gegen deinen Heimrouter.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def fetch_certificate(host: str, port: int = 443, timeout: float = 10.0) -> dict:
+    """Ruft TLS-Zertifikat von einem Host ab und gibt strukturierte Daten zurück."""
+
+def evaluate_certificate(cert: dict, warn_days: int = 30) -> dict:
+    """Bewertet ein Zertifikat und gibt Status + Warnungen zurück."""</code></pre>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle uctl</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

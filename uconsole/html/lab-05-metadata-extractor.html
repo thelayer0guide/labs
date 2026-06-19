@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 05 — Metadata Extractor - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #d2a8ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; position: relative; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-05-metadata-extractor</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 05</span>
+        <span class="badge badge-phase">Phase 2 — Parsing &amp; Forensik</span>
+        <span class="badge badge-time">4–6 Stunden</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>Metadata Extractor</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 04 (Datenmodell-Muster)</span><br>
+        Modul: <span>metaextract</span><br>
+        Befehl: <span>meta</span><br>
+        Dependencies: <span>Pillow, pypdf</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="python-cheatsheet.html" class="sheet-lnk">python-cheatsheet</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <main class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Externe Bibliotheken (<code>Pillow</code>, <code>pypdf</code>) gezielt für Metadaten-Extraktion einsetzen</li>
+        <li>Einheitliche Datenstrukturen über verschiedene Dateitypen hinweg bauen</li>
+        <li>GPS-Koordinaten aus EXIF-Rohdaten in Dezimalgrad umrechnen</li>
+        <li><code>os.stat()</code> und <code>pathlib.Path.stat()</code> für Dateisystem-Metadaten nutzen</li>
+        <li>Datenschutz-Implikationen von Metadaten praktisch verstehen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Dateien tragen oft mehr Informationen als der reine Inhalt: Fotos enthalten GPS-Koordinaten, Kameramodell und Aufnahmedatum. PDFs verraten das Autorenkürzel, das Office-Programm und manchmal interne Firmennamen. Selbst generische Dateieigenschaften wie <code>ctime</code>/<code>mtime</code> können forensisch relevant sein.</p>
+      <p>Dieses Tool ist dual-use: Als Forensik-Werkzeug analysierst du fremde Dateien. Als Datenschutz-Tool prüfst du deine eigenen Dateien, bevor du sie teilst. Beide Anwendungsfälle sind legitim und lehrreich.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>meta</code> — ein Tool, das Metadaten aus verschiedenen Dateitypen extrahiert und in einem einheitlichen JSON-Format ausgibt.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── metaextract/
+    ├── __init__.py
+    ├── core.py
+    ├── extractors/
+    │   ├── __init__.py
+    │   ├── image.py      ← EXIF-Extraktion (Pillow)
+    │   ├── pdf.py        ← PDF-Metadaten (pypdf)
+    │   └── generic.py    ← os.stat() für alle Dateitypen
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        ├── test_core.py
+        └── fixtures/
+            ├── sample.jpg    (kleines Testbild mit EXIF)
+            └── sample.pdf    (kleines Test-PDF)</code></pre>
+    </div>
+
+    <div class="lab-section" id="das-datenmodell">
+      <div class="sec-heading">Das Datenmodell</div>
+      <p>Alle Extraktoren geben ein Dict mit folgendem Schema zurück:</p>
+      <pre><code>{
+    "path": str,
+    "type": str,          # "jpeg", "png", "pdf", "unknown"
+    "size_bytes": int,
+    "modified": str,      # ISO 8601
+    "created": str,       # ISO 8601 (ctime — nicht immer Erstellzeit!)
+    "permissions": str,   # oktales Format: "644"
+    "owner": str,         # UID oder Username
+
+    # EXIF (nur für Bilder, falls vorhanden):
+    "exif": {
+        "camera_make": str | None,
+        "camera_model": str | None,
+        "datetime_original": str | None,   # ISO 8601
+        "gps_lat": float | None,           # Dezimalgrad, N positiv
+        "gps_lon": float | None,           # Dezimalgrad, E positiv
+        "software": str | None,
+        "orientation": int | None,
+    } | None,
+
+    # PDF (nur für PDFs, falls vorhanden):
+    "pdf": {
+        "author": str | None,
+        "creator": str | None,           # z. B. "Microsoft Word"
+        "producer": str | None,          # z. B. "Acrobat PDF 15.0"
+        "creation_date": str | None,     # ISO 8601
+        "modification_date": str | None, # ISO 8601
+        "page_count": int,
+        "encrypted": bool,
+    } | None,
+
+    # Anomalien (immer vorhanden, leer wenn keine):
+    "anomalies": list[str],
+}</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>extractors/generic.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>extract_generic(path: Path) -> dict</code>
+          <ul>
+            <li>Füllt alle Felder aus dem Schema (ohne EXIF und PDF)</li>
+            <li><code>permissions</code> als oktaler String (z. B. <code>"644"</code>)</li>
+            <li>Timestamps als ISO-8601-Strings</li>
+            <li>Bei fehlenden Rechten: gibt <code>{"path": str, "error": "permission denied"}</code> zurück</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>extractors/image.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>extract_exif(path: Path) -> dict | None</code>
+          <ul>
+            <li>Nutzt <code>PIL.Image.open()</code> und <code>._getexif()</code></li>
+            <li>Gibt das EXIF-Teildict zurück oder <code>None</code> wenn keine EXIF-Daten vorhanden</li>
+            <li>Importiert <code>PIL</code> in einem Try/Except: wenn nicht installiert → gibt <code>None</code> zurück</li>
+            <li>GPS-Koordinaten: EXIF speichert diese als Grad/Minuten/Sekunden-Tupel → umrechnen in Dezimalgrad</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>gps_to_decimal(degrees, minutes, seconds, ref: str) -> float</code>
+          <ul>
+            <li>Reine Berechnung, kein I/O</li>
+            <li><code>ref</code> ist <code>"N"</code>, <code>"S"</code>, <code>"E"</code> oder <code>"W"</code> — South und West sind negativ</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>extractors/pdf.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>extract_pdf_meta(path: Path) -> dict | None</code>
+          <ul>
+            <li>Nutzt <code>pypdf.PdfReader</code></li>
+            <li>Gibt das PDF-Teildict zurück oder <code>None</code> bei Fehler</li>
+            <li>Bei verschlüsseltem PDF: <code>encrypted: True</code>, restliche Felder <code>None</code></li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>extract_metadata(path: Path) -> dict</code>
+          <ul>
+            <li>Kombiniert alle Extraktoren zum vollständigen Schema</li>
+            <li>Erkennt Dateityp via <code>path.suffix.lower()</code> und Magic Bytes (erste 4 Bytes)</li>
+            <li>Füllt <code>anomalies</code>-Liste:
+              <ul>
+                <li>PDF: "modification_date before creation_date" wenn Änderungsdatum vor Erstelldatum</li>
+                <li>Bild: "GPS coordinates present" als Hinweis (nicht als Fehler)</li>
+                <li>Allgemein: "ctime in future" wenn <code>ctime</code> in der Zukunft liegt</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>meta DATEI [DATEI ...] [--format json|text]</code></li>
+        <li class="task"><span class="chk"></span><code>meta VERZEICHNIS --recursive [--ext jpg,pdf]</code></li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>meta foto.jpg
+meta dokument.pdf --format json
+meta ~/Dokumente --recursive --ext pdf
+meta foto1.jpg foto2.jpg foto3.jpg</code></pre>
+      <p>Beispiel-Output (Text):</p>
+      <pre><code>METADATA: foto.jpg
+─────────────────────────────
+Typ         JPEG
+Größe       3.2 MB
+Geändert    2026-05-15T14:32:01
+Rechte      644
+
+KAMERA
+  Hersteller  Apple
+  Modell      iPhone 15 Pro
+  Aufnahme    2026-05-15T12:00:00
+
+GPS
+  Koordinaten  48.1351° N, 11.5820° E
+  [!] Tipp: GPS-Koordinaten in Datei vorhanden — vor dem Teilen prüfen!
+
+ANOMALIEN
+  (keine)</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Erstelle ein minimales Test-JPEG (ohne EXIF)
+python -c "
+from PIL import Image
+img = Image.new('RGB', (100, 100), color='red')
+img.save('/tmp/test_noexif.jpg')
+"
+python -m metaextract /tmp/test_noexif.jpg --format json
+# → valides JSON, exif: null
+
+# GPS-Umrechnung
+python -c "
+from metaextract.extractors.image import gps_to_decimal
+lat = gps_to_decimal(48, 8, 3.6, 'N')
+assert abs(lat - 48.134333) &lt; 0.001, f'Erwartet ~48.134, bekam {lat}'
+lat_s = gps_to_decimal(48, 8, 3.6, 'S')
+assert lat_s &lt; 0, 'Südlich muss negativ sein'
+print('GPS-Umrechnung OK')
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>extract_generic</code> gibt vollständiges Dict mit allen Pflichtfeldern zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>gps_to_decimal(48, 8, 3.6, "N")</code> → ~48.134</li>
+        <li class="task"><span class="chk"></span>Test: <code>gps_to_decimal(48, 8, 3.6, "S")</code> → negativ</li>
+        <li class="task"><span class="chk"></span>Test: <code>gps_to_decimal(11, 34, 55.2, "E")</code> → positiv</li>
+        <li class="task"><span class="chk"></span>Test: <code>gps_to_decimal(11, 34, 55.2, "W")</code> → negativ</li>
+        <li class="task"><span class="chk"></span>Test: <code>extract_pdf_meta</code> auf Sample-PDF gibt <code>page_count >= 1</code> zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>extract_metadata</code> erkennt JPEG korrekt (<code>type == "jpeg"</code>)</li>
+        <li class="task"><span class="chk"></span>Test: <code>extract_metadata</code> auf nicht existierender Datei → enthält <code>"error"</code>-Feld</li>
+      </ul>
+      <p>Erstelle in <code>tests/fixtures/</code> ein minimales Test-PDF mit <code>pypdf</code>-Skript (oder Download eines freien 1-seitigen PDFs).</p>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>Magic Bytes:</strong> Erkenne Dateityp nicht nur via Extension, sondern via erste Bytes (<code>\xff\xd8\xff</code> = JPEG, <code>%PDF</code> = PDF, <code>\x89PNG</code> = PNG)</li>
+        <li class="task"><span class="chk"></span><strong>Batch-Report:</strong> <code>--format csv</code> für mehrere Dateien (eine Zeile pro Datei)</li>
+        <li class="task"><span class="chk"></span><strong>Metadata-Stripping-Hinweis:</strong> Zeige bei Dateien mit GPS-Daten konkret an, wie man Metadaten entfernt (<code>exiftool -all= datei.jpg</code>)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>Pillow EXIF:</strong> <code>Image.open(path)._getexif()</code> gibt ein Dict mit numerischen Tag-IDs zurück. Nutze <code>PIL.ExifTags.TAGS</code> zum Umwandeln in lesbare Namen: <code>TAGS.get(tag_id, str(tag_id))</code>.</p>
+      <p><strong>GPS-Daten in EXIF:</strong> GPS-Info steckt unter Tag-ID <code>34853</code> (GPSInfo). Die Werte für Breitengrad sind unter GPSLatitude (2) und GPSLatitudeRef (1). Die Rohdaten sind <code>IFDRational</code>-Objekte — rechne mit <code>float(val)</code>.</p>
+      <p><strong>ctime auf Linux:</strong> <code>ctime</code> ist die Zeit der letzten Inode-Änderung, <strong>nicht</strong> die Erstellzeit. Benenne es entsprechend im Output oder erkläre es in einem Kommentar.</p>
+      <p><strong>pypdf:</strong> <code>PdfReader(path).metadata</code> gibt ein <code>DocumentInformation</code>-Objekt zurück. Zugriff via Attribut: <code>.author</code>, <code>.creation_date</code>. Datumswerte sind manchmal <code>datetime</code>-Objekte, manchmal Strings — normalisiere zu ISO 8601.</p>
+    </div>
+
+    <div class="lab-section" id="datenschutz-hinweis">
+      <div class="sec-heading">Datenschutz-Hinweis (wichtiger Teil der Aufgabe)</div>
+      <p>Implementiere einen expliziten Warnhinweis in der Ausgabe, wenn GPS-Koordinaten gefunden werden:</p>
+      <pre><code>[!] DATENSCHUTZ: Diese Datei enthält GPS-Koordinaten (48.1351° N, 11.5820° E).
+    Wenn du diese Datei teilst, teilst du auch deinen Standort.
+    Zum Entfernen: exiftool -GPS:all= datei.jpg</code></pre>
+      <p>Dieser Hinweis soll Nutzer schulen, nicht erschrecken.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def extract_metadata(path: Path) -> dict:
+    """Extrahiert alle verfügbaren Metadaten einer Datei.
+
+    Returns:
+        Vollständiges Metadaten-Dict nach definiertem Schema.
+        Enthält "error"-Feld bei nicht lesbaren Dateien.
+    """</code></pre>
+    </div>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#das-datenmodell" class="toc-lnk">Das Datenmodell</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#datenschutz-hinweis" class="toc-lnk">Datenschutz-Hinweis</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle für uctl</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

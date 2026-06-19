@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 00 — Projekt-Skeleton & Dev-Workflow - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #58a6ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); text-decoration: none; transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid {
+    display: grid; grid-template-columns: 1fr auto;
+    align-items: start; gap: 32px; position: relative; max-width: 1240px;
+  }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 3px;
+  }
+  .badge-lab {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 {
+    font-size: clamp(24px, 3.5vw, 44px); font-weight: 800;
+    letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px;
+  }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; min-width: 180px;
+  }
+  .sheets-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+  }
+  .sheet-lnk {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    color: var(--muted); text-decoration: none;
+    padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s;
+  }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body {
+    display: grid; grid-template-columns: 1fr 220px;
+    gap: 40px; max-width: 1240px; margin: 0 auto;
+    padding: 48px; align-items: start;
+  }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading {
+    font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--accent); padding-bottom: 8px; margin-bottom: 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk {
+    display: inline-block; width: 14px; height: 14px;
+    border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    position: absolute; left: 0; top: 6px;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    padding: 1px 5px; border-radius: 3px; color: #e6edf3;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 6px;
+    padding: 18px 20px; overflow-x: auto; margin: 14px 0; position: relative;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote {
+    border-left: 3px solid var(--accent); padding: 12px 16px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    border-radius: 0 6px 6px 0; margin: 14px 0;
+  }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk {
+    display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); text-decoration: none; padding: 5px 0;
+    border-bottom: 1px solid var(--border); transition: color 0.15s;
+  }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Lab 00 — Projekt-Skeleton &amp; Dev-Workflow</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-lab">Lab 00</span>
+          <span class="badge badge-phase">Phase 0 — Fundament</span>
+          <span class="badge badge-time">2–4 Stunden</span>
+          <span class="badge" style="color:#58a6ff;background:rgba(0,0,0,0);border:1px solid #58a6ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#58a6ff">★</span><span style="color:#58a6ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Grundkenntnisse</span>
+        </div>
+        <h1>Projekt-Skeleton &amp; Dev-Workflow</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>keine</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-lnk">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/make-cheatsheet.html" class="sheet-lnk">make</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li>Einen Python-Monorepo aufsetzen, der alle folgenden Labs trägt</li>
+          <li><code>poetry</code> oder <code>pip + venv</code> für Dependency-Management nutzen</li>
+          <li><code>pyproject.toml</code> als zentralen Konfigurations-Anker verstehen</li>
+          <li>Einen reproduzierbaren Build-Workflow (Test / Lint / Format) einrichten</li>
+          <li>Git-Workflow und <code>.gitignore</code> sauber konfigurieren</li>
+          <li>Den Entwicklungsaufwand auf der uConsole (ARM64) einschätzen lernen</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Bevor du das erste Tool schreibst, braucht das Projekt ein stabiles Fundament. Ein Mono-Repo mit einheitlicher Struktur macht es später trivial, Tools miteinander zu kombinieren — und ist die Voraussetzung dafür, dass alle Labs in Phase 6 zu <code>uctl</code> zusammenwachsen können.</p>
+        <p>Professionelle Python-Projekte trennen immer: Kernlogik (testbar, ohne I/O), CLI-Einstiegspunkt, Tests. Diese Struktur lernst du hier einmal sauber aufzusetzen — und hältst sie dann durch alle 17 folgenden Labs durch.</p>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Richte das Mono-Repo <code>security-lab/</code> ein. Es wird das Zuhause für alle Tools aus den Labs 01–17 und schließlich für <code>uctl</code>.</p>
+        <h3>Verzeichnisstruktur</h3>
+        <p>Am Ende dieses Labs muss folgende Struktur stehen:</p>
+        <pre><code>security-lab/
+├── pyproject.toml
+├── Makefile              (oder justfile)
+├── .gitignore
+├── shared/
+│   ├── __init__.py
+│   └── output.py         (zunächst leer — Platzhalter für spätere Utils)
+├── hashinspect/          (Platzhalter für Lab 01 — noch leer)
+│   ├── __init__.py
+│   ├── core.py
+│   ├── cli.py
+│   └── tests/
+│       ├── __init__.py
+│       └── test_core.py
+└── README.md</code></pre>
+        <p>Du legst <strong>nur</strong> <code>hashinspect/</code> als Beispielstruktur an. Die anderen Tool-Verzeichnisse entstehen in den jeweiligen Labs.</p>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <ul>
+          <li class="task"><span class="chk"></span><code>pyproject.toml</code> enthält:
+            <ul>
+              <li><code>[build-system]</code> mit <code>setuptools</code> oder <code>poetry-core</code></li>
+              <li><code>[project]</code> mit <code>name</code>, <code>version</code>, <code>requires-python = ">=3.11"</code></li>
+              <li><code>[project.optional-dependencies]</code> oder <code>[tool.poetry.dev-dependencies]</code> mit <code>pytest >= 7</code>, <code>ruff</code>, <code>black</code></li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span><code>Makefile</code> (oder <code>justfile</code>) mit mindestens drei Targets:
+            <ul>
+              <li><code>make test</code> → führt <code>pytest</code> aus</li>
+              <li><code>make lint</code> → führt <code>ruff check .</code> aus</li>
+              <li><code>make format</code> → führt <code>black .</code> aus</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span><code>.gitignore</code> schließt aus: <code>__pycache__/</code>, <code>.venv/</code>, <code>*.egg-info/</code>, <code>.pytest_cache/</code>, <code>dist/</code>, <code>.ruff_cache/</code></li>
+          <li class="task"><span class="chk"></span><code>shared/__init__.py</code> und <code>shared/output.py</code> existieren (<code>output.py</code> darf leer sein)</li>
+          <li class="task"><span class="chk"></span><code>hashinspect/core.py</code> enthält eine Stub-Funktion:
+            <pre><code>def hash_file(path, algos):
+    raise NotImplementedError</code></pre>
+          </li>
+          <li class="task"><span class="chk"></span><code>hashinspect/tests/test_core.py</code> enthält mindestens einen Test, der aktuell fehlschlägt (<code>pytest.raises(NotImplementedError)</code>)</li>
+          <li class="task"><span class="chk"></span><code>make test</code> läuft durch (auch wenn Tests fehlschlagen — das Ziel ist, dass pytest überhaupt startet)</li>
+          <li class="task"><span class="chk"></span><code>make lint</code> läuft ohne Fehler</li>
+          <li class="task"><span class="chk"></span>Das Repo ist git-initialisiert, der erste Commit ist gemacht</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="akzeptanzkriterien">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <p>Führe nach deiner Einrichtung diese Befehle aus — alle müssen ohne Absturz durchlaufen:</p>
+        <pre><code>cd security-lab/
+make lint          # kein Fehler
+make test          # pytest startet, 1 Test schlägt fehl (NotImplementedError)
+python -c "from shared import output; print('OK')"   # importierbar
+python -c "from hashinspect.core import hash_file"   # importierbar
+git log --oneline  # mind. 1 Commit sichtbar</code></pre>
+      </div>
+
+      <div class="lab-section" id="bonus-aufgaben">
+        <div class="sec-heading">Bonus-Aufgaben</div>
+        <ul>
+          <li class="task"><span class="chk"></span><code>justfile</code> statt <code>Makefile</code> nutzen (modernere Alternative)</li>
+          <li class="task"><span class="chk"></span><code>make test-cov</code> als weiteres Target: <code>pytest --cov=. --cov-report=term-missing</code></li>
+          <li class="task"><span class="chk"></span><code>pyproject.toml</code> konfiguriert <code>ruff</code> mit <code>line-length = 88</code> und aktiviert die Regeln <code>E</code>, <code>F</code>, <code>I</code></li>
+          <li class="task"><span class="chk"></span><code>pre-commit</code>-Hook einrichten: lint + format vor jedem Commit automatisch</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="uconsole-hinweis">
+        <div class="sec-heading">uConsole-Hinweis</div>
+        <p>Richte das venv <strong>direkt auf der uConsole</strong> ein, sobald du das Repo dorthin geklont hast. ARM64-Wheels für Pakete wie <code>cryptography</code> oder <code>Pillow</code> sind nicht immer verfügbar — du wirst <code>pip install</code> manchmal durch <code>--no-binary :all:</code> ersetzen müssen, was längere Kompilierzeiten bedeutet. Lerne das jetzt, bevor du in Lab 07 oder 12 ein Paket brauchst und stundenlang wartest.</p>
+        <p>Teste explizit:</p>
+        <pre><code>python -m venv .venv && source .venv/bin/activate
+pip install pytest ruff black        # alle drei sollten auf ARM64 funktionieren</code></pre>
+      </div>
+
+      <div class="lab-section" id="was-du-nicht-brauchst">
+        <div class="sec-heading">Was du NICHT brauchst</div>
+        <ul>
+          <li>Keine echte Logik in <code>core.py</code> (kommt in Lab 01)</li>
+          <li>Kein CI/CD-Setup (kommt in Lab 16)</li>
+          <li>Kein vollständiges <code>shared/output.py</code> (wächst organisch)</li>
+          <li>Keine Abhängigkeiten außer pytest, ruff, black</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+        <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+        <a href="#uconsole-hinweis" class="toc-lnk">uConsole-Hinweis</a>
+        <a href="#was-du-nicht-brauchst" class="toc-lnk">Was du NICHT brauchst</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

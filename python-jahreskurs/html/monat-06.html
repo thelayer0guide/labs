@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monat 06 — Type Hints & CLI-Tools — Python Jahreskurs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --bg-raised: #1c2128;
+  --bg-code:   #0a0e14;
+  --border:    #30363d;
+  --border-s:  #21262d;
+  --tx:        #e6edf3;
+  --tx-sec:    #8b949e;
+  --tx-muted:  #6e7681;
+  --m1:#58a6ff; --m2:#79c0ff; --m3:#3fb950; --m4:#56d364;
+  --m5:#d2a8ff; --m6:#bc8cff; --m7:#ffa657; --m8:#e3a03a;
+  --m9:#ff7b72; --m10:#ffa198; --m11:#e3b341; --m12:#ffd700;
+  --fd: 'Syne', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+  --r: 6px; --rl: 10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fm);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.topnav{position:sticky;top:0;z-index:200;background:rgba(13,17,23,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-s);padding:0 32px;display:flex;align-items:center;height:48px;gap:8px}
+.nav-back{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--tx)}
+.nav-sep{color:var(--border-s);font-size:16px}
+.nav-here{font-family:var(--fm);font-size:11px}
+.nav-spacer{flex:1}
+.nav-adj{display:flex;gap:8px}
+.nav-adj a{font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:3px 10px;border:1px solid var(--border-s);border-radius:3px;transition:color .15s,border-color .15s}
+.nav-adj a:hover{color:var(--tx);border-color:var(--border)}
+.page-header{border-bottom:2px solid var(--ac,#58a6ff);padding:32px 32px 28px;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 600px 200px at 50% 50%,rgba(var(--ac-raw,88,166,255),.06),transparent)}
+.ph-row{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.ph-main{flex:1;min-width:280px}
+.ph-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ph-badge{font-family:var(--fm);font-size:10px;font-weight:600;padding:3px 10px;border-radius:3px;border:1px solid}
+.ph-title{font-family:var(--fd);font-size:clamp(22px,3vw,36px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px;color:var(--tx)}
+.ph-sub{font-size:12px;color:var(--tx-muted)}
+.sheets-panel{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);padding:14px 18px;min-width:160px;flex-shrink:0}
+.sheets-label{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--tx-muted);margin-bottom:10px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;color:var(--tx-muted);text-decoration:none;padding:4px 0;border-bottom:1px solid var(--border-s);transition:color .15s}
+.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'→';color:var(--ac,#58a6ff);opacity:.5;transition:opacity .15s}
+.sheet-lnk:hover{color:var(--ac,#58a6ff)}
+.sheet-lnk:hover::before{opacity:1}
+.page-content{padding:0 32px 80px;max-width:1280px;margin:0 auto}
+.month-section{padding:48px 0 0}
+.month-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border-s)}
+.month-badge{font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid;white-space:nowrap}
+.month-title{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.02em}
+.month-sub{font-size:11.5px;color:var(--tx-muted);margin-left:auto;white-space:nowrap}
+.week-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:700px){.week-grid{grid-template-columns:1fr}}
+.week-card{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--rl);border-left-width:3px;padding:18px 20px}
+.week-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.week-num{font-family:var(--fm);font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--bg-code)}
+.week-title{font-family:var(--fd);font-size:14px;font-weight:700;line-height:1.2}
+.topic-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.topic-list li{font-size:11.5px;color:var(--tx-sec);display:flex;gap:7px;align-items:baseline;line-height:1.4}
+.topic-list li::before{content:'›';color:inherit;opacity:.6;flex-shrink:0}
+.ex-label{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-bottom:6px}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:3px}
+.ex-list li{font-size:11px;color:var(--tx-muted);display:flex;gap:7px;line-height:1.35}
+.ex-list li::before{content:'→';flex-shrink:0}
+.code-block{background:var(--bg-code);border:1px solid var(--border-s);border-radius:var(--r);padding:12px 16px;font-family:var(--fm);font-size:11.5px;line-height:1.7;margin:10px 0;overflow-x:auto}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg-code);border:1px solid var(--border-s);color:var(--tx-muted)}
+.milestone-card{background:var(--bg-card);border-radius:var(--rl);overflow:hidden;margin-bottom:20px;position:relative}
+.milestone-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.milestone-inner{padding:28px 32px;position:relative;z-index:1}
+.milestone-eye{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.milestone-title{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:10px}
+.milestone-desc{font-size:12px;color:var(--tx-sec);line-height:1.65;max-width:600px;margin-bottom:18px}
+.milestone-feats{display:flex;flex-wrap:wrap;gap:8px}
+.milestone-feat{font-size:11px;background:var(--bg-raised);border:1px solid var(--border-s);border-radius:4px;padding:4px 10px;color:var(--tx-sec)}
+.milestone-code{margin-top:20px}
+.seclab-box{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:var(--r);padding:12px 16px;font-size:11px;color:#58a6ff99;line-height:1.55;display:flex;gap:8px;margin-top:14px}
+.seclab-box::before{content:'⬡';color:var(--m1);flex-shrink:0;font-size:13px}
+.seclab-box strong{color:var(--m1)}
+.hint-box{border-left:2px solid;background:var(--bg-code);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--tx-muted);line-height:1.55;margin-top:12px}
+.diff{display:inline-flex;gap:3px;align-items:center;margin-left:auto}
+.diff-dot{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.diff-dot.on{background:currentColor}
+.skills-row{background:var(--bg-card);border:1px solid var(--border-s);border-radius:var(--r);padding:14px 18px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+.skills-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx-muted);margin-right:8px;white-space:nowrap}
+.kw{color:var(--m5)}.fn{color:var(--m7)}.str{color:var(--m3)}.num{color:var(--m7)}.cm{color:var(--tx-muted)}.op{color:var(--m9)}
+@media(max-width:768px){.topnav{padding:0 16px}.page-header{padding:24px 16px}.page-content{padding:0 16px 60px}}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav" style="--ac:#bc8cff">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Jahreskurs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here" style="color:#bc8cff">Monat 06</span>
+  <div class="nav-spacer"></div>
+  <div class="nav-adj">
+    <a href="monat-05.html">← M05</a>
+    <a href="monat-07.html">M07 →</a>
+  </div>
+</nav>
+
+<div class="page-header" style="--ac:#bc8cff">
+  <div class="ph-row">
+    <div class="ph-main">
+      <div class="ph-badges">
+        <span class="ph-badge" style="color:#bc8cff;border-color:#bc8cff55;background:#bc8cff11">Phase C</span>
+        <span class="ph-badge" style="color:#bc8cff;border-color:#bc8cff55;background:#bc8cff11">Monat 06</span>
+        <span class="ph-badge" style="color:var(--tx-muted);border-color:var(--border-s);background:transparent">Wochen 21–24</span>
+        <span class="ph-badge" style="color:#d2a8ff;border-color:#d2a8ff55;background:#d2a8ff11"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <div class="ph-title">Type Hints &amp; CLI-Tools</div>
+      <div class="ph-sub">Type Hints · Dataclasses · argparse · Typer · Rich</div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="month-section">
+<div class="month-hdr">
+    <span class="month-badge" style="color:var(--m6);border-color:var(--m6);background:rgba(188,140,255,.07)">Monat 06</span>
+    <h2 class="month-title">Type Hints &amp; CLI-Tools</h2>
+    <span class="month-sub">Type Hints · Dataclasses · argparse · Typer · Rich</span>
+  </div>
+
+  <div class="week-grid">
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 21</span><div class="week-title">Type Hints &amp; Annotations</div></div>
+      <ul class="topic-list">
+        <li><code>def f(x: int) -> str</code> — Syntax und Zweck</li>
+        <li><code>Optional[X]</code>, <code>Union[X, Y]</code>, <code>X | Y</code> (3.10+)</li>
+        <li><code>list[str]</code>, <code>dict[str, int]</code>, <code>tuple[int, ...]</code></li>
+        <li><code>Any</code>, <code>Callable</code>, <code>TypeVar</code> Einführung</li>
+        <li>Mypy: statische Typprüfung lokal ausführen</li>
+        <li>Type Hints sind kein Laufzeit-Check — <code>isinstance()</code> bleibt nötig</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+<span class="kw">def</span> <span class="fn">finde_eintrag</span>(
+    eintraege: <span class="fn">list</span>[<span class="fn">dict</span>[<span class="fn">str</span>, <span class="fn">str</span>]],
+    schluessel: <span class="fn">str</span>,
+) -> Optional[<span class="fn">dict</span>[<span class="fn">str</span>, <span class="fn">str</span>]]:
+    <span class="kw">return</span> next((e <span class="kw">for</span> e <span class="kw">in</span> eintraege <span class="kw">if</span> e[<span class="str">"name"</span>]==schluessel), <span class="kw">None</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch (Milestone 2) vollständig mit Type Hints versehen</li>
+        <li>mypy über alle eigenen Module laufen lassen</li>
+        <li>TypeVar: generische Funktion first(lst)</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Type Hints</span><span class="tag">Optional/Union</span><span class="tag">mypy</span><span class="tag">TypeVar</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 22</span><div class="week-title">Dataclasses &amp; NamedTuple</div></div>
+      <ul class="topic-list">
+        <li><code>@dataclass</code>: automatisch <code>__init__</code>, <code>__repr__</code>, <code>__eq__</code></li>
+        <li><code>field(default_factory=...)</code>, <code>frozen=True</code></li>
+        <li><code>__post_init__</code> für Validierung</li>
+        <li><code>NamedTuple</code> vs. <code>dataclass</code> — Unterschiede</li>
+        <li><code>Protocol</code>: duck typing mit Typprüfung</li>
+        <li>JSON-Serialisierung von Dataclasses (<code>asdict()</code>)</li>
+      </ul>
+      <div class="code-block"><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field, asdict
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+@dataclass
+<span class="kw">class</span> <span class="fn">Kontakt</span>:
+    name: <span class="fn">str</span>
+    email: <span class="fn">str</span>
+    tags: <span class="fn">list</span>[<span class="fn">str</span>] = field(default_factory=<span class="fn">list</span>)
+    erstellt: <span class="fn">str</span>  = field(default_factory=<span class="kw">lambda</span>: datetime.now().isoformat())</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontakt (Milestone 2) auf Dataclass umstellen</li>
+        <li>Finding-Dataclass für Security-Lab-Vorbereitung</li>
+        <li>Frozen dataclass als Dict-Key nutzen</li>
+      </ul>
+      <div class="tag-row"><span class="tag">@dataclass</span><span class="tag">field()</span><span class="tag">__post_init__</span><span class="tag">asdict()</span><span class="tag">Protocol</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 23</span><div class="week-title">argparse in der Tiefe</div></div>
+      <ul class="topic-list">
+        <li><code>ArgumentParser</code>, <code>add_argument</code>, <code>parse_args()</code></li>
+        <li>Positional vs. Optional Arguments</li>
+        <li>Typen (<code>type=int</code>), <code>nargs</code>, <code>action='store_true'</code></li>
+        <li>Subcommands: <code>add_subparsers()</code></li>
+        <li><code>mutually_exclusive_group</code></li>
+        <li>Exit-Codes: <code>sys.exit(0)</code> vs. <code>sys.exit(1)</code> — Konventionen</li>
+      </ul>
+      <div class="code-block"><span class="fn">parser</span> = argparse.ArgumentParser(description=<span class="str">"Mein Tool"</span>)
+<span class="fn">sub</span>    = <span class="fn">parser</span>.add_subparsers(dest=<span class="str">"cmd"</span>)
+
+<span class="fn">add_p</span>  = <span class="fn">sub</span>.add_parser(<span class="str">"add"</span>)
+<span class="fn">add_p</span>.add_argument(<span class="str">"name"</span>)
+<span class="fn">add_p</span>.add_argument(<span class="str">"--email"</span>, required=<span class="kw">True</span>)
+
+<span class="fn">args</span> = <span class="fn">parser</span>.parse_args()  <span class="cm"># mein_tool add Ada --email ...</span></div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch auf argparse + Subcommands umbauen</li>
+        <li>Tool mit --verbose / --quiet Flag</li>
+        <li>Mehrere Dateien als nargs='+'</li>
+      </ul>
+      <div class="tag-row"><span class="tag">argparse</span><span class="tag">Subparsers</span><span class="tag">Exit-Codes</span><span class="tag">nargs</span></div>
+    </div>
+
+    <div class="week-card" style="border-left-color:var(--m6)">
+      <div class="week-top"><span class="week-num" style="color:var(--m6)">W 24</span><div class="week-title">Typer &amp; Rich</div></div>
+      <ul class="topic-list">
+        <li>Typer: Subcommands via Funktionen mit Type-Hints</li>
+        <li><code>typer.Option()</code>, <code>typer.Argument()</code>, <code>typer.confirm()</code></li>
+        <li>Rich: <code>Console</code>, <code>Table</code>, <code>Panel</code>, <code>Syntax</code></li>
+        <li>Rich Progress-Bars (ersetzt den self-built aus Lab 01)</li>
+        <li>Rich Themes &amp; custom Styles</li>
+        <li>Kombination: Typer-App mit Rich-Output</li>
+      </ul>
+      <div class="code-block"><span class="kw">import</span> typer
+<span class="kw">from</span> rich.console <span class="kw">import</span> Console
+
+<span class="fn">app</span>     = typer.Typer()
+<span class="fn">console</span> = Console()
+
+@<span class="fn">app</span>.command()
+<span class="kw">def</span> <span class="fn">hash</span>(datei: str, algo: <span class="fn">str</span> = <span class="str">"sha256"</span>):
+    <span class="str">"""Berechnet Hash einer Datei."""</span>
+    <span class="fn">console</span>.print(f<span class="str">"[green]✓[/] {algo}: ..."</span>)</div>
+      <div class="ex-label">Übungen</div>
+      <ul class="ex-list">
+        <li>Kontaktbuch mit Typer + Rich Table umbauen</li>
+        <li>Rich Progress für Datei-Scan</li>
+        <li>Eigene Rich-Theme für das Tool</li>
+      </ul>
+      <div class="tag-row"><span class="tag">Typer</span><span class="tag">Rich</span><span class="tag">Console/Table</span><span class="tag">Progress</span></div>
+    </div>
+  </div>
+
+  <!-- MILESTONE 3 -->
+  <div class="milestone-card" style="border:1px solid var(--m6)">
+    <div class="milestone-inner">
+      <div class="milestone-eye" style="color:var(--m6)">★ Milestone 3 — Ende Monat 06</div>
+      <div class="milestone-title">File Organizer CLI</div>
+      <div class="milestone-desc">Ein vollständiges Typer-Tool: <code>orgfile scan ~/Downloads</code> analysiert, <code>orgfile move --dry-run</code> sortiert Dateien nach Typ in Unterordner, <code>orgfile report</code> erzeugt eine Rich-Tabelle. Vollständig mit Dataclasses und Type Hints.</div>
+      <div class="milestone-feats">
+        <span class="milestone-feat">Typer-App mit Subcommands</span>
+        <span class="milestone-feat">Rich Table + Progress</span>
+        <span class="milestone-feat">Dataclasses für Datei-Einträge</span>
+        <span class="milestone-feat">Dry-run Modus</span>
+        <span class="milestone-feat">Type Hints überall</span>
+        <span class="milestone-feat">mypy-sauber</span>
+      </div>
+    </div>
+  </div>
+  <div class="skills-row" style="margin-top:12px">
+    <span class="skills-lbl">M06 Skills</span>
+    <span class="tag">Type Hints</span><span class="tag">@dataclass</span><span class="tag">argparse/Typer</span><span class="tag">Rich</span><span class="tag">Exit-Codes</span><span class="tag">Protocol</span>
+  </div>
+  </div>
+</div>
+
+</body>
+</html>

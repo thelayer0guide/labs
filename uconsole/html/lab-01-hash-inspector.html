@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 01 — Hash Inspector - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #3fb950;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); text-decoration: none; transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid {
+    display: grid; grid-template-columns: 1fr auto;
+    align-items: start; gap: 32px; position: relative; max-width: 1240px;
+  }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 3px;
+  }
+  .badge-lab {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .badge-phase { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 {
+    font-size: clamp(24px, 3.5vw, 44px); font-weight: 800;
+    letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px;
+  }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; min-width: 180px;
+  }
+  .sheets-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+  }
+  .sheet-lnk {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11.5px;
+    color: var(--muted); text-decoration: none;
+    padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s;
+  }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body {
+    display: grid; grid-template-columns: 1fr 220px;
+    gap: 40px; max-width: 1240px; margin: 0 auto;
+    padding: 48px; align-items: start;
+  }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading {
+    font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+    color: var(--accent); padding-bottom: 8px; margin-bottom: 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk {
+    display: inline-block; width: 14px; height: 14px;
+    border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    position: absolute; left: 0; top: 6px;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--code-bg); border: 1px solid var(--border);
+    padding: 1px 5px; border-radius: 3px; color: #e6edf3;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); border-radius: 6px;
+    padding: 18px 20px; overflow-x: auto; margin: 14px 0; position: relative;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote {
+    border-left: 3px solid var(--accent); padding: 12px 16px;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    border-radius: 0 6px 6px 0; margin: 14px 0;
+  }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk {
+    display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--muted); text-decoration: none; padding: 5px 0;
+    border-bottom: 1px solid var(--border); transition: color 0.15s;
+  }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <a href="../../index.html" class="nav-back">← Labs</a>
+    <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Lab 01 — Hash Inspector</span>
+  </nav>
+  <header>
+    <div class="header-grid">
+      <div>
+        <div class="badge-row">
+          <span class="badge badge-lab">Lab 01</span>
+          <span class="badge badge-phase">Phase 1 — Daten &amp; Dateien</span>
+          <span class="badge badge-time">4–6 Stunden</span>
+          <span class="badge" style="color:#58a6ff;background:rgba(0,0,0,0);border:1px solid #58a6ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#58a6ff">★</span><span style="color:#58a6ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Grundkenntnisse</span>
+        </div>
+        <h1>Hash Inspector</h1>
+        <div class="header-meta">
+          Voraussetzungen: <span>Lab 00</span>
+        </div>
+      </div>
+      <div class="sheets-panel">
+        <div class="sheets-label">Cheat Sheets</div>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">bash</a>
+      </div>
+    </div>
+  </header>
+  <div class="page-body">
+    <div class="content">
+
+      <div class="lab-section" id="lernziele">
+        <div class="sec-heading">Lernziele</div>
+        <ul>
+          <li><code>hashlib</code> für kryptografische Hash-Funktionen einsetzen</li>
+          <li>Dateien chunk-weise lesen statt vollständig in den RAM zu laden</li>
+          <li><code>argparse</code> für eine vollwertige CLI mit Subcommands nutzen</li>
+          <li>Exit-Codes sinnvoll für Skript-Verkettung einsetzen</li>
+          <li>Eine eigene Fortschrittsanzeige ohne externe Bibliotheken bauen</li>
+          <li>Die Trennung von Kernlogik (<code>core.py</code>) und I/O (<code>cli.py</code>) konsequent umsetzen</li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hintergrund">
+        <div class="sec-heading">Hintergrund</div>
+        <p>Hash-Werte sind das Fundament der Dateiintegrität: Wenn du eine ISO herunterlädst, ein Backup überprüfst oder Forensik betreibst, vergleichst du Hash-Werte. Tools wie <code>sha256sum</code> machen genau das — du baust jetzt eine erweiterte Version, die mehrere Algorithmen gleichzeitig berechnet und gegen Prüfsummenlisten vergleicht.</p>
+        <p>Der entscheidende Lernaspekt hier ist nicht die Hash-Berechnung selbst (die <code>hashlib</code> übernimmt), sondern das korrekte chunk-weise Lesen: Eine 4 GB ISO-Datei darf nicht komplett in den Arbeitsspeicher geladen werden — auf der uConsole mit begrenztem RAM wäre das fatal.</p>
+      </div>
+
+      <div class="lab-section" id="aufgabe">
+        <div class="sec-heading">Aufgabe</div>
+        <p>Implementiere <code>hashinspect</code> — ein CLI-Tool, das Dateien hasht, mehrere Algorithmen parallel unterstützt und Prüfsummenlisten abgleicht.</p>
+        <h3>Projektstruktur</h3>
+        <pre><code>security-lab/
+└── hashinspect/
+    ├── __init__.py
+    ├── core.py      ← reine Hash-Logik, kein print(), kein sys.exit()
+    ├── cli.py       ← argparse, Ausgabe, Exit-Code
+    └── tests/
+        ├── __init__.py
+        └── test_core.py</code></pre>
+      </div>
+
+      <div class="lab-section" id="anforderungen">
+        <div class="sec-heading">Anforderungen (Pflicht)</div>
+        <h3>core.py</h3>
+        <ul>
+          <li class="task"><span class="chk"></span>Funktion <code>hash_file(path: Path, algos: list[str]) -&gt; dict[str, str]</code>
+            <ul>
+              <li>Liest die Datei in Blöcken von <strong>maximal 64 KB</strong> (kein <code>f.read()</code> ohne Größenangabe)</li>
+              <li>Gibt ein Dict zurück, z. B. <code>{"sha256": "a4f2...", "md5": "c3b1..."}</code></li>
+              <li>Unterstützt mindestens: <code>sha256</code>, <code>sha1</code>, <code>md5</code></li>
+              <li>Wirft <code>ValueError</code> bei unbekanntem Algorithmus-Namen</li>
+              <li>Wirft <code>FileNotFoundError</code> wenn die Datei nicht existiert (nicht selbst fangen — durchlassen)</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Funktion <code>parse_checksum_file(path: Path) -&gt; dict[str, str]</code>
+            <ul>
+              <li>Parst das Format von <code>sha256sum</code>-Output: <code>&lt;hash&gt;  &lt;dateiname&gt;</code> (zwei Leerzeichen)</li>
+              <li>Gibt ein Dict zurück: <code>{dateiname: hash}</code></li>
+              <li>Ignoriert Kommentarzeilen (beginnen mit <code>#</code>)</li>
+              <li>Wirft <code>ValueError</code> bei Zeilen mit falschem Format</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Funktion <code>verify_hashes(computed: dict[str, str], expected: dict[str, str]) -&gt; dict[str, bool]</code>
+            <ul>
+              <li>Vergleicht berechnete gegen erwartete Hashes (case-insensitive)</li>
+              <li>Gibt zurück, welche Dateien übereinstimmen und welche nicht</li>
+            </ul>
+          </li>
+        </ul>
+        <h3>cli.py</h3>
+        <ul>
+          <li class="task"><span class="chk"></span>Subcommand <code>hash</code>: berechnet Hash(es) für eine oder mehrere Dateien
+            <ul>
+              <li><code>hashinspect hash datei1.iso datei2.tar.gz</code></li>
+              <li><code>--algo sha256</code> (Standard: sha256; mehrere mit Komma: <code>sha256,md5</code>)</li>
+              <li>Ausgabe: <code>SHA256  a4f2...  datei1.iso</code></li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Subcommand <code>check</code>: vergleicht gegen eine Prüfsummenliste
+            <ul>
+              <li><code>hashinspect check hashes.txt</code></li>
+              <li>Ausgabe pro Datei: <code>✓ datei.iso</code> oder <code>✗ datei.iso (erwartet: a4f2... gefunden: b3e1...)</code></li>
+              <li>Exit-Code <strong>0</strong> wenn alle Hashes stimmen, <strong>1</strong> wenn mindestens einer abweicht</li>
+            </ul>
+          </li>
+          <li class="task"><span class="chk"></span>Fortschrittsanzeige beim Hashing:
+            <ul>
+              <li>Nutzt <code>\r</code> und <code>sys.stdout.write</code> — <strong>kein <code>tqdm</code></strong></li>
+              <li>Zeigt: verarbeitete Bytes und Prozentsatz, aktualisiert pro Chunk</li>
+              <li>Wird nach Abschluss durch die Ergebniszeile überschrieben</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="cli-schnittstelle">
+        <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+        <pre><code>hashinspect hash [--algo ALGO] DATEI [DATEI ...]
+hashinspect check [--algo ALGO] CHECKSUMMEN_DATEI
+hashinspect hash --help</code></pre>
+        <p>Beispiel-Output <code>hash</code>:</p>
+        <pre><code>SHA256  a4f2c8d1e9b3f7a2...  kali-linux-2026.iso   (3.8 GB · 4.2s)
+MD5     c3b1a9e8d7f2b4c1...  kali-linux-2026.iso</code></pre>
+        <p>Beispiel-Output <code>check</code>:</p>
+        <pre><code>✓  kali-linux-2026.iso     SHA256  match
+✗  ubuntu-24.iso           SHA256  mismatch
+   erwartet: a4f2c8d1...
+   gefunden: deadbeef...
+
+Ergebnis: 1/2 Dateien OK</code></pre>
+      </div>
+
+      <div class="lab-section" id="akzeptanzkriterien">
+        <div class="sec-heading">Akzeptanzkriterien</div>
+        <pre><code># Erstellt eine Testdatei und prüft den Hash
+python -c "open('test.bin','wb').write(b'hello'*1000)"
+python -m hashinspect hash test.bin --algo sha256
+# → muss SHA256 + Hex-String ausgeben
+
+# Verzeichnet den Hash und prüft ihn
+python -m hashinspect hash test.bin --algo sha256 | \
+  awk '{print $2"  test.bin"}' > hashes.txt
+python -m hashinspect check hashes.txt
+echo $?    # → 0
+
+# Verfälsche den Hash und teste Exit-Code
+echo "deadbeef  test.bin" > bad.txt
+python -m hashinspect check bad.txt
+echo $?    # → 1
+
+# Unbekannter Algorithmus
+python -m hashinspect hash test.bin --algo xxhash
+# → Fehlermeldung auf stderr, Exit-Code != 0</code></pre>
+        <p>Die Kernfunktion muss in Tests ohne CLI nutzbar sein:</p>
+        <pre><code>from hashinspect.core import hash_file
+result = hash_file(Path("test.bin"), ["sha256", "md5"])
+assert "sha256" in result
+assert len(result["sha256"]) == 64</code></pre>
+      </div>
+
+      <div class="lab-section" id="tests">
+        <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+        <ul>
+          <li class="task"><span class="chk"></span>Test: <code>hash_file</code> auf einer kleinen bekannten Datei → Ergebnis stimmt mit <code>sha256sum</code> überein</li>
+          <li class="task"><span class="chk"></span>Test: <code>hash_file</code> mit ungültigem Algorithmus → <code>ValueError</code></li>
+          <li class="task"><span class="chk"></span>Test: <code>hash_file</code> auf nicht existierender Datei → <code>FileNotFoundError</code></li>
+          <li class="task"><span class="chk"></span>Test: <code>parse_checksum_file</code> parst valides Format korrekt</li>
+          <li class="task"><span class="chk"></span>Test: <code>parse_checksum_file</code> ignoriert Kommentarzeilen</li>
+          <li class="task"><span class="chk"></span>Test: <code>verify_hashes</code> — case-insensitive Vergleich funktioniert</li>
+          <li class="task"><span class="chk"></span>Test: Chunk-Verhalten — erstelle eine künstliche Datei, die größer als ein Chunk ist, prüfe dass Hash korrekt ist</li>
+        </ul>
+        <p>Nutze <code>pytest</code>'s <code>tmp_path</code>-Fixture für alle dateibasierten Tests.</p>
+      </div>
+
+      <div class="lab-section" id="bonus-aufgaben">
+        <div class="sec-heading">Bonus-Aufgaben</div>
+        <ul>
+          <li class="task"><span class="chk"></span><code>--algo sha256,md5,sha1</code> — alle drei Algorithmen in einem Durchlauf, Datei nur einmal lesen</li>
+          <li class="task"><span class="chk"></span>Mehrere Dateien parallel verarbeiten mit <code>concurrent.futures.ThreadPoolExecutor</code></li>
+          <li class="task"><span class="chk"></span><code>--quiet</code> Flag: keine Fortschrittsanzeige, nur Ergebnis</li>
+          <li class="task"><span class="chk"></span>Formatierter Output: Hashes in Tabelle ausrichten (kürzeste Spaltenbreite berechnen)</li>
+          <li class="task"><span class="chk"></span>Verifikation gegen eine URL (HEAD-Request, <code>Content-MD5</code> Header) — optional, erfordert <code>requests</code></li>
+        </ul>
+      </div>
+
+      <div class="lab-section" id="hinweise">
+        <div class="sec-heading">Hinweise</div>
+        <p><strong>Chunk-Lesen:</strong> <code>hashlib</code>-Objekte unterstützen inkrementelles Update via <code>.update(data)</code>. Erzeuge das Hash-Objekt einmal, rufe dann <code>.update()</code> für jeden Chunk auf, und erst am Ende <code>.hexdigest()</code>.</p>
+        <p><strong>Mehrere Algorithmen gleichzeitig:</strong> Statt die Datei für jeden Algorithmus erneut zu lesen, kannst du ein Dict <code>{algo: hashlib.new(algo)}</code> anlegen und in einer Schleife alle Objekte gleichzeitig updaten.</p>
+        <p><strong>Fortschrittsanzeige:</strong> <code>os.path.getsize(path)</code> gibt dir die Dateigröße vorab. Mit <code>bytes_read / total_size * 100</code> berechnest du den Fortschritt. <code>sys.stdout.write(f"\r{progress:.1f}%")</code> und <code>sys.stdout.flush()</code> — am Ende <code>sys.stdout.write("\n")</code>.</p>
+        <p><strong>Exit-Codes:</strong> Setze den Exit-Code mit <code>sys.exit(0)</code> oder <code>sys.exit(1)</code> — nie mit einer Exception.</p>
+      </div>
+
+      <div class="lab-section" id="schnittstelle-fur-uctl">
+        <div class="sec-heading">Schnittstelle für uctl</div>
+        <p>Diese Funktion wird später 1:1 als <code>uctl hash</code>-Subcommand verwendet:</p>
+        <pre><code>def hash_file(path: Path, algos: list[str]) -> dict[str, str]:
+    """Berechnet kryptografische Hashes für eine Datei.
+
+    Args:
+        path: Pfad zur Datei
+        algos: Liste der Algorithmen, z. B. ["sha256", "md5"]
+
+    Returns:
+        Dict {algorithmus: hex_digest}
+
+    Raises:
+        ValueError: Bei unbekanntem Algorithmus
+        FileNotFoundError: Wenn die Datei nicht existiert
+    """</code></pre>
+        <p>Halte diese Signatur genau so — Änderungen würden spätere Integration erschweren.</p>
+      </div>
+
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-lbl">Inhalt</div>
+        <a href="#lernziele" class="toc-lnk">Lernziele</a>
+        <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+        <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+        <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+        <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+        <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+        <a href="#tests" class="toc-lnk">Tests</a>
+        <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+        <a href="#hinweise" class="toc-lnk">Hinweise</a>
+        <a href="#schnittstelle-fur-uctl" class="toc-lnk">Schnittstelle für uctl</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

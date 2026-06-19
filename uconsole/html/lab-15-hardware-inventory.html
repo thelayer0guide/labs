@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 15 — Hardware Inventory - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #79c0ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav { padding: 14px 48px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header { border-bottom: 2px solid var(--accent); padding: 40px 48px 32px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%); }
+  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent); }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; }
+  td, th { padding: 8px 12px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #c9d1d9; text-align: left; }
+  th { color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Lab 15 — Hardware Inventory</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 15</span>
+        <span class="badge badge-phase">Phase 5 — Erweiterte Analyse</span>
+        <span class="badge badge-time">3–5 Stunden</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>USB &amp; Hardware Inventory</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 09 (psutil, Subprocess-Pattern), Lab 10 (BaselineStore)</span><br>
+        uConsole-spezifisches Lab
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk">Bash</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk">Python</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li><code>subprocess.run()</code> sicher für externe CLI-Tools verwenden</li>
+        <li>Strukturierte JSON-Ausgabe von System-Tools direkt parsen</li>
+        <li>Nicht-strukturierte CLI-Ausgabe (lsusb) mit Regex parsen</li>
+        <li>Das Baseline-Pattern auf Hardware-Inventarisierung anwenden</li>
+        <li>Kernel-Module über das <code>/proc</code>- und <code>sys</code>-Filesystem inspizieren</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Die uConsole hat mehrere exponierte USB-Ports und ein Steckplatz-System. Auf einem mobilen Security-Gerät ist es nützlich zu wissen: Welche USB-Geräte sind angeschlossen? Welche Block-Devices gibt es? Ist <code>usb-storage</code> geladen?</p>
+      <p>Mit dem Baseline-Pattern aus Lab 10 wird das Tool noch nützlicher: Es alarmiert bei neu angeschlossenen USB-Geräten seit dem letzten Scan.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>hwaudit</code> — ein Hardware-Inventarisierungstool.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── hwaudit/
+    ├── __init__.py
+    ├── core.py
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        ├── test_core.py
+        └── fixtures/
+            ├── lsusb_output.txt
+            ├── lsblk_output.json
+            └── lsmod_output.txt</code></pre>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>list_usb_devices(lsusb_output: str | None = None) -> list[dict]</code>
+          <ul>
+            <li>Wenn <code>lsusb_output</code> None: führt <code>lsusb</code> als Subprocess aus</li>
+            <li>Wenn übergeben: parst den String direkt (für Tests)</li>
+            <li>Parst das <code>lsusb</code>-Format:
+              <pre><code>Bus 001 Device 003: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 G2</code></pre>
+            </li>
+            <li>Gibt zurück:
+              <pre><code>[
+    {
+        "bus": str,              # "001"
+        "device": str,           # "003"
+        "vendor_id": str,        # "0951"
+        "product_id": str,       # "1666"
+        "description": str,      # "Kingston Technology DataTraveler..."
+    }
+]</code></pre>
+            </li>
+            <li>Bei fehlendem <code>lsusb</code>: gibt leere Liste zurück mit Warnung auf stderr</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>list_block_devices(lsblk_json: str | None = None) -> list[dict]</code>
+          <ul>
+            <li>Wenn <code>lsblk_json</code> None: führt <code>lsblk --json --output NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,VENDOR</code> aus</li>
+            <li>Parst das JSON-Output von <code>lsblk</code> direkt (kein Regex nötig)</li>
+            <li>Gibt flache Liste aller Devices zurück (rekursiv durch <code>children</code>):
+              <pre><code>[
+    {
+        "name": str,          # "sda"
+        "size": str,          # "500G"
+        "type": str,          # "disk", "part", "rom"
+        "mountpoint": str | None,
+        "fstype": str | None, # "ext4", "vfat", etc.
+        "model": str | None,
+        "vendor": str | None,
+    }
+]</code></pre>
+            </li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>list_kernel_modules(lsmod_output: str | None = None) -> list[dict]</code>
+          <ul>
+            <li>Wenn <code>lsmod_output</code> None: führt <code>lsmod</code> aus</li>
+            <li>Parst <code>lsmod</code>-Output:
+              <pre><code>Module                  Size  Used by
+usb_storage            73728  0</code></pre>
+            </li>
+            <li>Gibt zurück: <code>[{"name": str, "size": int, "used_by": list[str]}, ...]</code></li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>check_security_relevant_modules(modules: list[dict]) -> list[dict]</code>
+          <ul>
+            <li>Gibt Liste von Security-relevanten Modulen zurück mit Bewertung:
+              <pre><code>[
+    {
+        "name": "usb_storage",
+        "loaded": bool,
+        "risk": "MEDIUM",
+        "note": "USB-Massenspeicher aktiv — Datenexfiltration per USB möglich"
+    }
+]</code></pre>
+            </li>
+            <li>Mindestens diese Module prüfen:
+              <ul>
+                <li><code>usb_storage</code>: MEDIUM wenn geladen</li>
+                <li><code>nf_conntrack</code>: INFO wenn geladen (Firewall-Tracking)</li>
+                <li><code>bluetooth</code>: LOW wenn geladen</li>
+                <li><code>udf</code>: LOW wenn geladen (USB-Dateisystem)</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>create_hardware_snapshot() -> dict</code>
+          <ul>
+            <li>Kombiniert USB-Geräte, Block-Devices und relevante Module</li>
+            <li>Gibt vollständigen Snapshot-Dict zurück</li>
+            <li>Wird von <code>BaselineStore</code> gespeichert</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>diff_hardware_snapshots(old: dict, new: dict) -> dict</code>
+          <ul>
+            <li>Nutzt das gleiche Muster wie <code>diff_baselines</code> aus Lab 10</li>
+            <li>Vergleicht USB-Geräte nach <code>vendor_id + product_id</code></li>
+            <li>Gibt zurück: neue USB-Geräte, verschwundene USB-Geräte, neue Block-Devices</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>hwaudit [--format text|json] [--baseline DATEI] [--diff] [--save]</code>
+          <ul>
+            <li><code>--diff</code>: vergleicht mit gespeicherter Baseline</li>
+            <li><code>--save</code>: speichert aktuellen Snapshot als neue Baseline</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>hwaudit                        # einfaches Inventar
+hwaudit --save                 # Baseline erstellen/aktualisieren
+hwaudit --diff                 # Vergleich mit Baseline
+hwaudit --format json</code></pre>
+      <p>Beispiel-Output (Text):</p>
+      <pre><code>HARDWARE INVENTORY
+══════════════════════════════════════════
+
+USB-GERÄTE (3)
+  Bus 001 Dev 001  ID 1d6b:0002  Linux Foundation 2.0 root hub
+  Bus 001 Dev 002  ID 0951:1666  Kingston DataTraveler 100 G3
+  Bus 001 Dev 003  ID 04e8:6860  Samsung Electronics Galaxy A50
+
+BLOCK-DEVICES
+  NAME        GRÖSSE  TYP    MOUNT       FSTYPE
+  mmcblk0     29.1G   disk
+  ├─mmcblk0p1  512M   part   /boot/efi   vfat
+  └─mmcblk0p2  28.6G  part   /           ext4
+  sda          7.5G   disk
+  └─sda1       7.5G   part   /media/usb  vfat
+
+KERNEL-MODULE (Security)
+  [MED] usb_storage     geladen — USB-Massenspeicher aktiv
+  [OK]  nf_conntrack    geladen — Firewall-Tracking (normal)
+
+══════════════════════════════════════════</code></pre>
+      <p>Beispiel <code>hwaudit --diff</code>:</p>
+      <pre><code>HARDWARE-DIFF seit 2026-06-19 09:00:00
+
+NEUES USB-GERÄT
+  [!] ID 0951:1666  Kingston DataTraveler 100 G3
+      Bus 001 · Device 002
+
+KEINE weiteren Änderungen</code></pre>
+    </div>
+
+    <div class="lab-section" id="test-fixtures">
+      <div class="sec-heading">Test-Fixtures</div>
+      <p>Erstelle <code>tests/fixtures/lsusb_output.txt</code>:</p>
+      <pre><code>Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 G2</code></pre>
+      <p>Erstelle <code>tests/fixtures/lsblk_output.json</code>:</p>
+      <pre><code>{
+    "blockdevices": [
+        {
+            "name": "sda", "size": "7.5G", "type": "disk",
+            "mountpoint": null, "fstype": null, "model": "DataTraveler", "vendor": "Kingston",
+            "children": [
+                {"name": "sda1", "size": "7.5G", "type": "part",
+                 "mountpoint": "/media/usb", "fstype": "vfat", "model": null, "vendor": null}
+            ]
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># USB-Parsing ohne echtes lsusb
+python -c "
+from hwaudit.core import list_usb_devices
+output = 'Bus 001 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100'
+devices = list_usb_devices(lsusb_output=output)
+assert len(devices) == 1
+assert devices[0]['vendor_id'] == '0951'
+assert devices[0]['product_id'] == '1666'
+print('USB-Parsing OK')
+"
+
+# Block-Device-Parsing
+python -c "
+import json
+from hwaudit.core import list_block_devices
+sample = json.dumps({'blockdevices': [
+    {'name': 'sda', 'size': '7G', 'type': 'disk',
+     'mountpoint': None, 'fstype': None, 'model': None, 'vendor': None,
+     'children': [
+         {'name': 'sda1', 'size': '7G', 'type': 'part',
+          'mountpoint': '/media/usb', 'fstype': 'vfat', 'model': None, 'vendor': None}
+     ]}
+]})
+devices = list_block_devices(lsblk_json=sample)
+assert len(devices) == 2  # disk + partition
+print('Block-Device-Parsing OK')
+"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>list_usb_devices</code> parst Fixture korrekt (vendor_id, product_id, description)</li>
+        <li class="task"><span class="chk"></span>Test: <code>list_block_devices</code> parst Fixture korrekt (rekursiv durch children)</li>
+        <li class="task"><span class="chk"></span>Test: <code>list_kernel_modules</code> parst lsmod-Fixture korrekt</li>
+        <li class="task"><span class="chk"></span>Test: <code>check_security_relevant_modules</code> flaggt <code>usb_storage</code> als MEDIUM</li>
+        <li class="task"><span class="chk"></span>Test: <code>diff_hardware_snapshots</code> erkennt neues USB-Gerät</li>
+        <li class="task"><span class="chk"></span>Test: <code>diff_hardware_snapshots</code> erkennt verschwundenes USB-Gerät</li>
+        <li class="task"><span class="chk"></span>Test: Subprocess-Fehler (lsusb nicht installiert) → leere Liste, kein Absturz</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>PCI-Inventar:</strong> <code>hwaudit --pci</code> listet PCI-Geräte via <code>lspci</code> auf (gleiche Parsing-Logik)</li>
+        <li class="task"><span class="chk"></span><strong>USB-Alarm:</strong> <code>hwaudit --watch 5</code> prüft alle 5 Sekunden auf neue USB-Geräte (mit <code>time.sleep()</code>, kein Busy-Loop)</li>
+        <li class="task"><span class="chk"></span><strong>Bekannte Geräte-DB:</strong> Lade USB-Vendor/Product-Daten aus <code>usb.ids</code>-Datei (öffentlich verfügbar) für leserlichere Namen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>subprocess.run sicher nutzen:</strong></p>
+      <pre><code>result = subprocess.run(
+    ["lsusb"],
+    capture_output=True,
+    text=True,
+    timeout=10,
+)
+if result.returncode != 0:
+    return []  # Nicht absturzen</code></pre>
+      <p><strong>lsblk JSON:</strong> <code>lsblk --json</code> gibt ein Objekt mit <code>blockdevices</code>-Array zurück. Rekursiv <code>children</code> traversieren für Partitionen.</p>
+      <p><strong>lsusb Regex:</strong> <code>r"Bus (\d+) Device (\d+): ID ([0-9a-f]{4}):([0-9a-f]{4})\s+(.+)"</code> — fünf Gruppen.</p>
+      <p><strong>uConsole-Realität:</strong> Auf der uConsole gibt es spezifische Hardware (Rockchip RK3566, NIC, 4G-Modem als USB-Device). Teste das Tool explizit dort — das interne 4G-Modem sollte als USB-Device erscheinen.</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def list_usb_devices(lsusb_output: str | None = None) -> list[dict]:
+    """Listet angeschlossene USB-Geräte."""
+
+def create_hardware_snapshot() -> dict:
+    """Erstellt vollständigen Hardware-Snapshot."""
+
+def diff_hardware_snapshots(old: dict, new: dict) -> dict:
+    """Vergleicht zwei Hardware-Snapshots."""</code></pre>
+    </div>
+
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#test-fixtures" class="toc-lnk">Test-Fixtures</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle uctl</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>

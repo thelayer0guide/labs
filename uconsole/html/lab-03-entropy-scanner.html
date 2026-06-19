@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab 03 — Entropy Scanner - TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
+    --accent: #3fb950;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+  .topnav {
+    padding: 14px 48px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-back:hover { color: var(--text); }
+  .nav-sep { color: var(--border); font-size: 18px; }
+  .nav-crumb { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+
+  header {
+    border-bottom: 2px solid var(--accent); padding: 40px 48px 32px;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #0d1117 0%, #0d1420 60%, #0d1117 100%);
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 700px 250px at 65% 50%, color-mix(in srgb, var(--accent) 8%, transparent), transparent);
+  }
+  .header-grid { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; position: relative; max-width: 1240px; }
+  .badge-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 3px; }
+  .badge-lab { color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+  .badge-phase, .badge-time { color: var(--muted); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+  h1 { font-size: clamp(24px, 3.5vw, 44px); font-weight: 800; letter-spacing: -1px; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+  .header-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); line-height: 2; }
+  .header-meta span { color: var(--text); }
+
+  .sheets-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; min-width: 180px; }
+  .sheets-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .sheet-lnk { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .sheet-lnk:last-child { border-bottom: none; }
+  .sheet-lnk::before { content: '→'; color: var(--accent); opacity: 0.5; transition: opacity 0.15s; }
+  .sheet-lnk:hover { color: var(--accent); }
+  .sheet-lnk:hover::before { opacity: 1; }
+
+  .page-body { display: grid; grid-template-columns: 1fr 220px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 48px; align-items: start; }
+  .content { min-width: 0; }
+
+  .lab-section { margin-bottom: 44px; }
+  .sec-heading { font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+  h3 { font-size: 13px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+  p { font-size: 13.5px; line-height: 1.75; color: #c9d1d9; margin-bottom: 10px; }
+  ul, ol { list-style: none; padding: 0; margin-bottom: 14px; }
+  li { font-size: 13.5px; line-height: 1.7; color: #c9d1d9; padding: 3px 0 3px 20px; position: relative; }
+  li::before { content: '·'; position: absolute; left: 6px; color: var(--accent); opacity: 0.7; }
+  li.task { padding-left: 26px; }
+  li.task::before { display: none; }
+  .chk { display: inline-block; width: 14px; height: 14px; border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--accent) 6%, transparent); position: absolute; left: 0; top: 6px; }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: var(--code-bg); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: #e6edf3; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 6px; padding: 18px 20px; overflow-x: auto; margin: 14px 0; position: relative; }
+  pre code { background: none; border: none; padding: 0; font-size: 12.5px; line-height: 1.65; }
+  blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); border-radius: 0 6px 6px 0; margin: 14px 0; }
+  blockquote p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .sidebar { position: sticky; top: 60px; }
+  .sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px; }
+  .sidebar-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .toc-lnk { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; padding: 5px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+  .toc-lnk:last-child { border-bottom: none; }
+  .toc-lnk:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .page-body { grid-template-columns: 1fr; padding: 32px 24px; }
+    .header-grid { grid-template-columns: 1fr; }
+    .sidebar, .sheets-panel { display: none; }
+    .topnav, header { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">uConsole Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">lab-03-entropy-scanner</span>
+</nav>
+
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-lab">Lab 03</span>
+        <span class="badge badge-phase">Phase 1 — Daten &amp; Dateien</span>
+        <span class="badge badge-time">4–6 Stunden</span>
+          <span class="badge" style="color:#d2a8ff;background:rgba(0,0,0,0);border:1px solid #d2a8ff88;font-size:11px;letter-spacing:0.5px"><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#d2a8ff">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>Entropy Scanner</h1>
+      <div class="header-meta">
+        Voraussetzungen: <span>Lab 01 (Projektstruktur, chunk-weises Lesen)</span><br>
+        Modul: <span>entropyscanner</span><br>
+        Befehl: <span>entropy</span>
+      </div>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="python-cheatsheet.html" class="sheet-lnk">python-cheatsheet</a>
+      <a href="bash-cheatsheet.html" class="sheet-lnk">bash-cheatsheet</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-body">
+  <main class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Shannon-Entropie mathematisch verstehen und implementieren</li>
+        <li>Verzeichnisrekursion mit <code>pathlib.Path.rglob()</code> und Filterlogik</li>
+        <li>CSV-Export mit der <code>csv</code>-Stdlib strukturieren</li>
+        <li>ASCII-Visualisierungen für das Terminal bauen (kein matplotlib)</li>
+        <li>Den Unterschied zwischen "Finding" und "Interpretation" in der Forensik verstehen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Die Shannon-Entropie misst, wie zufällig oder komprimiert Daten sind. Hoch-entropische Dateien (nahe 8 Bit/Byte) können verschlüsselt, komprimiert oder gepackt sein — oder eben auch Mediendateien, Backups, oder Kryptographie-Container.</p>
+      <p>Ein Entropy Scanner ist ein nützliches Forensik-Werkzeug: Er hilft, "verdächtige" Dateien in einem Verzeichnisbaum zu identifizieren, die dann manuell untersucht werden. Das Tool flaggt — es urteilt nicht. Diese Unterscheidung (Finding vs. Interpretation) ist zentral für jede forensische Arbeit.</p>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Implementiere <code>entropy</code> — einen rekursiven Verzeichnis-Scanner, der die Shannon-Entropie jeder Datei berechnet und Ergebnisse als CSV oder Terminal-Report ausgibt.</p>
+      <h3>Projektstruktur</h3>
+      <pre><code>security-lab/
+└── entropyscanner/
+    ├── __init__.py
+    ├── core.py
+    ├── cli.py
+    └── tests/
+        ├── __init__.py
+        └── test_core.py</code></pre>
+    </div>
+
+    <div class="lab-section" id="die-mathematik">
+      <div class="sec-heading">Die Mathematik</div>
+      <p><strong>Shannon-Entropie</strong> für eine Datei:</p>
+      <pre><code>H = -Σ p_i · log2(p_i)</code></pre>
+      <p>wobei <code>p_i</code> die relative Häufigkeit von Byte-Wert <code>i</code> (0–255) in der Datei ist.</p>
+      <ul>
+        <li>Maximum: <strong>8 Bit/Byte</strong> (jedes der 256 Byte-Werte tritt gleich oft auf — maximale Zufälligkeit)</li>
+        <li>Minimum: <strong>0 Bit/Byte</strong> (alle Bytes haben den gleichen Wert — keine Information)</li>
+      </ul>
+      <p>Typische Richtwerte:</p>
+      <ul>
+        <li>Englischer Text: ~3.5–5 Bit/Byte</li>
+        <li>Komprimierte/verschlüsselte Daten: ~7.5–8 Bit/Byte</li>
+        <li>Executable-Binaries: ~5.5–7 Bit/Byte</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen (Pflicht)</div>
+
+      <h3>core.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span>Funktion <code>calculate_entropy(data: bytes) -> float</code>
+          <ul>
+            <li>Berechnet die Shannon-Entropie für gegebene Bytes</li>
+            <li>Gibt einen Wert zwischen 0.0 und 8.0 zurück</li>
+            <li><code>data = b""</code> → gibt <code>0.0</code> zurück (Sonderfall)</li>
+            <li>Nutzt <code>math.log2()</code> aus der Stdlib</li>
+            <li>Kein <code>print()</code>, kein Dateizugriff</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>scan_file(path: Path) -> dict</code>
+          <ul>
+            <li>Liest die Datei chunk-weise (max. 64 KB pro Chunk — nutze Muster aus Lab 01)</li>
+            <li>Gibt zurück: <code>{"path": str, "size": int, "entropy": float, "extension": str}</code></li>
+            <li>Bei Lesefehler (Permissions): gibt <code>{"path": str, "error": str}</code> zurück — wirft keine Exception</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>scan_directory(root: Path, min_size: int, extensions: list[str] | None) -> list[dict]</code>
+          <ul>
+            <li>Durchsucht <code>root</code> rekursiv mit <code>rglob("*")</code></li>
+            <li>Überspringt Verzeichnisse und Symlinks</li>
+            <li>Filtert nach Minimalgröße in Bytes (<code>min_size</code>, Standard: 0)</li>
+            <li>Filtert nach Extensions wenn <code>extensions</code> angegeben (z. B. <code>[".py", ".js"]</code>)</li>
+            <li>Gibt Liste der Scan-Ergebnisse zurück (kein <code>print()</code>)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>flag_results(results: list[dict], threshold: float) -> list[dict]</code>
+          <ul>
+            <li>Fügt jedem Ergebnis <code>"flagged": True/False</code> hinzu</li>
+            <li>Geflaggt wenn <code>entropy >= threshold</code></li>
+            <li>Gibt neue Liste zurück (mutiert die Eingabe nicht)</li>
+          </ul>
+        </li>
+        <li class="task"><span class="chk"></span>Funktion <code>export_csv(results: list[dict], output: Path) -> None</code>
+          <ul>
+            <li>Schreibt CSV mit Spalten: <code>pfad,größe,entropie,flag,erweiterung</code></li>
+            <li>Nutzt <code>csv.DictWriter</code> aus der Stdlib</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>cli.py</h3>
+      <ul>
+        <li class="task"><span class="chk"></span><code>entropy PFAD [--threshold 7.5] [--ext .py,.js] [--min-size 1024] [--format csv|text] [--out DATEI]</code>
+          <ul>
+            <li>Standard: Terminal-Output (Textformat)</li>
+            <li><code>--format csv --out report.csv</code>: schreibt CSV-Datei</li>
+            <li>Zeigt Zusammenfassung am Ende: Anzahl gescannter Dateien, Anzahl geflaggt</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="cli-schnittstelle">
+      <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
+      <pre><code>entropy ~/Downloads
+entropy ~/Downloads --threshold 7.5
+entropy /etc --ext "" --min-size 0
+entropy ~/projects --ext .py,.js,.ts --format csv --out entropy-report.csv</code></pre>
+      <p>Beispiel-Output (Terminal):</p>
+      <pre><code>ENTROPY SCAN: /home/user/Downloads
+─────────────────────────────────────────────────────
+SUSPECT  7.94  payload.bin          (2.3 MB)
+SUSPECT  7.89  archive.tar.gz       (45 MB)
+OK       3.21  readme.txt           (4.2 KB)
+OK       5.67  app.exe              (1.1 MB)
+─────────────────────────────────────────────────────
+Gescannt: 4 Dateien · Geflaggt: 2 · Schwellenwert: 7.50</code></pre>
+    </div>
+
+    <div class="lab-section" id="akzeptanzkriterien">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <pre><code># Mathematische Korrektheit
+python -c "
+from entropyscanner.core import calculate_entropy
+# Alle gleichen Bytes → Entropie 0
+assert calculate_entropy(b'\x00' * 1000) == 0.0
+
+# Alle 256 Werte gleichmäßig → maximale Entropie
+data = bytes(range(256)) * 4
+h = calculate_entropy(data)
+assert 7.9 &lt; h &lt;= 8.0, f'Erwartet ~8.0, bekam {h}'
+
+# Leere Eingabe
+assert calculate_entropy(b'') == 0.0
+
+print('Entropie-Berechnungen korrekt')
+"
+
+# Verzeichnis-Scan
+python -m entropyscanner ~/Downloads --threshold 7.5
+# → muss ohne Absturz durchlaufen, auch wenn keine Dateien gefunden
+
+# CSV-Export
+python -m entropyscanner /tmp --format csv --out /tmp/test.csv
+python -c "import csv; rows = list(csv.DictReader(open('/tmp/test.csv'))); print(f'{len(rows)} Zeilen')"</code></pre>
+    </div>
+
+    <div class="lab-section" id="tests">
+      <div class="sec-heading">Tests (Anforderungen an test_core.py)</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Test: <code>calculate_entropy(b"\x00" * 1000)</code> == 0.0</li>
+        <li class="task"><span class="chk"></span>Test: <code>calculate_entropy(bytes(range(256)) * 10)</code> liegt zwischen 7.99 und 8.0</li>
+        <li class="task"><span class="chk"></span>Test: <code>calculate_entropy(b"")</code> == 0.0</li>
+        <li class="task"><span class="chk"></span>Test: Englischer Text hat Entropie zwischen 3.0 und 6.0</li>
+        <li class="task"><span class="chk"></span>Test: <code>scan_file</code> auf einer bekannten Datei gibt korrektes Dict zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>scan_file</code> auf nicht lesbarer Datei gibt <code>{"error": ...}</code> zurück statt Exception</li>
+        <li class="task"><span class="chk"></span>Test: <code>flag_results</code> markiert korrekt mit <code>flagged: True/False</code></li>
+        <li class="task"><span class="chk"></span>Test: <code>scan_directory</code> mit Extension-Filter gibt nur passende Dateien zurück</li>
+        <li class="task"><span class="chk"></span>Test: <code>export_csv</code> erstellt valide CSV-Datei (mit <code>tmp_path</code>-Fixture)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="bonus-aufgaben">
+      <div class="sec-heading">Bonus-Aufgaben</div>
+      <ul>
+        <li class="task"><span class="chk"></span><strong>ASCII-Histogramm:</strong> <code>--histogram</code>-Flag zeigt Byte-Verteilung einer einzelnen Datei als Balkendiagramm im Terminal
+          <pre><code>00-0F: ████░░░░░░ 12%
+10-1F: ██░░░░░░░░  4%
+...</code></pre>
+          Breite passt sich an <code>shutil.get_terminal_size()</code> an.
+        </li>
+        <li class="task"><span class="chk"></span><strong>Extension-Kombination:</strong> Report gruppiert nach Extension, zeigt Durchschnitts-Entropie pro Typ</li>
+        <li class="task"><span class="chk"></span><strong>Größen-normierte Analyse:</strong> Option <code>--per-chunk</code> — Entropie pro 4KB-Chunk statt über die gesamte Datei (findet "lokale" Anomalien)</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hinweise">
+      <div class="sec-heading">Hinweise</div>
+      <p><strong>Byte-Häufigkeiten:</strong> <code>collections.Counter(data)</code> zählt Byte-Vorkommen. Für alle 256 möglichen Werte: <code>Counter(data).get(i, 0)</code> für jeden Wert 0–255.</p>
+      <p><strong>Logarithmus:</strong> <code>math.log2(0)</code> ist mathematisch undefiniert — überspringe Bytes mit Häufigkeit 0 in der Summe.</p>
+      <p><strong>Performance:</strong> Für große Verzeichnisse ist chunk-weises Lesen wichtig. <code>calculate_entropy(data)</code> kann auf den gesammelten Bytes nach dem Lesen aufgerufen werden — du musst nicht den Algorithmus selbst inkrementell machen, da die Byte-Häufigkeiten am Ende berechnet werden.</p>
+      <p><strong>uConsole-Tipp:</strong> Scanne niemals <code>/proc</code> oder <code>/sys</code> — diese Pseudo-Dateisysteme können hängen bleiben. Füge Ausschlusslogik für diese Pfade hinzu.</p>
+    </div>
+
+    <div class="lab-section" id="forensischer-kontext">
+      <div class="sec-heading">Forensischer Kontext (wichtig)</div>
+      <p>Stelle in deinem Report immer klar, dass:</p>
+      <ul>
+        <li>Hohe Entropie ≠ Malware</li>
+        <li><code>.tar.gz</code>, <code>.jpg</code>, <code>.mp4</code>, <code>.zip</code> sind naturgemäß hoch-entropisch</li>
+        <li>Das Tool filtert — es urteilt nicht</li>
+      </ul>
+      <p>Implementiere diese Warnung in der Tool-Ausgabe (z. B. als Fußnote im Report).</p>
+    </div>
+
+    <div class="lab-section" id="schnittstelle">
+      <div class="sec-heading">Schnittstelle für uctl</div>
+      <pre><code>def calculate_entropy(data: bytes) -> float:
+    """Berechnet Shannon-Entropie in Bit/Byte (0.0–8.0)."""
+
+def scan_file(path: Path) -> dict:
+    """Scannt eine einzelne Datei auf Entropie."""
+
+def scan_directory(root: Path, min_size: int = 0, extensions: list[str] | None = None) -> list[dict]:
+    """Scannt ein Verzeichnis rekursiv."""</code></pre>
+    </div>
+
+  </main>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#die-mathematik" class="toc-lnk">Die Mathematik</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#cli-schnittstelle" class="toc-lnk">CLI-Schnittstelle</a>
+      <a href="#akzeptanzkriterien" class="toc-lnk">Akzeptanzkriterien</a>
+      <a href="#tests" class="toc-lnk">Tests</a>
+      <a href="#bonus-aufgaben" class="toc-lnk">Bonus-Aufgaben</a>
+      <a href="#hinweise" class="toc-lnk">Hinweise</a>
+      <a href="#forensischer-kontext" class="toc-lnk">Forensischer Kontext</a>
+      <a href="#schnittstelle" class="toc-lnk">Schnittstelle für uctl</a>
+    </div>
+  </aside>
+</div>
+
+</body>
+</html>
