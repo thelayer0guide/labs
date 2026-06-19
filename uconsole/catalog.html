@@ -6,97 +6,85 @@
 <title>uConsole Security Labs — TheLayer0Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d1117; --surface: #161b22; --border: #30363d;
-    --text: #e6edf3; --muted: #7d8590;
-    --p0:#58a6ff; --p1:#3fb950; --p2:#d2a8ff; --p3:#ffa657;
-    --p4:#ff7b72; --p5:#79c0ff; --p6:#f0883e; --cp:#e3b341;
-    --d1:#3fb950; --d2:#58a6ff; --d3:#d2a8ff; --d4:#ffa657; --d5:#ff7b72;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column}
 
   /* TOPNAV */
-  .topnav {
-    padding: 14px 48px; border-bottom: 1px solid var(--border);
-    background: var(--bg); position: sticky; top: 0; z-index: 100;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .nav-back { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); text-decoration: none; transition: color 0.15s; }
-  .nav-back:hover { color: var(--text); }
-  .nav-sep { color: var(--border); font-size: 18px; }
-  .nav-here { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #58a6ff; }
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:16px;user-select:none}
+  .nav-here{font-family:'JetBrains Mono',monospace;font-size:11px;color:#58a6ff}
 
   /* HEADER */
-  header {
-    background: linear-gradient(135deg, #0d1117 0%, #111820 60%, #0d1117 100%);
-    border-bottom: 1px solid var(--border); padding: 56px 48px 48px;
-    position: relative; overflow: hidden; text-align: center;
-  }
-  header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 800px 300px at 50% 50%, rgba(88,166,255,0.03), transparent); }
-  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; position: relative; }
-  h1 { font-size: clamp(32px, 5vw, 60px); font-weight: 800; letter-spacing: -2px; line-height: 1; color: var(--text); margin-bottom: 16px; position: relative; }
-  .header-sub { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); max-width: 540px; margin: 0 auto; line-height: 1.7; position: relative; }
-  .header-sub code { color: var(--cp); background: rgba(227,179,65,0.08); border: 1px solid rgba(227,179,65,0.2); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
-  .header-stats { display: flex; justify-content: center; gap: 12px; margin-top: 28px; position: relative; flex-wrap: wrap; }
-  .stat-chip { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 20px; padding: 5px 16px; color: var(--muted); }
-  .stat-chip span { color: var(--text); font-weight: 700; }
+  header{background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%);border-bottom:1px solid var(--border);padding:48px 48px 40px;position:relative;overflow:hidden;text-align:center}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(88,166,255,0.04),transparent)}
+  .header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;position:relative}
+  h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1;color:var(--text);margin-bottom:14px;position:relative}
+  .header-sub{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);max-width:500px;margin:0 auto;line-height:1.6;position:relative}
+  .header-sub code{color:#58a6ff;background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.2);padding:1px 5px;border-radius:3px;font-size:.9em}
+  .header-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:20px;position:relative}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:4px 14px;color:var(--muted)}
+  .chip span{color:var(--text);font-weight:700}
 
   /* MAIN */
-  main { flex: 1; padding: 48px; max-width: 1340px; margin: 0 auto; width: 100%; }
+  main{flex:1;padding:40px 48px;max-width:1300px;margin:0 auto;width:100%}
 
-  /* PHASE */
-  .phase-section { margin-bottom: 52px; }
-  .phase-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-  .phase-badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 3px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid; }
-  .phase-title { font-size: 17px; font-weight: 700; color: var(--text); }
-  .phase-count { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-left: auto; }
+  /* PHASE HEADER */
+  .phase-section{margin-bottom:48px}
+  .phase-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+  .phase-pill{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;border:1px solid}
+  .phase-title{font-size:15px;font-weight:700;color:var(--text)}
+  .phase-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto}
 
-  /* GRID */
-  .labs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  /* CARD GRID */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 
   /* LAB CARD */
-  .lab-card { display: block; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s; position: relative; }
-  .lab-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
-  .card-accent { height: 3px; width: 100%; }
-  .card-body { padding: 18px 20px 20px; }
-  .card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-  .lab-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; border: 1px solid; letter-spacing: 0.5px; text-transform: uppercase; }
-  .lab-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-left: auto; }
-  .lab-name { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); margin-bottom: 7px; line-height: 1.3; }
-  .lab-desc { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); line-height: 1.55; margin-bottom: 12px; }
+  .card{display:block;text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;position:relative}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+  .card-accent{height:3px;width:100%}
+  .card-body{padding:16px 18px 20px}
+  .card-top{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .lab-num{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.5px;text-transform:uppercase}
+  .lab-time{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto}
+  .card-name{font-size:15px;font-weight:800;letter-spacing:-0.3px;margin-bottom:6px}
+  .card-tagline{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);line-height:1.5;margin-bottom:10px}
 
   /* DIFFICULTY */
-  .lab-diff { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-  .diff-stars { display: flex; gap: 2px; }
-  .diff-star { font-size: 11px; }
-  .diff-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+  .diff-row{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+  .diff-stars{display:flex;gap:1px;font-size:11px}
+  .diff-label{font-family:'JetBrains Mono',monospace;font-size:9.5px}
 
-  /* CHEAT SHEETS */
-  .lab-sheets { display: flex; flex-wrap: wrap; gap: 5px; }
-  .sheet-tag { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; padding: 2px 7px; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); text-decoration: none; transition: color 0.15s, border-color 0.15s; }
-  .sheet-tag:hover { color: var(--text); border-color: #555; background: rgba(255,255,255,0.08); }
-  .card-arrow { position: absolute; bottom: 16px; right: 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; opacity: 0.3; transition: opacity 0.18s, transform 0.18s; }
-  .lab-card:hover .card-arrow { opacity: 0.8; transform: translateX(3px); }
+  /* SHEET TAGS */
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:3px;font-weight:600;letter-spacing:.3px;text-decoration:none;transition:opacity .15s}
+  .tag:hover{opacity:.75}
+  .card-arrow{position:absolute;bottom:16px;right:16px;font-family:'JetBrains Mono',monospace;font-size:14px;opacity:.25;transition:opacity .18s,transform .18s}
+  .card:hover .card-arrow{opacity:.7;transform:translateX(3px)}
 
-  /* Phase color system */
-  .p0{--ac:var(--p0)} .p1{--ac:var(--p1)} .p2{--ac:var(--p2)} .p3{--ac:var(--p3)}
-  .p4{--ac:var(--p4)} .p5{--ac:var(--p5)} .p6{--ac:var(--p6)} .pcp{--ac:var(--cp)}
-  .card-accent { background: var(--ac, #58a6ff); }
-  .lab-num { color: var(--ac, #58a6ff); border-color: color-mix(in srgb, var(--ac, #58a6ff) 35%, transparent); background: color-mix(in srgb, var(--ac, #58a6ff) 8%, transparent); }
-  .lab-card:hover { border-color: color-mix(in srgb, var(--ac, #58a6ff) 35%, transparent); }
-  .phase-badge { color: var(--ac, #58a6ff); background: color-mix(in srgb, var(--ac, #58a6ff) 8%, transparent); border-color: color-mix(in srgb, var(--ac, #58a6ff) 25%, transparent); }
+  /* COLOR SYSTEM — per phase */
+  .p0{--ac:#58a6ff;--acs:rgba(88,166,255,.1);--acb:rgba(88,166,255,.22)}
+  .p1{--ac:#3fb950;--acs:rgba(63,185,80,.1);--acb:rgba(63,185,80,.22)}
+  .p2{--ac:#d2a8ff;--acs:rgba(210,168,255,.1);--acb:rgba(210,168,255,.22)}
+  .p3{--ac:#ffa657;--acs:rgba(255,166,87,.1);--acb:rgba(255,166,87,.22)}
+  .p4{--ac:#ff7b72;--acs:rgba(255,123,114,.1);--acb:rgba(255,123,114,.22)}
+  .p5{--ac:#79c0ff;--acs:rgba(121,192,255,.1);--acb:rgba(121,192,255,.22)}
+  .p6{--ac:#f0883e;--acs:rgba(240,136,62,.1);--acb:rgba(240,136,62,.22)}
+  .pcp{--ac:#e3b341;--acs:rgba(227,179,65,.1);--acb:rgba(227,179,65,.22)}
 
-  /* Difficulty star colors */
-  .d1 .diff-star.on{color:var(--d1)} .d2 .diff-star.on{color:var(--d2)}
-  .d3 .diff-star.on{color:var(--d3)} .d4 .diff-star.on{color:var(--d4)}
-  .d5 .diff-star.on{color:var(--d5)}
-  .diff-star.off { color: var(--border); }
-  .d1 .diff-label{color:var(--d1)} .d2 .diff-label{color:var(--d2)}
-  .d3 .diff-label{color:var(--d3)} .d4 .diff-label{color:var(--d4)}
-  .d5 .diff-label{color:var(--d5)}
+  .card .card-accent{background:var(--ac)}
+  .card:hover{border-color:var(--ac)}
+  .lab-num{color:var(--ac);background:var(--acs);border:1px solid var(--acb)}
+  .card-name{color:var(--ac)}
+  .card-arrow{color:var(--ac)}
+  .tag{background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
+  .phase-pill{color:var(--ac);background:var(--acs);border-color:var(--acb)}
+  .diff-label,.diff-stars .on{color:var(--ac)}
+  .diff-stars .off{color:var(--border)}
 
-  @media (max-width: 768px) { header { padding: 40px 24px 32px; } main { padding: 32px 24px; } .topnav { padding: 14px 24px; } }
+  @media(max-width:768px){header{padding:36px 24px 28px}main{padding:32px 24px}.topnav{padding:0 24px}}
 </style>
 </head>
 <body>
@@ -108,15 +96,15 @@
 </nav>
 
 <header>
-  <div class="eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide · uConsole Security Lab</div>
+  <div class="header-eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide · Security Lab</div>
   <h1>Python Security Labs</h1>
-  <p class="header-sub">19 aufeinander aufbauende Labs. Jedes Tool eigenständig nutzbar. Am Ende vereint als <code>uctl</code> — eine einheitliche CLI-Suite auf der uConsole (ARM64, RK3566).</p>
-  <div class="header-stats">
-    <div class="stat-chip"><span>19</span> Labs</div>
-    <div class="stat-chip"><span>7</span> Phasen</div>
-    <div class="stat-chip"><span>60–110 h</span> Gesamtaufwand</div>
-    <div class="stat-chip"><span>stdlib-first</span></div>
-    <div class="stat-chip"><span>ARM64</span> nativ</div>
+  <p class="header-sub">19 Labs, 7 Phasen. Jedes Tool eigenständig nutzbar — am Ende vereint als <code>uctl</code> auf der uConsole (ARM64, RK3566).</p>
+  <div class="header-chips">
+    <span class="chip"><span>19</span> Labs</span>
+    <span class="chip"><span>7</span> Phasen</span>
+    <span class="chip"><span>60–110 h</span> Aufwand</span>
+    <span class="chip">stdlib-first</span>
+    <span class="chip"><span>ARM64</span> nativ</span>
   </div>
 </header>
 
@@ -125,29 +113,23 @@
 <!-- PHASE 0 -->
 <section class="phase-section p0">
   <div class="phase-header">
-    <span class="phase-badge">Phase 0</span>
+    <span class="phase-pill">Phase 0</span>
     <span class="phase-title">Fundament</span>
-    <span class="phase-count">1 Lab · 2–4 h</span>
+    <span class="phase-meta">1 Lab · 2–4 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-00-projekt-skeleton.html" class="lab-card p0">
+  <div class="grid">
+    <a href="html/lab-00-projekt-skeleton.html" class="card p0">
       <div class="card-accent"></div>
       <div class="card-body">
-        <div class="card-top">
-          <span class="lab-num">Lab 00</span>
-          <span class="lab-time">2–4 h</span>
-        </div>
-        <div class="lab-name">Projekt-Skeleton &amp; Dev-Workflow</div>
-        <div class="lab-desc">Mono-Repo · pyproject.toml · Makefile · .gitignore · pytest-Stub · venv auf ARM64</div>
-        <div class="lab-diff d2">
-          <div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div>
-          <span class="diff-label">Grundkenntnisse</span>
-        </div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">git</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/make-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">make</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-top"><span class="lab-num">Lab 00</span><span class="lab-time">2–4 h</span></div>
+        <div class="card-name">Projekt-Skeleton &amp; Dev-Workflow</div>
+        <div class="card-tagline">Mono-Repo · pyproject.toml · Makefile · pytest-Stub · venv auf ARM64</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Grundkenntnisse</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">git</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/make-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">make</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -158,49 +140,49 @@
 <!-- PHASE 1 -->
 <section class="phase-section p1">
   <div class="phase-header">
-    <span class="phase-badge">Phase 1</span>
+    <span class="phase-pill">Phase 1</span>
     <span class="phase-title">Daten &amp; Dateien</span>
-    <span class="phase-count">3 Labs · 11–17 h</span>
+    <span class="phase-meta">3 Labs · 11–17 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-01-hash-inspector.html" class="lab-card p1">
+  <div class="grid">
+    <a href="html/lab-01-hash-inspector.html" class="card p1">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 01</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Hash Inspector</div>
-        <div class="lab-desc">hashlib · 64 KB Chunk-Lesen · Prüfsummenlisten · Fortschrittsanzeige ohne tqdm</div>
-        <div class="lab-diff d2"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Grundkenntnisse</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        <div class="card-name">Hash Inspector</div>
+        <div class="card-tagline">hashlib · 64 KB Chunk-Lesen · Prüfsummenlisten · Fortschrittsanzeige ohne tqdm</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Grundkenntnisse</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-02-base-encoding.html" class="lab-card p1">
+    <a href="html/lab-02-base-encoding.html" class="card p1">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 02</span><span class="lab-time">3–5 h</span></div>
-        <div class="lab-name">Base Encoding Toolkit</div>
-        <div class="lab-desc">base64 · base32 · hex · URL-Encoding · Encoding-Detection · Roundtrip-Tests</div>
-        <div class="lab-diff d2"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Grundkenntnisse</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">regex</a>
+        <div class="card-name">Base Encoding Toolkit</div>
+        <div class="card-tagline">base64 · base32 · hex · URL-Encoding · Encoding-Detection · Roundtrip-Tests</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Grundkenntnisse</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">regex</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-03-entropy-scanner.html" class="lab-card p1">
+    <a href="html/lab-03-entropy-scanner.html" class="card p1">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 03</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Entropy Scanner</div>
-        <div class="lab-desc">Shannon-Entropie · pathlib.rglob · ASCII-Histogramm · CSV-Export · Schwellenwerte</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        <div class="card-name">Entropy Scanner</div>
+        <div class="card-tagline">Shannon-Entropie · pathlib.rglob · ASCII-Histogramm · CSV-Export · Schwellenwerte</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -211,49 +193,49 @@
 <!-- PHASE 2 -->
 <section class="phase-section p2">
   <div class="phase-header">
-    <span class="phase-badge">Phase 2</span>
+    <span class="phase-pill">Phase 2</span>
     <span class="phase-title">Parsing &amp; Forensik</span>
-    <span class="phase-count">3 Labs · 14–22 h</span>
+    <span class="phase-meta">3 Labs · 14–22 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-04-log-forensics.html" class="lab-card p2">
+  <div class="grid">
+    <a href="html/lab-04-log-forensics.html" class="card p2">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 04</span><span class="lab-time">5–8 h</span></div>
-        <div class="lab-name">Log Forensics Toolkit</div>
-        <div class="lab-desc">auth.log parsen · SSH-Failure-Aggregation · Zeitfilter · dataclass · JSON-Output</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">regex</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Log Forensics Toolkit</div>
+        <div class="card-tagline">auth.log parsen · SSH-Failure-Aggregation · Zeitfilter · dataclass · JSON-Output</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">regex</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-05-metadata-extractor.html" class="lab-card p2">
+    <a href="html/lab-05-metadata-extractor.html" class="card p2">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 05</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Metadata Extractor</div>
-        <div class="lab-desc">EXIF via Pillow · GPS-Dezimalgrad · PDF via pypdf · einheitliches JSON-Schema</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Metadata Extractor</div>
+        <div class="card-tagline">EXIF via Pillow · GPS-Dezimalgrad · PDF via pypdf · einheitliches JSON-Schema</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-06-secret-detector.html" class="lab-card p2">
+    <a href="html/lab-06-secret-detector.html" class="card p2">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 06</span><span class="lab-time">5–8 h</span></div>
-        <div class="lab-name">Secret Detector</div>
-        <div class="lab-desc">AWS-Keys · JWTs · Private Keys · Secret-Masking · .secretauditignore · Severity</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">regex</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Secret Detector</div>
+        <div class="card-tagline">AWS-Keys · JWTs · Private Keys · Secret-Masking · .secretauditignore · Severity</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/regex-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">regex</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -264,49 +246,49 @@
 <!-- PHASE 3 -->
 <section class="phase-section p3">
   <div class="phase-header">
-    <span class="phase-badge">Phase 3</span>
+    <span class="phase-pill">Phase 3</span>
     <span class="phase-title">Krypto &amp; Netzwerk</span>
-    <span class="phase-count">3 Labs · 11–17 h</span>
+    <span class="phase-meta">3 Labs · 11–17 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-07-certificate-auditor.html" class="lab-card p3">
+  <div class="grid">
+    <a href="html/lab-07-certificate-auditor.html" class="card p3">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 07</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Certificate Auditor</div>
-        <div class="lab-desc">TLS via socket+ssl · X.509-Parsing · Ablauf-Warnungen · Zertifikatsketten</div>
-        <div class="lab-diff d4"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div><span class="diff-label">Erfahren</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/openssl-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">openssl</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Certificate Auditor</div>
+        <div class="card-tagline">TLS via socket+ssl · X.509-Parsing · Ablauf-Warnungen · Zertifikatsketten</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span></div><span class="diff-label">Erfahren</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/openssl-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">openssl</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-08-password-strength.html" class="lab-card p3">
+    <a href="html/lab-08-password-strength.html" class="card p3">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 08</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Password Strength Analyzer</div>
-        <div class="lab-desc">Zeichenklassen-Entropie · Crack-Time · k-Anonymity · HaveIBeenPwned API</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Password Strength Analyzer</div>
+        <div class="card-tagline">Zeichenklassen-Entropie · Crack-Time · k-Anonymity · HaveIBeenPwned API</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-09-port-inventory.html" class="lab-card p3">
+    <a href="html/lab-09-port-inventory.html" class="card p3">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 09</span><span class="lab-time">3–5 h</span></div>
-        <div class="lab-name">Local Port Inventory</div>
-        <div class="lab-desc">psutil · Socket-Prozess-Mapping · TOML-Whitelist · Anomalie-Erkennung</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">systemd</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        <div class="card-name">Local Port Inventory</div>
+        <div class="card-tagline">psutil · Socket-Prozess-Mapping · TOML-Whitelist · Anomalie-Erkennung</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">systemd</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -317,51 +299,51 @@
 <!-- PHASE 4 -->
 <section class="phase-section p4">
   <div class="phase-header">
-    <span class="phase-badge">Phase 4</span>
+    <span class="phase-pill">Phase 4</span>
     <span class="phase-title">Integrität &amp; Monitoring</span>
-    <span class="phase-count">3 Labs · 14–20 h</span>
+    <span class="phase-meta">3 Labs · 14–20 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-10-file-integrity-monitor.html" class="lab-card p4">
+  <div class="grid">
+    <a href="html/lab-10-file-integrity-monitor.html" class="card p4">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 10</span><span class="lab-time">5–7 h</span></div>
-        <div class="lab-name">File Integrity Monitor</div>
-        <div class="lab-desc">Baseline/Diff-Pattern · JSON-Persistenz · BaselineStore in shared/ · Ausschlusslogik</div>
-        <div class="lab-diff d4"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div><span class="diff-label">Erfahren</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">File Integrity Monitor</div>
+        <div class="card-tagline">Baseline/Diff-Pattern · JSON-Persistenz · BaselineStore in shared/ · Ausschlusslogik</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span></div><span class="diff-label">Erfahren</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-11-process-baseline.html" class="lab-card p4">
+    <a href="html/lab-11-process-baseline.html" class="card p4">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 11</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Process &amp; Service Baseline</div>
-        <div class="lab-desc">psutil · Prozess-Snapshot · Heuristiken · /proc-Filesystem · Whitelist</div>
-        <div class="lab-diff d4"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div><span class="diff-label">Erfahren</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">systemd</a>
+        <div class="card-name">Process &amp; Service Baseline</div>
+        <div class="card-tagline">psutil · Prozess-Snapshot · Heuristiken · /proc-Filesystem · Whitelist</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span></div><span class="diff-label">Erfahren</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">systemd</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-12-config-auditor.html" class="lab-card p4">
+    <a href="html/lab-12-config-auditor.html" class="card p4">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 12</span><span class="lab-time">5–7 h</span></div>
-        <div class="lab-name">SSH &amp; Firewall Config Auditor</div>
-        <div class="lab-desc">sshd_config · iptables-save · Findings-Modell · Severity · Markdown-Report</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/ssh-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">ssh</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/iptables-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">iptables</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
+        <div class="card-name">SSH &amp; Firewall Config Auditor</div>
+        <div class="card-tagline">sshd_config · iptables-save · Findings-Modell · Severity · Markdown-Report</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/ssh-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">ssh</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/iptables-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">iptables</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -372,51 +354,51 @@
 <!-- PHASE 5 -->
 <section class="phase-section p5">
   <div class="phase-header">
-    <span class="phase-badge">Phase 5</span>
+    <span class="phase-pill">Phase 5</span>
     <span class="phase-title">Erweiterte Analyse</span>
-    <span class="phase-count">3 Labs · 12–19 h</span>
+    <span class="phase-meta">3 Labs · 12–19 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-13-pcap-analyzer.html" class="lab-card p5">
+  <div class="grid">
+    <a href="html/lab-13-pcap-analyzer.html" class="card p5">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 13</span><span class="lab-time">5–8 h</span></div>
-        <div class="lab-name">Offline PCAP Analyzer</div>
-        <div class="lab-desc">PCAP-Format · Protokoll-Statistiken · DNS-Queries · Cleartext-Auth · ASCII-Sparkline</div>
-        <div class="lab-diff d5"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span></div><span class="diff-label">Experte</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/tcpdump-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">tcpdump</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/wireshark-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">wireshark</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Offline PCAP Analyzer</div>
+        <div class="card-tagline">PCAP-Format · Protokoll-Statistiken · DNS-Queries · Cleartext-Auth · ASCII-Sparkline</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span></div><span class="diff-label">Experte</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/tcpdump-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">tcpdump</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/wireshark-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">wireshark</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-14-cve-auditor.html" class="lab-card p5">
+    <a href="html/lab-14-cve-auditor.html" class="card p5">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 14</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">CVE Auditor</div>
-        <div class="lab-desc">OSV.dev API · pip/dpkg/rpm · TTL-Cache · CVSS-Score · Rate-Limiting · Offline-Modus</div>
-        <div class="lab-diff d4"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div><span class="diff-label">Erfahren</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/curl-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">curl</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">json</a>
+        <div class="card-name">CVE Auditor</div>
+        <div class="card-tagline">OSV.dev API · pip/dpkg/rpm · TTL-Cache · CVSS-Score · Rate-Limiting · Offline-Modus</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span></div><span class="diff-label">Erfahren</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/curl-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">curl</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/json-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">json</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-15-hardware-inventory.html" class="lab-card p5">
+    <a href="html/lab-15-hardware-inventory.html" class="card p5">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 15</span><span class="lab-time">3–5 h</span></div>
-        <div class="lab-name">USB &amp; Hardware Inventory</div>
-        <div class="lab-desc">lsusb · lsblk --json · Kernel-Module · Hardware-Diff · uConsole-spezifisch</div>
-        <div class="lab-diff d3"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">USB &amp; Hardware Inventory</div>
+        <div class="card-tagline">lsusb · lsblk --json · Kernel-Module · Hardware-Diff · uConsole-spezifisch</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span><span class="off">★</span></div><span class="diff-label">Fortgeschritten</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -427,34 +409,34 @@
 <!-- PHASE 6 -->
 <section class="phase-section p6">
   <div class="phase-header">
-    <span class="phase-badge">Phase 6</span>
+    <span class="phase-pill">Phase 6</span>
     <span class="phase-title">Engineering &amp; Integration</span>
-    <span class="phase-count">2 Labs · 10–16 h</span>
+    <span class="phase-meta">2 Labs · 10–16 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/lab-16-testing-ci.html" class="lab-card p6">
+  <div class="grid">
+    <a href="html/lab-16-testing-ci.html" class="card p6">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 16</span><span class="lab-time">6–10 h</span></div>
-        <div class="lab-name">Testing &amp; CI</div>
-        <div class="lab-desc">pytest-Fixtures · unittest.mock · Coverage ≥ 80% · GitHub Actions · conftest.py</div>
-        <div class="lab-diff d4"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span></div><span class="diff-label">Erfahren</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">git</a>
+        <div class="card-name">Testing &amp; CI</div>
+        <div class="card-tagline">pytest-Fixtures · unittest.mock · Coverage ≥ 80% · GitHub Actions · conftest.py</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="off">★</span></div><span class="diff-label">Erfahren</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">git</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
     </a>
-    <a href="html/lab-17-plugin-architektur.html" class="lab-card p6">
+    <a href="html/lab-17-plugin-architektur.html" class="card p6">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Lab 17</span><span class="lab-time">4–6 h</span></div>
-        <div class="lab-name">Plugin-Architektur</div>
-        <div class="lab-desc">ABC · abstractmethod · entry_points · importlib.metadata · Plugin-Dispatcher</div>
-        <div class="lab-diff d5"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span></div><span class="diff-label">Experte</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
+        <div class="card-name">Plugin-Architektur</div>
+        <div class="card-tagline">ABC · abstractmethod · entry_points · importlib.metadata · Plugin-Dispatcher</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span></div><span class="diff-label">Experte</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
         </div>
         <span class="card-arrow">→</span>
       </div>
@@ -465,23 +447,23 @@
 <!-- CAPSTONE -->
 <section class="phase-section pcp">
   <div class="phase-header">
-    <span class="phase-badge">★ Capstone</span>
+    <span class="phase-pill">★ Capstone</span>
     <span class="phase-title">uctl — Unified Security Toolkit</span>
-    <span class="phase-count">8–15 h</span>
+    <span class="phase-meta">8–15 h</span>
   </div>
-  <div class="labs-grid">
-    <a href="html/capstone-uctl.html" class="lab-card pcp">
+  <div class="grid">
+    <a href="html/capstone-uctl.html" class="card pcp">
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-top"><span class="lab-num">Capstone</span><span class="lab-time">8–15 h</span></div>
-        <div class="lab-name">uctl — Unified Security Toolkit</div>
-        <div class="lab-desc">Typer · config.toml · rich-Output · pipx install · ARM64-Deployment · Plugin-Dispatcher · Offline-First</div>
-        <div class="lab-diff d5"><div class="diff-stars"><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span></div><span class="diff-label">Experte</span></div>
-        <div class="lab-sheets">
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">python</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">bash</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">git</a>
-          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="sheet-tag" onclick="event.stopPropagation()" target="_blank">systemd</a>
+        <div class="card-name">uctl — Unified Security Toolkit</div>
+        <div class="card-tagline">Typer · config.toml · rich-Output · pipx install · ARM64-Deployment · Plugin-Dispatcher · Offline-First</div>
+        <div class="diff-row"><div class="diff-stars"><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span><span class="on">★</span></div><span class="diff-label">Experte</span></div>
+        <div class="card-tags">
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">python</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">bash</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">git</a>
+          <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/systemd-cheatsheet.html" class="tag" target="_blank" onclick="event.stopPropagation()">systemd</a>
         </div>
         <span class="card-arrow">→</span>
       </div>

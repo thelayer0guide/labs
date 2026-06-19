@@ -6,255 +6,168 @@
 <title>Labs — TheLayer0Guide</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d1117; --surface: #161b22; --surface2: #1c2330; --border: #30363d;
-    --text: #e6edf3; --muted: #7d8590; --code-bg: #10161d;
-    --blue: #58a6ff; --green: #3fb950; --purple: #d2a8ff;
-    --orange: #ffa657; --gold: #e3b341;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column}
 
   /* HEADER */
-  header {
-    background: linear-gradient(135deg, #0d1117 0%, #111820 60%, #0d1117 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 64px 48px 56px;
-    position: relative; overflow: hidden; text-align: center;
-  }
-  header::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse 900px 400px at 50% 50%, rgba(88,166,255,0.04), transparent);
-  }
-  .eyebrow {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
-    letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
-    margin-bottom: 20px; position: relative;
-  }
-  h1 {
-    font-size: clamp(38px, 6vw, 72px); font-weight: 800; letter-spacing: -2.5px;
-    line-height: 1; color: var(--text); margin-bottom: 20px; position: relative;
-  }
-  .header-sub {
-    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted);
-    max-width: 520px; margin: 0 auto; line-height: 1.7; position: relative;
-  }
+  header{background:linear-gradient(135deg,#0d1117 0%,#111820 60%,#0d1117 100%);border-bottom:1px solid var(--border);padding:56px 48px 48px;position:relative;overflow:hidden;text-align:center}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(255,255,255,0.02),transparent)}
+  .header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+  h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);margin-bottom:16px}
+  .header-sub{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+  .header-count{display:inline-block;margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:5px 16px;color:var(--muted)}
+  .header-count span{color:var(--text);font-weight:700}
 
   /* MAIN */
-  main { flex: 1; padding: 72px 48px; max-width: 1100px; margin: 0 auto; width: 100%; }
+  main{flex:1;padding:48px;max-width:1100px;margin:0 auto;width:100%}
 
   /* CURRICULUM CARDS */
-  .curricula { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}}
 
-  .curriculum-card {
-    display: block; text-decoration: none;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    position: relative;
+  .card{
+    display:block;text-decoration:none;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    transition:border-color 0.18s,transform 0.18s,box-shadow 0.18s;
+    position:relative;
   }
-  .curriculum-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
-  }
-  .card-top-bar { height: 4px; width: 100%; }
-  .card-content { padding: 32px; }
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
+  .card-accent{height:3px;width:100%}
+  .card-body{padding:24px 26px 28px}
+  .card-icon-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .card-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+  .card-name{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:10px}
+  .card-tagline{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);margin-bottom:18px;line-height:1.55}
+  .card-stats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .stat{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:3px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,0.02)}
+  .stat strong{font-weight:700}
+  .card-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:0.3px}
+  .card-arrow{position:absolute;bottom:22px;right:22px;font-family:'JetBrains Mono',monospace;font-size:16px;opacity:0.3;transition:opacity 0.18s,transform 0.18s}
+  .card:hover .card-arrow{opacity:0.8;transform:translateX(3px)}
 
-  .card-eyebrow {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px;
-    letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted);
-    margin-bottom: 16px;
-  }
-  .card-title {
-    font-size: 28px; font-weight: 800; letter-spacing: -0.8px;
-    color: var(--text); margin-bottom: 10px; line-height: 1.15;
-  }
-  .card-desc {
-    font-family: 'JetBrains Mono', monospace; font-size: 12px;
-    color: var(--muted); line-height: 1.65; margin-bottom: 24px;
-  }
+  /* uConsole card */
+  .c-uc{--ac:#58a6ff;--acs:rgba(88,166,255,0.12);--acb:rgba(88,166,255,0.25)}
+  /* Python card */
+  .c-py{--ac:#e3b341;--acs:rgba(227,179,65,0.12);--acb:rgba(227,179,65,0.25)}
 
-  .card-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
-  .stat {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px;
-    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-    border-radius: 16px; padding: 4px 12px; color: var(--muted);
-  }
-  .stat strong { font-weight: 700; }
+  .card .card-accent{background:var(--ac)}
+  .card:hover{border-color:var(--ac)}
+  .card-icon{background:var(--acs)}
+  .card-name{color:var(--ac)}
+  .card-arrow{color:var(--ac)}
+  .tag{background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
 
-  .card-modules { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
-  .module-tag {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px;
-    padding: 3px 9px; border-radius: 3px; border: 1px solid var(--border);
-    color: var(--muted); background: rgba(255,255,255,0.03);
-  }
+  /* DIFFICULTY LEGEND */
+  .diff-legend{margin-top:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px}
+  .diff-legend-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+  .diff-levels{display:flex;flex-wrap:wrap;gap:10px 28px}
+  .diff-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+  .diff-stars{display:flex;gap:1px}
+  .diff-star-on{color:#e3b341}
+  .diff-star-off{color:var(--border)}
+  .diff-name{color:var(--text);font-weight:600}
 
-  .card-cta {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
-    padding: 10px 20px; border-radius: 6px; border: 1px solid;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  /* uConsole card (blue) */
-  .uc-card { --ac: var(--blue); }
-  .uc-card .card-top-bar { background: var(--blue); }
-  .uc-card:hover { border-color: rgba(88,166,255,0.35); }
-  .uc-card .card-eyebrow::before { content: '⬡ '; }
-  .uc-card .card-cta {
-    color: var(--blue); border-color: rgba(88,166,255,0.3);
-    background: rgba(88,166,255,0.06);
-  }
-  .uc-card:hover .card-cta { background: rgba(88,166,255,0.12); }
-
-  /* Python Jahreskurs card (green→gold) */
-  .py-card { --ac: var(--gold); }
-  .py-card .card-top-bar { background: linear-gradient(90deg, #3fb950, #e3b341); }
-  .py-card:hover { border-color: rgba(227,179,65,0.35); }
-  .py-card .card-eyebrow::before { content: '𝜆 '; }
-  .py-card .card-cta {
-    color: var(--gold); border-color: rgba(227,179,65,0.3);
-    background: rgba(227,179,65,0.06);
-  }
-  .py-card:hover .card-cta { background: rgba(227,179,65,0.12); }
-
-  /* DIFFICULTY SCALE */
-  .diff-legend {
-    margin-top: 64px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 24px 28px;
-  }
-  .diff-legend-title {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
-    margin-bottom: 18px;
-  }
-  .diff-levels { display: flex; flex-wrap: wrap; gap: 12px; }
-  .diff-level {
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
-  }
-  .diff-stars { display: flex; gap: 3px; }
-  .diff-star { font-size: 12px; }
-  .diff-star.on { color: var(--gold); }
-  .diff-star.off { color: var(--border); }
-  .diff-label { color: var(--text); }
-
-  @media (max-width: 760px) {
-    header { padding: 48px 24px 40px; }
-    main { padding: 48px 24px; }
-    .curricula { grid-template-columns: 1fr; }
-    .diff-levels { flex-direction: column; }
-  }
+  @media(max-width:700px){header{padding:40px 24px 36px}main{padding:32px 24px}.diff-levels{flex-direction:column}}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
+  <div class="header-eyebrow">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.1em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
   <h1>Labs</h1>
   <p class="header-sub">Zwei Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
+  <div class="header-count"><span>2</span> Curricula &nbsp;·&nbsp; <span>31</span> Labs &amp; Module &nbsp;·&nbsp; <span>70–125 h</span></div>
 </header>
 
 <main>
-  <div class="curricula">
+  <div class="grid">
 
-    <!-- uConsole Security Lab -->
-    <a href="uconsole/catalog.html" class="curriculum-card uc-card">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-eyebrow">Security Lab · ARM64</div>
-        <div class="card-title">uConsole<br>Security Labs</div>
-        <div class="card-desc">18 Python-Labs + Capstone. Jedes Tool ist ein eigenständiges CLI-Programm. Am Ende vereint als <code style="color:#58a6ff;background:rgba(88,166,255,0.08);padding:1px 5px;border-radius:3px;font-size:0.9em">uctl</code> auf der uConsole (RK3566, ARM64).</div>
+    <a href="uconsole/catalog.html" class="card c-uc">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">⬡</div>
+          <div class="card-name">uConsole<br>Security Lab</div>
+        </div>
+        <p class="card-tagline">18 Python-Labs + Capstone. Jedes Tool ist ein eigenständiges CLI-Programm. Am Ende vereint als <code style="background:rgba(88,166,255,0.08);color:#58a6ff;padding:1px 5px;border-radius:3px;font-size:0.9em">uctl</code> auf der uConsole (RK3566, ARM64).</p>
         <div class="card-stats">
           <span class="stat"><strong>19</strong> Labs</span>
           <span class="stat"><strong>7</strong> Phasen</span>
-          <span class="stat"><strong>60–110 h</strong> Aufwand</span>
-          <span class="stat"><strong>ARM64</strong> nativ</span>
+          <span class="stat"><strong>60–110 h</strong></span>
+          <span class="stat"><strong>ARM64</strong></span>
         </div>
-        <div class="card-modules">
-          <span class="module-tag">Kryptografie</span>
-          <span class="module-tag">Log-Forensik</span>
-          <span class="module-tag">Netzwerk</span>
-          <span class="module-tag">Integrität</span>
-          <span class="module-tag">PCAP-Analyse</span>
-          <span class="module-tag">Plugin-System</span>
-          <span class="module-tag">CI/CD</span>
+        <div class="card-tags">
+          <span class="tag">Kryptografie</span>
+          <span class="tag">Log-Forensik</span>
+          <span class="tag">Netzwerk</span>
+          <span class="tag">Integrität</span>
+          <span class="tag">PCAP</span>
+          <span class="tag">Plugin-System</span>
+          <span class="tag">CI/CD</span>
         </div>
-        <span class="card-cta">Labs öffnen →</span>
+        <span class="card-arrow">→</span>
       </div>
     </a>
 
-    <!-- Python Jahreskurs -->
-    <a href="python-jahreskurs/catalog.html" class="curriculum-card py-card">
-      <div class="card-top-bar"></div>
-      <div class="card-content">
-        <div class="card-eyebrow">Vollzeit · 12 Monate</div>
-        <div class="card-title">Python<br>Jahreskurs</div>
-        <div class="card-desc">Von der ersten Variable zum vollständigen Programm. Strukturierter 12-Monats-Lehrplan — Vollzeit, hands-on, kein Framework-Cargo-Cult. Läuft parallel zum Security Lab.</div>
+    <a href="python-jahreskurs/catalog.html" class="card c-py">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">𝜆</div>
+          <div class="card-name">Python<br>Jahreskurs</div>
+        </div>
+        <p class="card-tagline">Vollzeit, 12 Monate, zero to pro. Kein Framework-Cargo-Cult — eigene Module, eigene Tools, eigene Architektur. Läuft parallel zum Security Lab.</p>
         <div class="card-stats">
           <span class="stat"><strong>12</strong> Monate</span>
           <span class="stat"><strong>48</strong> Wochen</span>
           <span class="stat"><strong>7</strong> Milestones</span>
-          <span class="stat"><strong>Zero to Pro</strong></span>
+          <span class="stat"><strong>stdlib-first</strong></span>
         </div>
-        <div class="card-modules">
-          <span class="module-tag">Basics &amp; OOP</span>
-          <span class="module-tag">Stdlib</span>
-          <span class="module-tag">CLI-Tools</span>
-          <span class="module-tag">Netzwerk &amp; APIs</span>
-          <span class="module-tag">Asyncio</span>
-          <span class="module-tag">Testing</span>
-          <span class="module-tag">Packaging</span>
+        <div class="card-tags">
+          <span class="tag">Basics &amp; OOP</span>
+          <span class="tag">Stdlib</span>
+          <span class="tag">CLI-Tools</span>
+          <span class="tag">Netzwerk</span>
+          <span class="tag">Asyncio</span>
+          <span class="tag">Testing</span>
+          <span class="tag">Packaging</span>
         </div>
-        <span class="card-cta">Kurs öffnen →</span>
+        <span class="card-arrow">→</span>
       </div>
     </a>
 
   </div>
 
-  <!-- DIFFICULTY LEGEND -->
   <div class="diff-legend">
-    <div class="diff-legend-title">Schwierigkeits-Skala</div>
+    <div class="diff-legend-label">Schwierigkeits-Skala</div>
     <div class="diff-levels">
-      <div class="diff-level">
-        <div class="diff-stars">
-          <span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span>
-        </div>
-        <span class="diff-label">Einsteiger</span>
-        <span>— Erste Schritte, kaum Vorkenntnisse nötig</span>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></div>
+        <span class="diff-name">Einsteiger</span><span>— Erste Schritte, kaum Vorkenntnisse</span>
       </div>
-      <div class="diff-level">
-        <div class="diff-stars">
-          <span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span>
-        </div>
-        <span class="diff-label">Grundkenntnisse</span>
-        <span>— Python-Grundlagen erforderlich</span>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></div>
+        <span class="diff-name">Grundkenntnisse</span><span>— Python-Grundlagen erforderlich</span>
       </div>
-      <div class="diff-level">
-        <div class="diff-stars">
-          <span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span><span class="diff-star off">★</span>
-        </div>
-        <span class="diff-label">Fortgeschritten</span>
-        <span>— OOP, Stdlib, mehrere Konzepte kombiniert</span>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></div>
+        <span class="diff-name">Fortgeschritten</span><span>— OOP, Stdlib, mehrere Konzepte kombiniert</span>
       </div>
-      <div class="diff-level">
-        <div class="diff-stars">
-          <span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star off">★</span>
-        </div>
-        <span class="diff-label">Erfahren</span>
-        <span>— Systemkenntnisse, Netzwerk, komplexes Design</span>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span></div>
+        <span class="diff-name">Erfahren</span><span>— Systemkenntnisse, Netzwerk, komplexes Design</span>
       </div>
-      <div class="diff-level">
-        <div class="diff-stars">
-          <span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span><span class="diff-star on">★</span>
-        </div>
-        <span class="diff-label">Experte</span>
-        <span>— Binärformate, Plugin-Systeme, Capstone</span>
+      <div class="diff-item">
+        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span></div>
+        <span class="diff-name">Experte</span><span>— Binärformate, Plugin-Systeme, Capstone</span>
       </div>
     </div>
   </div>
-
 </main>
 
 </body>
