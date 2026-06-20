@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -148,7 +158,7 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Zeilenweises Lesen</h3>
-        <pre><code>from pathlib import Path
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from pathlib import Path
 
 def count_errors(log_path: Path) -> int:
     count = 0
@@ -156,9 +166,9 @@ def count_errors(log_path: Path) -> int:
         for line in f:  # nie f.read() bei großen Dateien!
             if "ERROR" in line:
                 count += 1
-    return count</code></pre>
+    return count</code></pre></details>
         <h3>CSV DictReader</h3>
-        <pre><code>import csv
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import csv
 from pathlib import Path
 
 def read_server_inventory(path: Path) -> list[dict]:
@@ -166,14 +176,14 @@ def read_server_inventory(path: Path) -> list[dict]:
         return list(csv.DictReader(f))
 
 # CSV-Header: hostname,ip,os,role
-servers = read_server_inventory(Path("servers.csv"))</code></pre>
+servers = read_server_inventory(Path("servers.csv"))</code></pre></details>
         <h3>JSON schreiben</h3>
-        <pre><code>import json
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import json
 from pathlib import Path
 
 def save_report(data: dict, path: Path) -> None:
     with path.open("w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)</code></pre>
+        json.dump(data, f, indent=2, ensure_ascii=False)</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -206,7 +216,7 @@ def save_report(data: dict, path: Path) -> None:
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python log_aggregator.py
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python log_aggregator.py
 
 # report.json muss gültiges JSON sein:
 python -c "import json; json.load(open('report.json'))"
@@ -217,7 +227,7 @@ cat report.json
 #   "total": 30,
 #   "by_level": {"INFO": 15, "WARNING": 8, "ERROR": 7},
 #   "by_service": {"nginx": 12, "db": 10, "auth": 8}
-# }</code></pre>
+# }</code></pre></details>
       </div>
 
     </div>

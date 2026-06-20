@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -149,7 +159,7 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Systemressourcen</h3>
-        <pre><code>import psutil
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import psutil
 
 cpu = psutil.cpu_percent(interval=1)  # Auslastung über 1 Sekunde
 ram = psutil.virtual_memory()
@@ -157,25 +167,25 @@ disk = psutil.disk_usage("/")
 
 print(f"CPU: {cpu}%")
 print(f"RAM: {ram.used / 1e9:.1f} GB / {ram.total / 1e9:.1f} GB ({ram.percent}%)")
-print(f"Disk: {disk.percent}% belegt")</code></pre>
+print(f"Disk: {disk.percent}% belegt")</code></pre></details>
         <h3>Prozesse filtern</h3>
-        <pre><code>import psutil
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import psutil
 
 def find_process(name: str) -> list[dict]:
     result = []
     for proc in psutil.process_iter(["pid", "name", "cpu_percent", "memory_mb"]):
         if name.lower() in proc.info["name"].lower():
             result.append(proc.info)
-    return result</code></pre>
+    return result</code></pre></details>
         <h3>Servicecheck via subprocess</h3>
-        <pre><code>import subprocess
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import subprocess
 
 def service_status(name: str) -> str:
     result = subprocess.run(
         ["systemctl", "is-active", name],
         capture_output=True, text=True
     )
-    return result.stdout.strip()  # "active", "inactive", "failed"</code></pre>
+    return result.stdout.strip()  # "active", "inactive", "failed"</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -209,12 +219,12 @@ def service_status(name: str) -> str:
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python sysmon.py --once
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python sysmon.py --once
 # → Ausgabe aller Metriken
 # → snapshots/2026-06-19_14-30-00.json erzeugt
 
 python -c "import json; d=json.load(open('snapshots/$(ls snapshots | tail -1)')); print(list(d.keys()))"
-# ['system', 'cpu', 'ram', 'disk', 'network', 'services', 'top_procs']</code></pre>
+# ['system', 'cpu', 'ram', 'disk', 'network', 'services', 'top_procs']</code></pre></details>
       </div>
 
     </div>

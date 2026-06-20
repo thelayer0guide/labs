@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modul 07 — Authentication & Session Attacks · Team Red — Offensive Security</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#ff7b72}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+  header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+  .header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+  .badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+  .badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+  .badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+  h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+  .header-meta{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);line-height:2}
+  .header-meta span{color:var(--text)}
+  .sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+  .sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .sheet-lnk:last-child{border-bottom:none}
+  .sheet-lnk::before{content:'→';color:var(--accent);opacity:.5;transition:opacity .15s}
+  .sheet-lnk:hover{color:var(--accent)}
+  .sheet-lnk:hover::before{opacity:1}
+  .page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+  .content{min-width:0}
+  .lab-section{margin-bottom:44px}
+  .sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+  h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+  p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+  ul,ol{list-style:none;padding:0;margin-bottom:14px}
+  li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}
+  li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+  li.task{padding-left:26px}
+  li.task::before{display:none}
+  .chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+  pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+  blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+  blockquote p{margin:0;font-size:13px;color:var(--muted)}
+  .sidebar{position:sticky;top:60px}
+  .sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+  .sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}
+  .toc-lnk:last-child{border-bottom:none}
+  .toc-lnk:hover{color:var(--accent)}
+  .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}
+  .nav-mod-link:last-child{border-bottom:none}
+  .nav-mod-link:hover{color:var(--accent)}
+  .nav-mod-link.next::after{content:' →'}
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
+  @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Team Red — Offensive Security</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 07 — Authentication & Session Attacks</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 07</span>
+        <span class="badge badge-cat">Web Hacking</span>
+        <span class="badge badge-cat">4–5 h</span>
+        <span class="badge" style="background:transparent;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#30363d">★</span><span style="color:#30363d">★</span> Fortgeschritten</span>
+      </div>
+      <h1>Authentication & Session Attacks</h1>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/burp-cheatsheet.html" class="sheet-lnk" target="_blank">burp</a>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/hashcat-cheatsheet.html" class="sheet-lnk" target="_blank">hashcat</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+
+    <div class="lab-section" id="lernziele">
+      <div class="sec-heading">Lernziele</div>
+      <ul>
+        <li>Brute-Force und Password-Spraying gegen Login-Formulare durchführen</li>
+        <li>Schwache Session-Token analysieren und fälschen</li>
+        <li>JWT-Token dekodieren, manipulieren und unsicher konfigurierte JWT exploiten</li>
+        <li>Account-Takeover via Password-Reset-Flaws erkennen</li>
+        <li>Rate-Limiting und Lockout-Mechanismen umgehen</li>
+      </ul>
+    </div>
+
+    <div class="lab-section" id="hintergrund">
+      <div class="sec-heading">Hintergrund</div>
+      <p>Schwache Authentifizierung ist OWASP #7. Häufige Schwächen: keine Brute-Force-Schutz, schwache Passwörter erlaubt, unsichere "Passwort vergessen"-Mechanismen und schlecht implementierte Session-Verwaltung.</p>
+      <p>JWT (JSON Web Token) wird weit verbreitet für API-Authentifizierung genutzt. Falsch implementiert (z.B. Algorithmus "none", schwacher Secret-Key) ermöglicht es Angreifern, Token zu fälschen und als jeder Nutzer zu agieren.</p>
+    </div>
+
+    <div class="lab-section" id="konzepte">
+      <div class="sec-heading">Schlüsselkonzepte</div>
+
+      <h3>Brute-Force mit Burp Intruder</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># 1. Login-Request in Burp interceptieren
+# 2. Request an Intruder senden (Ctrl+I)
+# 3. Payload-Positionen markieren (§username§, §password§)
+# 4. Payload-Liste laden
+# 5. Angriff starten, nach unterschiedlichen Response-Längen suchen
+
+# hydra Alternative:
+hydra -l admin -P /usr/share/wordlists/rockyou.txt http-post-form "/login:user=^USER^&pass=^PASS^:Invalid" -V</code></pre></details>
+      <h3>JWT-Analyse</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import base64, json
+
+def decode_jwt(token: str) -> dict:
+    parts = token.split(".")
+    header = json.loads(base64.urlsafe_b64decode(parts[0] + "=="))
+    payload = json.loads(base64.urlsafe_b64decode(parts[1] + "=="))
+    return {"header": header, "payload": payload}
+
+# Typische Schwächen:
+# 1. Algorithm: none
+# {"alg": "none", "typ": "JWT"}
+# Token ohne Signatur wird akzeptiert!
+
+# 2. Schwacher Secret
+# john --wordlist=rockyou.txt jwt.txt --format=HMAC-SHA256
+
+# 3. RS256 → HS256 Confusion
+# Public Key des Servers als HS256-Secret nutzen</code></pre></details>
+      <h3>Session-Token-Analyse</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Requests mit verschiedenen Usern machen
+# Session-Tokens vergleichen
+# Muster: sequential, time-based, base64(user_id)
+
+import base64
+# Wenn Token = base64("user_id:12345")
+base64.b64encode(b"user_id:99999").decode()
+# → diesen Wert als Cookie setzen → Account 99999!
+
+# Burp Sequencer:
+# Token-Entropie messen (< 100 Bit = unsicher)</code></pre></details>
+    </div>
+
+    <div class="lab-section" id="aufgabe">
+      <div class="sec-heading">Aufgabe</div>
+      <p>Führe einen Brute-Force-Angriff auf DVWA-Login mit Hydra durch. Dekodiere und analysiere einen JWT-Token (jwt.io oder Python). Demonstriere "Algorithm: none" Schwäche.</p>
+    </div>
+
+    <div class="lab-section" id="anforderungen">
+      <div class="sec-heading">Anforderungen</div>
+      <ol>
+        <li class="task"><span class="chk"></span>Hydra-Brute-Force findet gültiges Passwort</li>
+        <li class="task"><span class="chk"></span>JWT korrekt dekodiert (Header + Payload)</li>
+        <li class="task"><span class="chk"></span>JWT-Schwäche "alg: none" demonstriert</li>
+        <li class="task"><span class="chk"></span>Session-Token-Analyse dokumentiert</li>
+      </ol>
+    </div>
+
+    <div class="lab-section" id="akzeptanz">
+      <div class="sec-heading">Akzeptanzkriterien</div>
+      <ul>
+        <li class="task"><span class="chk"></span>Hydra findet Passwort "admin" oder ähnliches</li>
+        <li class="task"><span class="chk"></span>JWT-Payload zeigt user_id oder role-Claim</li>
+        <li class="task"><span class="chk"></span>Manipulierter JWT wird als admin akzeptiert (bei vuln. App)</li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte" class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz" class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card">
+      <div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">↑ Alle Module</a>
+      <a href="modul-06.html" class="nav-mod-link">← Modul 06</a>
+      <a href="modul-08.html" class="nav-mod-link next">Modul 08</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

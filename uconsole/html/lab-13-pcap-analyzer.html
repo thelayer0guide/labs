@@ -72,6 +72,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -132,7 +142,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>pcapaudit</code> — einen Offline-Analyzer für PCAP-Dateien.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── pcapaudit/
     ├── __init__.py
     ├── core.py
@@ -141,17 +151,17 @@
         ├── __init__.py
         ├── test_core.py
         └── fixtures/
-            └── sample.pcap   (kleiner Test-Capture)</code></pre>
+            └── sample.pcap   (kleiner Test-Capture)</code></pre></details>
     </div>
 
     <div class="lab-section" id="test-pcap">
       <div class="sec-heading">Test-PCAP erstellen</div>
       <p>Bevor du anfängst, erstelle eine Test-Datei in deinem eigenen Netz:</p>
-      <pre><code># 30 Sekunden Traffic aufzeichnen (nur eigenes Netzwerk-Interface)
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># 30 Sekunden Traffic aufzeichnen (nur eigenes Netzwerk-Interface)
 sudo tcpdump -i eth0 -w tests/fixtures/sample.pcap -G 30 -W 1
 
 # Oder kleiner: nur DNS-Traffic
-sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></pre>
+sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></pre></details>
       <p>Alternativ: Lade eine der freien Sample-PCAP-Dateien von <a href="https://wiki.wireshark.org/SampleCaptures" style="color: var(--accent);">Wireshark Wiki</a> — dort gibt es lizenzfreie Testdateien.</p>
     </div>
 
@@ -165,7 +175,7 @@ sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></
             <li>Liest PCAP-Datei mit <code>dpkt.pcap.Reader</code> (oder <code>scapy.rdpcap</code>)</li>
             <li>Für jedes Paket:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "timestamp": float,        # UNIX-Timestamp
     "length": int,             # Paketlänge in Bytes
     "protocol": str,           # "TCP", "UDP", "ICMP", "ARP", "OTHER"
@@ -174,7 +184,7 @@ sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></
     "src_port": int | None,    # nur TCP/UDP
     "dst_port": int | None,
     "payload_len": int,        # Nutzdaten-Länge
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li>Fehlerhafte/nicht parsbare Pakete werden übersprungen</li>
             <li>Gibt leere Liste für leere PCAP zurück</li>
@@ -184,23 +194,23 @@ sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></
           <ul>
             <li>Zählt Pakete und Bytes pro Protokoll:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "TCP":  {"packets": int, "bytes": int},
     "UDP":  {"packets": int, "bytes": int},
     "ICMP": {"packets": int, "bytes": int},
     "OTHER":{"packets": int, "bytes": int},
     "total_packets": int,
     "total_bytes": int,
-}</code></pre>
+}</code></pre></details>
         </li>
         <li class="task"><span class="chk"></span>Funktion <code>get_top_talkers(packets: list[dict], n: int = 10) -&gt; list[dict]</code>
           <ul>
             <li>Berechnet Traffic-Volumen pro IP-Paar (src→dst):</li>
           </ul>
-          <pre><code>[
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[
     {"src": "192.168.1.10", "dst": "1.1.1.1", "bytes": 2345678, "packets": 1234},
     ...
-]</code></pre>
+]</code></pre></details>
           <ul>
             <li>Sortiert nach Bytes absteigend, gibt Top-n zurück</li>
           </ul>
@@ -211,10 +221,10 @@ sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></
             <li>Nutzt direkt <code>dpkt</code> für DNS-Parsing</li>
             <li>Gibt zurück:</li>
           </ul>
-          <pre><code>[
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[
     {"timestamp": float, "src_ip": str, "query": str, "qtype": str},
     ...
-]</code></pre>
+]</code></pre></details>
           <ul>
             <li><code>qtype</code>: <code>"A"</code>, <code>"AAAA"</code>, <code>"MX"</code>, <code>"CNAME"</code>, <code>"OTHER"</code></li>
           </ul>
@@ -225,14 +235,14 @@ sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></
             <li>Pattern: <code>Authorization: Basic &lt;base64&gt;</code></li>
             <li>Gibt zurück:</li>
           </ul>
-          <pre><code>[
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[
     {
         "timestamp": float,
         "src_ip": str,
         "dst_ip": str,
         "masked_credentials": str,  # Base64 dekodiert, dann maskiert
     }
-]</code></pre>
+]</code></pre></details>
           <ul>
             <li><strong>Credentials werden maskiert</strong> — gleiche Logik wie Lab 06 <code>mask_secret()</code></li>
             <li>Dies ist ein Awareness-Feature: zeigt dem Nutzer, dass sein Netz unsicher war</li>
@@ -255,12 +265,12 @@ sudo tcpdump -i eth0 port 53 -w tests/fixtures/dns-only.pcap -G 10 -W 1</code></
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>pcapaudit capture.pcap
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>pcapaudit capture.pcap
 pcapaudit capture.pcap --top 5
 pcapaudit capture.pcap --dns-only
-pcapaudit capture.pcap --format json</code></pre>
+pcapaudit capture.pcap --format json</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>PCAP ANALYSIS: capture.pcap
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>PCAP ANALYSIS: capture.pcap
 Zeitraum: 2026-06-19 09:00:00 — 09:05:00 (5 Minuten)
 Pakete gesamt: 12.453 | Traffic: 45.3 MB
 
@@ -285,12 +295,12 @@ ZEITACHSE (Pakete/5s)
 KLARTEXT-AUTHENTIFIZIERUNG
   [!] HTTP-Basic-Auth gefunden:
       09:02:14  192.168.1.5 → 10.0.0.1
-      Credentials: adm***...***123 (maskiert)</code></pre>
+      Credentials: adm***...***123 (maskiert)</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Grundfunktion mit Sample-PCAP
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Grundfunktion mit Sample-PCAP
 python -m pcapaudit tests/fixtures/sample.pcap
 # → Keine Exception, mindestens Protokoll-Statistik angezeigt
 
@@ -314,7 +324,7 @@ assert stats['TCP']['packets'] == 2
 assert stats['UDP']['packets'] == 1
 assert stats['total_packets'] == 3
 print('Statistiken korrekt')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -353,7 +363,7 @@ print('Statistiken korrekt')
       <div class="sec-heading">Hinweise</div>
       <p><strong>dpkt vs scapy:</strong> <code>dpkt</code> ist leichtgewichtiger und schneller — empfohlen für dieses Lab. <code>scapy</code> ist mächtiger aber deutlich langsamer und ressourcenhungriger (auf der uConsole relevant).</p>
       <p><strong>dpkt PCAP lesen:</strong></p>
-      <pre><code>import dpkt
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import dpkt
 with open(path, "rb") as f:
     pcap = dpkt.pcap.Reader(f)
     for timestamp, buf in pcap:
@@ -361,25 +371,25 @@ with open(path, "rb") as f:
             eth = dpkt.ethernet.Ethernet(buf)
             # weiterverarbeiten...
         except:
-            continue</code></pre>
+            continue</code></pre></details>
       <p><strong>DNS mit dpkt:</strong></p>
-      <pre><code>udp = ip.data   # wenn ip.p == 17 (UDP)
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>udp = ip.data   # wenn ip.p == 17 (UDP)
 dns = dpkt.dns.DNS(udp.data)
 for q in dns.qd:
-    print(q.name)</code></pre>
+    print(q.name)</code></pre></details>
       <p><strong>uConsole-Hinweis:</strong> Capture-Dateien erzeuge immer nur im eigenen Netz (<code>-i</code> auf das eigene Interface). Niemals in fremden Netzen aufzeichnen.</p>
     </div>
 
     <div class="lab-section" id="schnittstelle-uctl">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def load_pcap(path: Path) -&gt; list[dict]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def load_pcap(path: Path) -&gt; list[dict]:
     """Liest PCAP-Datei und gibt strukturierte Paketliste zurück."""
 
 def get_protocol_stats(packets: list[dict]) -&gt; dict:
     """Berechnet Protokoll-Statistiken."""
 
 def get_top_talkers(packets: list[dict], n: int = 10) -&gt; list[dict]:
-    """Gibt Top-N IP-Paare nach Traffic-Volumen zurück."""</code></pre>
+    """Gibt Top-N IP-Paare nach Traffic-Volumen zurück."""</code></pre></details>
     </div>
 
   </div><!-- /content -->

@@ -49,6 +49,16 @@
   .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -106,7 +116,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Secret-Pattern-Definitionen</h3>
-      <pre><code>import re
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import re
 
 PATTERNS = {
     'private_key': re.compile(
@@ -126,27 +136,27 @@ PATTERNS = {
     'connection_string': re.compile(
         r'(?:mysql|postgres|mongodb|redis)://[^@\s]+:[^@\s]+@'
     ),
-}</code></pre>
+}</code></pre></details>
       <h3>Binärdateien erkennen</h3>
-      <pre><code>def is_binary(path, sample_size=8192) -&gt; bool:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def is_binary(path, sample_size=8192) -&gt; bool:
     try:
         with open(path, 'rb') as f:
             chunk = f.read(sample_size)
         return b'\x00' in chunk  # Null-Bytes = binary
     except (PermissionError, OSError):
-        return True</code></pre>
+        return True</code></pre></details>
       <h3>Wert redaktieren</h3>
-      <pre><code>def redact(value: str, visible: int = 4) -&gt; str:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def redact(value: str, visible: int = 4) -&gt; str:
     if len(value) &lt;= visible * 2:
         return '*' * len(value)
     return value[:visible] + '*' * (len(value) - visible * 2) + value[-visible:]
 
-# "mysupersecretpassword123" → "mysu****************d123"</code></pre>
+# "mysupersecretpassword123" → "mysu****************d123"</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — secretscanner.py</div>
-      <pre><code># Ganzes Projektverzeichnis scannen
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Ganzes Projektverzeichnis scannen
 secretscanner.py /home/user/myproject
 
 # Nur bestimmte Dateitypen
@@ -159,7 +169,7 @@ secretscanner.py /repo --exclude .git __pycache__ node_modules
 secretscanner.py /repo --format json --out secrets_report.json
 
 # Mit eigener Pattern-Datei
-secretscanner.py /repo --patterns custom_rules.toml</code></pre>
+secretscanner.py /repo --patterns custom_rules.toml</code></pre></details>
       <p>Ausgabe je Fund: <code>PATTERN | FILE:LINE | REDACTED_SNIPPET</code></p>
       <blockquote><p>Das Tool darf niemals den vollständigen Secret-Wert ausgeben — immer nur den redaktierten Wert. Wenn der Nutzer den vollständigen Wert sehen will, muss er die Datei selbst öffnen.</p></blockquote>
     </div>

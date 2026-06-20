@@ -83,6 +83,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -143,20 +153,20 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>entropy</code> — einen rekursiven Verzeichnis-Scanner, der die Shannon-Entropie jeder Datei berechnet und Ergebnisse als CSV oder Terminal-Report ausgibt.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── entropyscanner/
     ├── __init__.py
     ├── core.py
     ├── cli.py
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
     </div>
 
     <div class="lab-section" id="die-mathematik">
       <div class="sec-heading">Die Mathematik</div>
       <p><strong>Shannon-Entropie</strong> für eine Datei:</p>
-      <pre><code>H = -Σ p_i · log2(p_i)</code></pre>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>H = -Σ p_i · log2(p_i)</code></pre></details>
       <p>wobei <code>p_i</code> die relative Häufigkeit von Byte-Wert <code>i</code> (0–255) in der Datei ist.</p>
       <ul>
         <li>Maximum: <strong>8 Bit/Byte</strong> (jedes der 256 Byte-Werte tritt gleich oft auf — maximale Zufälligkeit)</li>
@@ -229,24 +239,24 @@
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>entropy ~/Downloads
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>entropy ~/Downloads
 entropy ~/Downloads --threshold 7.5
 entropy /etc --ext "" --min-size 0
-entropy ~/projects --ext .py,.js,.ts --format csv --out entropy-report.csv</code></pre>
+entropy ~/projects --ext .py,.js,.ts --format csv --out entropy-report.csv</code></pre></details>
       <p>Beispiel-Output (Terminal):</p>
-      <pre><code>ENTROPY SCAN: /home/user/Downloads
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>ENTROPY SCAN: /home/user/Downloads
 ─────────────────────────────────────────────────────
 SUSPECT  7.94  payload.bin          (2.3 MB)
 SUSPECT  7.89  archive.tar.gz       (45 MB)
 OK       3.21  readme.txt           (4.2 KB)
 OK       5.67  app.exe              (1.1 MB)
 ─────────────────────────────────────────────────────
-Gescannt: 4 Dateien · Geflaggt: 2 · Schwellenwert: 7.50</code></pre>
+Gescannt: 4 Dateien · Geflaggt: 2 · Schwellenwert: 7.50</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Mathematische Korrektheit
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Mathematische Korrektheit
 python -c "
 from entropyscanner.core import calculate_entropy
 # Alle gleichen Bytes → Entropie 0
@@ -269,7 +279,7 @@ python -m entropyscanner ~/Downloads --threshold 7.5
 
 # CSV-Export
 python -m entropyscanner /tmp --format csv --out /tmp/test.csv
-python -c "import csv; rows = list(csv.DictReader(open('/tmp/test.csv'))); print(f'{len(rows)} Zeilen')"</code></pre>
+python -c "import csv; rows = list(csv.DictReader(open('/tmp/test.csv'))); print(f'{len(rows)} Zeilen')"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -291,9 +301,9 @@ python -c "import csv; rows = list(csv.DictReader(open('/tmp/test.csv'))); print
       <div class="sec-heading">Bonus-Aufgaben</div>
       <ul>
         <li class="task"><span class="chk"></span><strong>ASCII-Histogramm:</strong> <code>--histogram</code>-Flag zeigt Byte-Verteilung einer einzelnen Datei als Balkendiagramm im Terminal
-          <pre><code>00-0F: ████░░░░░░ 12%
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>00-0F: ████░░░░░░ 12%
 10-1F: ██░░░░░░░░  4%
-...</code></pre>
+...</code></pre></details>
           Breite passt sich an <code>shutil.get_terminal_size()</code> an.
         </li>
         <li class="task"><span class="chk"></span><strong>Extension-Kombination:</strong> Report gruppiert nach Extension, zeigt Durchschnitts-Entropie pro Typ</li>
@@ -322,14 +332,14 @@ python -c "import csv; rows = list(csv.DictReader(open('/tmp/test.csv'))); print
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def calculate_entropy(data: bytes) -> float:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def calculate_entropy(data: bytes) -> float:
     """Berechnet Shannon-Entropie in Bit/Byte (0.0–8.0)."""
 
 def scan_file(path: Path) -> dict:
     """Scannt eine einzelne Datei auf Entropie."""
 
 def scan_directory(root: Path, min_size: int = 0, extensions: list[str] | None = None) -> list[dict]:
-    """Scannt ein Verzeichnis rekursiv."""</code></pre>
+    """Scannt ein Verzeichnis rekursiv."""</code></pre></details>
     </div>
 
   </main>

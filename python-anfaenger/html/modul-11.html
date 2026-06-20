@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -147,25 +157,25 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>DataFrame laden und inspizieren</h3>
-        <pre><code>import pandas as pd
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import pandas as pd
 
 df = pd.read_csv("server_inventory.csv")
 print(df.shape)        # (Zeilen, Spalten)
 print(df.dtypes)       # Datentypen je Spalte
 print(df.head())       # erste 5 Zeilen
-print(df.describe())   # Statistiken für numerische Spalten</code></pre>
+print(df.describe())   # Statistiken für numerische Spalten</code></pre></details>
         <h3>Filtern und Sortieren</h3>
-        <pre><code>high_cpu = df[df["cpu_usage"] > 80]
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>high_cpu = df[df["cpu_usage"] > 80]
 critical = df[(df["cpu_usage"] > 80) & (df["status"] == "production")]
 
-top10 = df.sort_values("ram_gb", ascending=False).head(10)</code></pre>
+top10 = df.sort_values("ram_gb", ascending=False).head(10)</code></pre></details>
         <h3>groupby Aggregation</h3>
-        <pre><code>by_role = df.groupby("role")["cpu_usage"].agg(["mean", "max", "count"])
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>by_role = df.groupby("role")["cpu_usage"].agg(["mean", "max", "count"])
 print(by_role)
 
 # OS-Verteilung:
 os_counts = df["os"].value_counts()
-print(os_counts)</code></pre>
+print(os_counts)</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -197,7 +207,7 @@ print(os_counts)</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python inventory_report.py
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python inventory_report.py
 # → report.xlsx erzeugt
 
 # Prüfen:
@@ -207,7 +217,7 @@ df = pd.read_excel('report.xlsx', sheet_name='Nach Rolle')
 print(df.columns.tolist())
 assert 'mean_cpu' in df.columns
 print('OK')
-"</code></pre>
+"</code></pre></details>
       </div>
 
     </div>

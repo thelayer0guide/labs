@@ -142,6 +142,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -201,7 +211,7 @@
         <p>Richte das Mono-Repo <code>security-lab/</code> ein. Es wird das Zuhause für alle Tools aus den Labs 01–17 und schließlich für <code>uctl</code>.</p>
         <h3>Verzeichnisstruktur</h3>
         <p>Am Ende dieses Labs muss folgende Struktur stehen:</p>
-        <pre><code>security-lab/
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 ├── pyproject.toml
 ├── Makefile              (oder justfile)
 ├── .gitignore
@@ -215,7 +225,7 @@
 │   └── tests/
 │       ├── __init__.py
 │       └── test_core.py
-└── README.md</code></pre>
+└── README.md</code></pre></details>
         <p>Du legst <strong>nur</strong> <code>hashinspect/</code> als Beispielstruktur an. Die anderen Tool-Verzeichnisse entstehen in den jeweiligen Labs.</p>
       </div>
 
@@ -239,8 +249,8 @@
           <li class="task"><span class="chk"></span><code>.gitignore</code> schließt aus: <code>__pycache__/</code>, <code>.venv/</code>, <code>*.egg-info/</code>, <code>.pytest_cache/</code>, <code>dist/</code>, <code>.ruff_cache/</code></li>
           <li class="task"><span class="chk"></span><code>shared/__init__.py</code> und <code>shared/output.py</code> existieren (<code>output.py</code> darf leer sein)</li>
           <li class="task"><span class="chk"></span><code>hashinspect/core.py</code> enthält eine Stub-Funktion:
-            <pre><code>def hash_file(path, algos):
-    raise NotImplementedError</code></pre>
+            <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def hash_file(path, algos):
+    raise NotImplementedError</code></pre></details>
           </li>
           <li class="task"><span class="chk"></span><code>hashinspect/tests/test_core.py</code> enthält mindestens einen Test, der aktuell fehlschlägt (<code>pytest.raises(NotImplementedError)</code>)</li>
           <li class="task"><span class="chk"></span><code>make test</code> läuft durch (auch wenn Tests fehlschlagen — das Ziel ist, dass pytest überhaupt startet)</li>
@@ -252,12 +262,12 @@
       <div class="lab-section" id="akzeptanzkriterien">
         <div class="sec-heading">Akzeptanzkriterien</div>
         <p>Führe nach deiner Einrichtung diese Befehle aus — alle müssen ohne Absturz durchlaufen:</p>
-        <pre><code>cd security-lab/
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>cd security-lab/
 make lint          # kein Fehler
 make test          # pytest startet, 1 Test schlägt fehl (NotImplementedError)
 python -c "from shared import output; print('OK')"   # importierbar
 python -c "from hashinspect.core import hash_file"   # importierbar
-git log --oneline  # mind. 1 Commit sichtbar</code></pre>
+git log --oneline  # mind. 1 Commit sichtbar</code></pre></details>
       </div>
 
       <div class="lab-section" id="bonus-aufgaben">
@@ -274,8 +284,8 @@ git log --oneline  # mind. 1 Commit sichtbar</code></pre>
         <div class="sec-heading">uConsole-Hinweis</div>
         <p>Richte das venv <strong>direkt auf der uConsole</strong> ein, sobald du das Repo dorthin geklont hast. ARM64-Wheels für Pakete wie <code>cryptography</code> oder <code>Pillow</code> sind nicht immer verfügbar — du wirst <code>pip install</code> manchmal durch <code>--no-binary :all:</code> ersetzen müssen, was längere Kompilierzeiten bedeutet. Lerne das jetzt, bevor du in Lab 07 oder 12 ein Paket brauchst und stundenlang wartest.</p>
         <p>Teste explizit:</p>
-        <pre><code>python -m venv .venv && source .venv/bin/activate
-pip install pytest ruff black        # alle drei sollten auf ARM64 funktionieren</code></pre>
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python -m venv .venv && source .venv/bin/activate
+pip install pytest ruff black        # alle drei sollten auf ARM64 funktionieren</code></pre></details>
       </div>
 
       <div class="lab-section" id="was-du-nicht-brauchst">

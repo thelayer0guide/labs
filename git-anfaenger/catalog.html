@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git für Anfänger — TheLayer0Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2330;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--accent:#e8774a}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+  .topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+  .nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}
+  .nav-back:hover{color:var(--text)}
+  .nav-sep{color:var(--border);font-size:16px}
+  .nav-here{font-family:'JetBrains Mono',monospace;font-size:11px;color:#e8774a}
+  header{background:linear-gradient(135deg,#0d1117 0%,#111820 60%,#0d1117 100%);border-bottom:2px solid #e8774a;padding:48px 48px 40px;position:relative;overflow:hidden;text-align:center}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(232,119,74,.1),transparent)}
+  h1{font-size:clamp(28px,4vw,52px);font-weight:800;letter-spacing:-1.5px;color:var(--text);margin-bottom:8px;position:relative}
+  .header-brand{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:16px;position:relative}
+  .header-sub{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);max-width:560px;margin:0 auto;line-height:1.6;position:relative}
+  .header-chips{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:20px;position:relative}
+  .chip{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:20px;padding:4px 14px;color:var(--muted)}
+  .chip span{color:#e8774a;font-weight:700}
+  main{flex:1;padding:40px 48px 64px;max-width:1300px;margin:0 auto;width:100%}
+  .phase-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px;align-items:center}
+  .pb-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
+  .pb-item{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+  .modules-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:1100px){.modules-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.modules-grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;transition:border-color .18s,transform .18s,box-shadow .18s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+  .card-accent{height:3px;width:100%}
+  .card-body{padding:14px 15px 18px}
+  .card-top{display:flex;align-items:center;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+  .mod-num{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+  .phase-tag{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;opacity:.7}
+  .time-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:3px;padding:1px 6px;margin-left:auto}
+  .card-name{font-size:13px;font-weight:800;letter-spacing:-.2px;margin-bottom:3px;line-height:1.2}
+  .card-tagline{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+  .diff-row{display:flex;align-items:center;gap:5px;margin-bottom:8px}
+  .stars{display:flex;gap:1px;font-size:10px}
+  .diff-lbl{font-family:'JetBrains Mono',monospace;font-size:9px}
+  .card-tags{display:flex;flex-wrap:wrap;gap:4px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:8.5px;padding:2px 6px;border-radius:3px;font-weight:600;text-decoration:none;background:rgba(232,119,74,.1);border:1px solid rgba(232,119,74,.25);color:#e8774a;transition:opacity .15s}
+  .tag:hover{opacity:.75}
+  .card-arrow{position:absolute;bottom:12px;right:13px;font-family:'JetBrains Mono',monospace;font-size:13px;opacity:.2;transition:opacity .18s,transform .18s}
+  .card:hover .card-arrow{opacity:.65;transform:translateX(3px)}
+  /* Overlay-Link */
+  .card{cursor:pointer}
+  .card-link{position:absolute;inset:0;z-index:1;border-radius:inherit}
+  .card-body{position:relative}
+  .card-accent{position:relative}
+  .card-tags{position:relative;z-index:2}
+  /* Status-Chip */
+  .s-chip{position:absolute;top:10px;right:10px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:2px 7px;border-radius:3px;pointer-events:none;z-index:15}
+  .s-ia{background:#f0883e;color:#0d1117}
+  .s-alpha{background:#a371f7;color:#0d1117}
+  .s-beta{background:#388bfd;color:#0d1117}
+  /* Diff-Legend */
+  .diff-legend{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-top:28px}
+  .dl-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .dl-items{display:flex;flex-wrap:wrap;gap:10px 28px}
+  .dl-item{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+  @media(max-width:768px){header{padding:36px 24px 28px}main{padding:32px 24px}.topnav{padding:0 24px}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a href="../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-here">Git für Anfänger</span>
+</nav>
+<header>
+  <h1>Git für Anfänger</h1>
+  <div class="header-brand">Versionskontrolle · 12 Module · 3 Phasen</div>
+  <p class="header-sub">12 Module von Installation bis professionellen Workflows. Versionskontrolle als Kernkompetenz — lokal, remote und im Team.</p>
+  <div class="header-chips"><span class="chip"><span>12</span> Module</span><span class="chip"><span>3</span> Phasen</span><span class="chip"><span>28–46 h</span> </span><span class="chip"><span>lokal+remote</span> </span></div>
+</header>
+<main>
+<div class="phase-bar">
+  <span class="pb-label">Phasen:</span>
+  <span class="pb-item" style="color:#58a6ff;background:rgba(0,0,0,.2);border:1px solid #58a6ff33">Phase A — Grundlagen · M01–04</span>
+  <span class="pb-item" style="color:#3fb950;background:rgba(0,0,0,.2);border:1px solid #3fb95033">Phase B — Zusammenarbeit · M05–08</span>
+  <span class="pb-item" style="color:#d2a8ff;background:rgba(0,0,0,.2);border:1px solid #d2a8ff33">Phase C — Profi-Werkzeuge · M09–12</span>
+  
+</div>
+<div class="modules-grid">
+
+  <!-- M01 -->
+  <div class="card">
+    <a href="html/modul-01.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#58a6ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#58a6ff;background:#58a6ff1a;border:1px solid #58a6ff40">Modul 01</span>
+        <span class="phase-tag" style="color:#58a6ff">Phase A</span>
+        <span class="time-badge">1–2 h</span>
+      </div>
+      <div class="card-name" style="color:#58a6ff">Git installieren & konfigurieren</div>
+      <div class="card-tagline">user.name · user.email · SSH-Key · core.editor</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#58a6ff">Einsteiger</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank">bash</a>
+      </div>
+      <span class="card-arrow" style="color:#58a6ff">→</span>
+    </div>
+  </div>
+  <!-- M02 -->
+  <div class="card">
+    <a href="html/modul-02.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#58a6ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#58a6ff;background:#58a6ff1a;border:1px solid #58a6ff40">Modul 02</span>
+        <span class="phase-tag" style="color:#58a6ff">Phase A</span>
+        <span class="time-badge">2–3 h</span>
+      </div>
+      <div class="card-name" style="color:#58a6ff">Erstes Repository & erste Commits</div>
+      <div class="card-tagline">git init · add · commit · status · log</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#58a6ff">Einsteiger</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#58a6ff">→</span>
+    </div>
+  </div>
+  <!-- M03 -->
+  <div class="card">
+    <a href="html/modul-03.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#58a6ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#58a6ff;background:#58a6ff1a;border:1px solid #58a6ff40">Modul 03</span>
+        <span class="phase-tag" style="color:#58a6ff">Phase A</span>
+        <span class="time-badge">2–3 h</span>
+      </div>
+      <div class="card-name" style="color:#58a6ff">Staging Area & Diffs</div>
+      <div class="card-tagline">git add -p · diff · diff --staged · .gitignore</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#58a6ff">Grundkenntnisse</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#58a6ff">→</span>
+    </div>
+  </div>
+  <!-- M04 -->
+  <div class="card">
+    <a href="html/modul-04.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#58a6ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#58a6ff;background:#58a6ff1a;border:1px solid #58a6ff40">Modul 04</span>
+        <span class="phase-tag" style="color:#58a6ff">Phase A</span>
+        <span class="time-badge">2–3 h</span>
+      </div>
+      <div class="card-name" style="color:#58a6ff">Branching</div>
+      <div class="card-tagline">git branch · switch · HEAD · Feature-Branch-Workflow</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#58a6ff">Grundkenntnisse</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#58a6ff">→</span>
+    </div>
+  </div>
+  <!-- M05 -->
+  <div class="card">
+    <a href="html/modul-05.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#3fb950"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#3fb950;background:#3fb9501a;border:1px solid #3fb95040">Modul 05</span>
+        <span class="phase-tag" style="color:#3fb950">Phase B</span>
+        <span class="time-badge">3–4 h</span>
+      </div>
+      <div class="card-name" style="color:#3fb950">Merging & Konflikte lösen</div>
+      <div class="card-tagline">git merge · Fast-Forward · 3-Way-Merge · Konfliktauflösung</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#3fb950">Grundkenntnisse</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#3fb950">→</span>
+    </div>
+  </div>
+  <!-- M06 -->
+  <div class="card">
+    <a href="html/modul-06.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#3fb950"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#3fb950;background:#3fb9501a;border:1px solid #3fb95040">Modul 06</span>
+        <span class="phase-tag" style="color:#3fb950">Phase B</span>
+        <span class="time-badge">2–3 h</span>
+      </div>
+      <div class="card-name" style="color:#3fb950">Remote Repositories</div>
+      <div class="card-tagline">git remote · clone · push · pull · fetch · Upstream-Tracking</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#3fb950">Grundkenntnisse</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#3fb950">→</span>
+    </div>
+  </div>
+  <!-- M07 -->
+  <div class="card">
+    <a href="html/modul-07.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#3fb950"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#3fb950;background:#3fb9501a;border:1px solid #3fb95040">Modul 07</span>
+        <span class="phase-tag" style="color:#3fb950">Phase B</span>
+        <span class="time-badge">3–4 h</span>
+      </div>
+      <div class="card-name" style="color:#3fb950">GitHub & GitLab Workflow</div>
+      <div class="card-tagline">Fork · Pull Request · Code Review · gh CLI · Issues</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#3fb950">Grundkenntnisse</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/gh-cheatsheet.html" class="tag" target="_blank">gh</a>
+      </div>
+      <span class="card-arrow" style="color:#3fb950">→</span>
+    </div>
+  </div>
+  <!-- M08 -->
+  <div class="card">
+    <a href="html/modul-08.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#3fb950"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#3fb950;background:#3fb9501a;border:1px solid #3fb95040">Modul 08</span>
+        <span class="phase-tag" style="color:#3fb950">Phase B</span>
+        <span class="time-badge">2–3 h</span>
+      </div>
+      <div class="card-name" style="color:#3fb950">Git History & Navigation</div>
+      <div class="card-tagline">git log --graph · blame · bisect · log -S · show</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#3fb950">Fortgeschritten</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#3fb950">→</span>
+    </div>
+  </div>
+  <!-- M09 -->
+  <div class="card">
+    <a href="html/modul-09.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#d2a8ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#d2a8ff;background:#d2a8ff1a;border:1px solid #d2a8ff40">Modul 09</span>
+        <span class="phase-tag" style="color:#d2a8ff">Phase C</span>
+        <span class="time-badge">3–4 h</span>
+      </div>
+      <div class="card-name" style="color:#d2a8ff">Rebase & interaktive History</div>
+      <div class="card-tagline">git rebase -i · squash · fixup · reword · reorder</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#d2a8ff">Fortgeschritten</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#d2a8ff">→</span>
+    </div>
+  </div>
+  <!-- M10 -->
+  <div class="card">
+    <a href="html/modul-10.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#d2a8ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#d2a8ff;background:#d2a8ff1a;border:1px solid #d2a8ff40">Modul 10</span>
+        <span class="phase-tag" style="color:#d2a8ff">Phase C</span>
+        <span class="time-badge">1–2 h</span>
+      </div>
+      <div class="card-name" style="color:#d2a8ff">Tags & Semantic Versioning</div>
+      <div class="card-tagline">git tag · annotierte Tags · SemVer · Releases · CHANGELOG</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#d2a8ff">Grundkenntnisse</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+      </div>
+      <span class="card-arrow" style="color:#d2a8ff">→</span>
+    </div>
+  </div>
+  <!-- M11 -->
+  <div class="card">
+    <a href="html/modul-11.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#d2a8ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#d2a8ff;background:#d2a8ff1a;border:1px solid #d2a8ff40">Modul 11</span>
+        <span class="phase-tag" style="color:#d2a8ff">Phase C</span>
+        <span class="time-badge">3–4 h</span>
+      </div>
+      <div class="card-name" style="color:#d2a8ff">Git Hooks & Automation</div>
+      <div class="card-tagline">pre-commit · commit-msg · post-merge · pre-commit Tool</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#d2a8ff">Fortgeschritten</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="tag" target="_blank">bash</a>
+      </div>
+      <span class="card-arrow" style="color:#d2a8ff">→</span>
+    </div>
+  </div>
+  <!-- M12 -->
+  <div class="card">
+    <a href="html/modul-12.html" class="card-link"></a>
+    <span class="s-chip s-ia">In Arbeit</span>
+    <div class="card-accent" style="background:#d2a8ff"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <span class="mod-num" style="color:#d2a8ff;background:#d2a8ff1a;border:1px solid #d2a8ff40">Modul 12</span>
+        <span class="phase-tag" style="color:#d2a8ff">Phase C</span>
+        <span class="time-badge">3–5 h</span>
+      </div>
+      <div class="card-name" style="color:#d2a8ff">Branching-Strategien & Workflows</div>
+      <div class="card-tagline">GitFlow · Trunk-Based Dev · Feature Flags · Monorepo</div>
+      <div class="diff-row">
+        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#d2a8ff">Erfahren</span>
+      </div>
+      <div class="card-tags">
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" target="_blank">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/gh-cheatsheet.html" class="tag" target="_blank">gh</a>
+      </div>
+      <span class="card-arrow" style="color:#d2a8ff">→</span>
+    </div>
+  </div>
+</div>
+<div class="diff-legend">
+  <div class="dl-label">Schwierigkeits-Skala</div>
+  <div class="dl-items">
+    <div class="dl-item"><span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></span> Einsteiger</div>
+    <div class="dl-item"><span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></span> Grundkenntnisse</div>
+    <div class="dl-item"><span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span><span style="color:var(--border)">★</span></span> Fortgeschritten</div>
+    <div class="dl-item"><span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span></span> Erfahren</div>
+    <div class="dl-item"><span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span></span> Experte</div>
+  </div>
+</div>
+</main>
+</body>
+</html>

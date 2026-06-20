@@ -24,7 +24,8 @@
   main{flex:1;padding:48px;max-width:1100px;margin:0 auto;width:100%}
 
   /* CURRICULUM CARDS */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:1200px){.grid{grid-template-columns:1fr 1fr}}
   @media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}}
   @media(max-width:600px){.grid{grid-template-columns:1fr}}
 
@@ -60,6 +61,14 @@
   .c-pa{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
   /* Python Forensik card */
   .c-pf{--ac:#f0883e;--acs:rgba(240,136,62,0.12);--acb:rgba(240,136,62,0.25)}
+  /* Git für Anfänger card */
+  .c-gi{--ac:#e8774a;--acs:rgba(232,119,74,0.12);--acb:rgba(232,119,74,0.25)}
+  /* Team Red card */
+  .c-tr{--ac:#ff7b72;--acs:rgba(255,123,114,0.12);--acb:rgba(255,123,114,0.25)}
+  /* Team Blue card */
+  .c-tb{--ac:#388bfd;--acs:rgba(56,139,253,0.12);--acb:rgba(56,139,253,0.25)}
+  /* Kryptologie card */
+  .c-kr{--ac:#d2a8ff;--acs:rgba(210,168,255,0.12);--acb:rgba(210,168,255,0.25)}
 
   .card .card-accent{background:var(--ac)}
   .card:hover{border-color:var(--ac)}
@@ -68,32 +77,12 @@
   .card-arrow{color:var(--ac)}
   .tag{background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
 
-  /* UNDER CONSTRUCTION — blockiert Klicks */
-  .card.wip{pointer-events:none;opacity:0.72}
-  .card.wip:hover{transform:none;box-shadow:none}
-  /* IN ARBEIT — nur Hinweis, Klicks erlaubt */
-  .card.wip-hint{opacity:0.88}
-  .wip-banner{
-    position:absolute;top:14px;right:-28px;
-    background:#f0883e;color:#0d1117;
-    font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
-    letter-spacing:1.5px;text-transform:uppercase;
-    padding:3px 36px;
-    transform:rotate(35deg);
-    pointer-events:none;
-    z-index:10;
-  }
-  /* ALPHA */
-  .alpha-banner{
-    position:absolute;top:14px;right:-32px;
-    background:#a371f7;color:#0d1117;
-    font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;
-    letter-spacing:1.5px;text-transform:uppercase;
-    padding:3px 40px;
-    transform:rotate(35deg);
-    pointer-events:none;
-    z-index:10;
-  }
+  /* STATUS-SYSTEM — nie klick-blockierend */
+  /* Stufen: In Arbeit → Alpha → Beta → Fertig (kein Label) */
+  .s-ribbon{position:absolute;top:14px;right:-32px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 44px;transform:rotate(35deg);pointer-events:none;z-index:10}
+  .s-ia    {background:#f0883e;color:#0d1117}
+  .s-alpha {background:#a371f7;color:#0d1117}
+  .s-beta  {background:#388bfd;color:#0d1117}
 
   /* DIFFICULTY LEGEND */
   .diff-legend{margin-top:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px}
@@ -114,14 +103,14 @@
   <h1>Labs</h1>
   <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
   <p class="header-sub">Vier Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
-  <div class="header-count"><span>4</span> Curricula &nbsp;·&nbsp; <span>55</span> Labs &amp; Module &nbsp;·&nbsp; <span>145–260 h</span></div>
+  <div class="header-count"><span>8</span> Curricula &nbsp;·&nbsp; <span>103</span> Labs &amp; Module &nbsp;·&nbsp; <span>290–540 h</span></div>
 </header>
 
 <main>
   <div class="grid">
 
-    <a href="uconsole/catalog.html" class="card c-uc wip">
-      <div class="wip-banner">In Arbeit</div>
+    <a href="uconsole/catalog.html" class="card c-uc">
+      <div class="s-ribbon s-ia">In Arbeit</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -148,8 +137,8 @@
       </div>
     </a>
 
-    <a href="python-jahreskurs/catalog.html" class="card c-py wip">
-      <div class="wip-banner">In Arbeit</div>
+    <a href="python-jahreskurs/catalog.html" class="card c-py">
+      <div class="s-ribbon s-ia">In Arbeit</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -177,7 +166,7 @@
     </a>
 
     <a href="python-anfaenger/catalog.html" class="card c-pa">
-      <div class="alpha-banner">Alpha</div>
+      <div class="s-ribbon s-alpha">Alpha</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -204,8 +193,8 @@
       </div>
     </a>
 
-    <a href="python-forensik/catalog.html" class="card c-pf wip-hint">
-      <div class="wip-banner">In Arbeit</div>
+    <a href="python-forensik/catalog.html" class="card c-pf">
+      <div class="s-ribbon s-ia">In Arbeit</div>
       <div class="card-accent"></div>
       <div class="card-body">
         <div class="card-icon-row">
@@ -226,6 +215,114 @@
           <span class="tag">Netzwerk</span>
           <span class="tag">Datenprofilierung</span>
           <span class="tag">Incident Response</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="git-anfaenger/catalog.html" class="card c-gi">
+      <div class="s-ribbon s-ia">In Arbeit</div>
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">⎇</div>
+          <div class="card-name">Git für<br>Anfänger</div>
+        </div>
+        <p class="card-tagline">12 Module von Installation bis Branching-Strategien. Versionskontrolle von Grund auf — commit, branch, merge, rebase, hooks und GitHub-Workflows.</p>
+        <div class="card-stats">
+          <span class="stat"><strong>12</strong> Module</span>
+          <span class="stat"><strong>4</strong> Phasen</span>
+          <span class="stat"><strong>25–45 h</strong></span>
+          <span class="stat"><strong>Alle Level</strong></span>
+        </div>
+        <div class="card-tags">
+          <span class="tag">Grundlagen</span>
+          <span class="tag">Branching</span>
+          <span class="tag">Merging</span>
+          <span class="tag">Remote</span>
+          <span class="tag">GitHub</span>
+          <span class="tag">Hooks</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="team-red/catalog.html" class="card c-tr">
+      <div class="s-ribbon s-ia">In Arbeit</div>
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">🔴</div>
+          <div class="card-name">Team Red<br>Offensive Sec</div>
+        </div>
+        <p class="card-tagline">12 Module Penetration Testing. OSINT, Web Hacking, SQLi, XSS, PrivEsc, Metasploit und professionelles Reporting. Nur auf autorisierten Systemen.</p>
+        <div class="card-stats">
+          <span class="stat"><strong>12</strong> Module</span>
+          <span class="stat"><strong>4</strong> Phasen</span>
+          <span class="stat"><strong>45–80 h</strong></span>
+          <span class="stat"><strong>Ethical Only</strong></span>
+        </div>
+        <div class="card-tags">
+          <span class="tag">OSINT</span>
+          <span class="tag">Web Hacking</span>
+          <span class="tag">SQLi / XSS</span>
+          <span class="tag">PrivEsc</span>
+          <span class="tag">Metasploit</span>
+          <span class="tag">Reporting</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="team-blue/catalog.html" class="card c-tb">
+      <div class="s-ribbon s-ia">In Arbeit</div>
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">🔵</div>
+          <div class="card-name">Team Blue<br>Defensive Sec</div>
+        </div>
+        <p class="card-tagline">12 Module Defensive Security. Log-Analyse, Incident Response, Hardening, Threat Hunting, Cloud Security, Forensik und SOC-Abschlussszenario.</p>
+        <div class="card-stats">
+          <span class="stat"><strong>12</strong> Module</span>
+          <span class="stat"><strong>4</strong> Phasen</span>
+          <span class="stat"><strong>45–80 h</strong></span>
+          <span class="stat"><strong>SOC-Level</strong></span>
+        </div>
+        <div class="card-tags">
+          <span class="tag">Log-Analyse</span>
+          <span class="tag">Incident Response</span>
+          <span class="tag">Hardening</span>
+          <span class="tag">SIEM</span>
+          <span class="tag">Threat Hunting</span>
+          <span class="tag">Forensik</span>
+        </div>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="kryptologie/catalog.html" class="card c-kr">
+      <div class="s-ribbon s-ia">In Arbeit</div>
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-icon-row">
+          <div class="card-icon">🔐</div>
+          <div class="card-name">Kryptologie<br>für Anfänger</div>
+        </div>
+        <p class="card-tagline">12 Module von Caesar bis Post-Quantum. Symmetrisch, asymmetrisch, Hashing, Signaturen, TLS, PKI, Steganographie und NIST PQC-Standards 2024.</p>
+        <div class="card-stats">
+          <span class="stat"><strong>12</strong> Module</span>
+          <span class="stat"><strong>4</strong> Phasen</span>
+          <span class="stat"><strong>35–65 h</strong></span>
+          <span class="stat"><strong>Alle Level</strong></span>
+        </div>
+        <div class="card-tags">
+          <span class="tag">Klassische Krypto</span>
+          <span class="tag">AES / RSA</span>
+          <span class="tag">TLS / PKI</span>
+          <span class="tag">Hashing</span>
+          <span class="tag">Signaturen</span>
+          <span class="tag">Post-Quantum</span>
         </div>
         <span class="card-arrow">→</span>
       </div>

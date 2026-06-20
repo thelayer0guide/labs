@@ -49,6 +49,16 @@
   .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -106,7 +116,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Mehrere Logs zeitzeilengeordnet zusammenführen</h3>
-      <pre><code>import heapq
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import heapq
 from datetime import datetime
 
 def merged_events(sources: list[tuple[str, str]]):
@@ -115,9 +125,9 @@ def merged_events(sources: list[tuple[str, str]]):
     for path, fmt in sources:
         iterators.append(parse_log_stream(path, fmt))
     # heapq.merge sortiert nach erstem Element — muss datetime sein
-    yield from heapq.merge(*iterators, key=lambda e: e['ts'])</code></pre>
+    yield from heapq.merge(*iterators, key=lambda e: e['ts'])</code></pre></details>
       <h3>Zeitfenster-Clustering</h3>
-      <pre><code>from datetime import timedelta
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from datetime import timedelta
 
 def cluster_by_window(events, window_sec: int = 30):
     window = timedelta(seconds=window_sec)
@@ -130,9 +140,9 @@ def cluster_by_window(events, window_sec: int = 30):
                 yield cluster
             cluster = [ev]
     if len(cluster) &gt; 1:
-        yield cluster</code></pre>
+        yield cluster</code></pre></details>
       <h3>Einfaches Message-Clustering per Jaccard</h3>
-      <pre><code>def tokenize(msg: str) -&gt; set[str]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def tokenize(msg: str) -&gt; set[str]:
     import re
     # Zahlen normalisieren damit "error on line 42" == "error on line 7"
     msg = re.sub(r'\d+', 'N', msg.lower())
@@ -153,12 +163,12 @@ def find_similar(messages: list[str], threshold=0.6) -&gt; list[list[int]]:
             if j not in assigned and jaccard(tokenize(m), tokenize(n)) &gt;= threshold:
                 group.append(j); assigned.add(j)
         groups.append(group); assigned.add(i)
-    return groups</code></pre>
+    return groups</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — errcorr.py</div>
-      <pre><code># Drei Logdateien korrelieren, 30-Sekunden-Fenster
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Drei Logdateien korrelieren, 30-Sekunden-Fenster
 errcorr.py app.log db.log nginx/access.log --window 30
 
 # Nur ERROR-Level-Ereignisse, 60s-Fenster
@@ -168,7 +178,7 @@ errcorr.py *.log --level error --window 60
 errcorr.py app.log --cluster-messages --threshold 0.7
 
 # Ausgabe als JSON für ForensicKit
-errcorr.py app.log db.log --format json &gt; correlations.json</code></pre>
+errcorr.py app.log db.log --format json &gt; correlations.json</code></pre></details>
       <p>Ausgabe: Für jede Korrelationsgruppe werden Zeitraum, beteiligte Quellen, Anzahl Ereignisse und die häufigste Nachricht angezeigt.</p>
       <blockquote><p>Tipp: Logdateien sind oft <em>nicht</em> perfekt sortiert. Behandle fehlerhaft sortierte Einträge mit einem kleinen Puffer (<code>deque</code> der letzten N Einträge) statt alles vorab zu laden.</p></blockquote>
     </div>

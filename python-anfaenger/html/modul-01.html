@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -148,29 +158,29 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Installation prüfen</h3>
-        <pre><code>python3 --version
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python3 --version
 # → Python 3.12.x
 
 which python3
-# → /usr/bin/python3</code></pre>
+# → /usr/bin/python3</code></pre></details>
         <h3>Virtuelle Umgebung</h3>
-        <pre><code>python3 -m venv .venv
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python3 -m venv .venv
 source .venv/bin/activate   # Linux/macOS
 .venv\Scripts\activate      # Windows
 
 pip install --upgrade pip
-pip install ipython black</code></pre>
+pip install ipython black</code></pre></details>
         <h3>Skript-Grundstruktur</h3>
-        <pre><code>def main() -> None:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def main() -> None:
     print("Automatisierung startet...")
 
 if __name__ == "__main__":
-    main()</code></pre>
+    main()</code></pre></details>
         <h3>requirements.txt erzeugen</h3>
-        <pre><code>pip freeze > requirements.txt
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>pip freeze > requirements.txt
 
 # Später reinstallieren:
-pip install -r requirements.txt</code></pre>
+pip install -r requirements.txt</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -205,14 +215,14 @@ pip install -r requirements.txt</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python sysinfo.py
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python sysinfo.py
 # Ausgabe muss enthalten:
 # Python 3.12.x — /pfad/zu/python
 # OS: Linux / Hostname: mein-rechner
 # Arbeitsverzeichnis: /pfad/zum/projekt
 # venv aktiv: Ja
 
-# Kein ImportError, kein SyntaxError</code></pre>
+# Kein ImportError, kein SyntaxError</code></pre></details>
       </div>
 
     </div>

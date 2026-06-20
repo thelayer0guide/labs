@@ -76,6 +76,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -239,13 +249,13 @@
         <tr><td>Lab 15</td><td><code>subprocess.run</code> (für lsusb, lsblk)</td></tr>
       </table>
       <p><strong>Beispiel-Pattern:</strong></p>
-      <pre><code>from unittest.mock import patch, MagicMock
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from unittest.mock import patch, MagicMock
 
 def test_fetch_certificate_timeout():
     with patch("socket.create_connection") as mock_conn:
         mock_conn.side_effect = TimeoutError("Verbindung abgelaufen")
         with pytest.raises((TimeoutError, ConnectionError)):
-            fetch_certificate("10.255.255.1", timeout=1.0)</code></pre>
+            fetch_certificate("10.255.255.1", timeout=1.0)</code></pre></details>
     </div>
 
     <div class="lab-section" id="coverage-ziele">
@@ -259,20 +269,20 @@ def test_fetch_certificate_timeout():
       </table>
       <p><strong>Ausgeschlossen von Coverage:</strong> <code>if __name__ == "__main__":</code>, reine Stub-Funktionen</p>
       <p>Füge in <code>pyproject.toml</code> ein:</p>
-      <pre><code>[tool.pytest.ini_options]
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[tool.pytest.ini_options]
 addopts = "--cov=. --cov-report=term-missing --cov-config=.coveragerc"
 
 [tool.coverage.report]
 exclude_lines = [
     "if __name__ == .__main__.",
     "raise NotImplementedError",
-]</code></pre>
+]</code></pre></details>
     </div>
 
     <div class="lab-section" id="github-actions">
       <div class="sec-heading">GitHub Actions CI</div>
       <p>Erstelle <code>.github/workflows/ci.yml</code>:</p>
-      <pre><code>name: CI
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>name: CI
 
 on: [push, pull_request]
 
@@ -289,7 +299,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev]"
       - run: make lint
-      - run: make test</code></pre>
+      - run: make test</code></pre></details>
       <p>Anforderungen:</p>
       <ul>
         <li class="task"><span class="chk"></span>Workflow läuft bei jedem Push und Pull Request</li>
@@ -303,7 +313,7 @@ jobs:
     <div class="lab-section" id="conftest">
       <div class="sec-heading">conftest.py (Shared Fixtures)</div>
       <p>Erstelle <code>conftest.py</code> im Root des Repos mit gemeinsamen Fixtures:</p>
-      <pre><code>import pytest
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import pytest
 from pathlib import Path
 
 @pytest.fixture
@@ -322,12 +332,12 @@ def known_hash_file(tmp_path):
     data = b"security-lab-test-data-2026"
     path = tmp_path / "known.bin"
     path.write_bytes(data)
-    return path, data</code></pre>
+    return path, data</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Alle Tests laufen durch
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Alle Tests laufen durch
 make test
 # → 0 Failures, 0 Errors
 
@@ -341,7 +351,7 @@ make lint
 
 # CI-Konfiguration valide
 python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
-# → kein Fehler</code></pre>
+# → kein Fehler</code></pre></details>
     </div>
 
     <div class="lab-section" id="was-testen">
@@ -376,7 +386,7 @@ python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
       <p><strong><code>tmp_path</code>-Fixture:</strong> Von pytest bereitgestellt — jeder Test bekommt ein eigenes temporäres Verzeichnis. Wird nach dem Test automatisch gelöscht.</p>
       <p><strong>Fixture-Scope:</strong> <code>@pytest.fixture(scope="session")</code> für teure Fixtures (z. B. eine Baseline die einmal erstellt wird), <code>scope="function"</code> (Standard) für Fixtures die pro Test frisch sein sollen.</p>
       <p><strong>parametrize:</strong></p>
-      <pre><code>@pytest.mark.parametrize("algo,expected_len", [
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>@pytest.mark.parametrize("algo,expected_len", [
     ("sha256", 64),
     ("md5", 32),
     ("sha1", 40),
@@ -384,7 +394,7 @@ python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
 def test_hash_length(algo, expected_len, known_hash_file):
     path, _ = known_hash_file
     result = hash_file(path, [algo])
-    assert len(result[algo]) == expected_len</code></pre>
+    assert len(result[algo]) == expected_len</code></pre></details>
       <p><strong>Mock-Assertion:</strong> Nutze <code>mock.assert_called_once_with(...)</code> um zu prüfen dass ein Mock korrekt aufgerufen wurde — wichtig für Tests die sicherstellen wollen, dass keine Netzwerkverbindung aufgebaut wird.</p>
     </div>
 

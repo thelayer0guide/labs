@@ -76,6 +76,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -133,7 +143,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Definiere das Plugin-Interface, konvertiere 3 bestehende Tools in Plugins, und implementiere den Plugin-Loader.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 ├── shared/
 │   ├── __init__.py
 │   ├── baseline.py
@@ -145,13 +155,13 @@
 │   └── plugin.py
 ├── certaudit/
 │   └── plugin.py
-└── pyproject.toml      ← entry_points konfigurieren</code></pre>
+└── pyproject.toml      ← entry_points konfigurieren</code></pre></details>
     </div>
 
     <div class="lab-section" id="plugin-interface">
       <div class="sec-heading">Das Plugin-Interface</div>
       <p>Definiere in <code>shared/plugin.py</code>:</p>
-      <pre><code>from abc import ABC, abstractmethod
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from abc import ABC, abstractmethod
 import argparse
 from typing import Any
 
@@ -182,7 +192,7 @@ class SecurityTool(ABC):
 
     def validate_args(self, args: argparse.Namespace) -> list[str]:
         """Optionale Argument-Validierung vor run(). Gibt Fehlermeldungen zurück."""
-        return []</code></pre>
+        return []</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -211,7 +221,7 @@ class SecurityTool(ABC):
       <p>Implementiere <code>SecurityTool</code> für <strong>mindestens 3 Tools</strong>:</p>
 
       <h3>hashinspect/plugin.py</h3>
-      <pre><code>class HashInspectPlugin(SecurityTool):
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>class HashInspectPlugin(SecurityTool):
 
     @property
     def name(self) -> str:
@@ -229,16 +239,16 @@ class SecurityTool(ABC):
     def run(self, args: argparse.Namespace) -> int:
         # Nutzt hash_file aus hashinspect.core
         # Gibt 0 oder 1 zurück
-        ...</code></pre>
+        ...</code></pre></details>
       <p>Implementiere entsprechend für 2 weitere Tools deiner Wahl.</p>
 
       <h3>pyproject.toml</h3>
       <ul>
         <li class="task"><span class="chk"></span><code>entry_points</code> für alle implementierten Plugins konfigurieren:
-          <pre><code>[project.entry-points."uctl.plugins"]
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[project.entry-points."uctl.plugins"]
 hash    = "hashinspect.plugin:HashInspectPlugin"
 entropy = "entropyscanner.plugin:EntropyScannerPlugin"
-cert    = "certaudit.plugin:CertAuditPlugin"</code></pre>
+cert    = "certaudit.plugin:CertAuditPlugin"</code></pre></details>
         </li>
       </ul>
 
@@ -257,12 +267,12 @@ cert    = "certaudit.plugin:CertAuditPlugin"</code></pre>
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>python uctl_proto.py --help
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python uctl_proto.py --help
 python uctl_proto.py hash datei.iso
 python uctl_proto.py entropy ~/Downloads
-python uctl_proto.py cert github.com</code></pre>
+python uctl_proto.py cert github.com</code></pre></details>
       <p>Beispiel-Output <code>uctl_proto.py --help</code>:</p>
-      <pre><code>uctl — Unified Security Toolkit (Prototyp)
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>uctl — Unified Security Toolkit (Prototyp)
 
 Subcommands:
   cert      Auditiert TLS-Zertifikate
@@ -270,12 +280,12 @@ Subcommands:
   hash      Berechnet kryptografische Hashes für Dateien
 
 Optionen:
-  --help    Zeigt diese Hilfe</code></pre>
+  --help    Zeigt diese Hilfe</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Plugin-Loading funktioniert
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Plugin-Loading funktioniert
 pip install -e .   # installiert entry_points
 python -c "
 from shared.plugin import load_plugins
@@ -299,7 +309,7 @@ from importlib.metadata import entry_points
 eps = entry_points(group='uctl.plugins')
 print('entry_points:', list(eps))
 assert len(list(eps)) >= 3
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -329,29 +339,29 @@ assert len(list(eps)) >= 3
       <div class="sec-heading">Hinweise</div>
       <p><strong>entry_points Installation:</strong> Plugins werden über <code>entry_points</code> registriert, aber die <code>entry_points</code>-Konfiguration wird erst nach <code>pip install -e .</code> aktiv. Für Tests kannst du <code>load_plugin_from_module()</code> direkt nutzen.</p>
       <p><strong>ABC und abstractmethod:</strong></p>
-      <pre><code>from abc import ABC, abstractmethod
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from abc import ABC, abstractmethod
 
 class MyABC(ABC):
     @abstractmethod
     def my_method(self): ...
 
-# MyABC() → TypeError: Can't instantiate abstract class</code></pre>
+# MyABC() → TypeError: Can't instantiate abstract class</code></pre></details>
       <p><strong>importlib.metadata (Python 3.9+):</strong></p>
-      <pre><code>from importlib.metadata import entry_points
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from importlib.metadata import entry_points
 eps = entry_points(group="uctl.plugins")
 for ep in eps:
     cls = ep.load()  # gibt die Klasse zurück
-    plugin = cls()</code></pre>
+    plugin = cls()</code></pre></details>
       <p><strong>Robustheit:</strong> Wenn ein Plugin-Import fehlschlägt (z. B. fehlende Dependency), soll der Loader das Plugin überspringen und eine Warnung ausgeben — nicht den gesamten Start von <code>uctl</code> blockieren.</p>
     </div>
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für den Capstone</div>
-      <pre><code>from shared.plugin import SecurityTool, load_plugins
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from shared.plugin import SecurityTool, load_plugins
 
 # Im Capstone:
 plugins = load_plugins()
-# → alle registrierten Tools als fertige SecurityTool-Instanzen</code></pre>
+# → alle registrierten Tools als fertige SecurityTool-Instanzen</code></pre></details>
       <p>Das ist die Brücke: Der Capstone muss für das Hinzufügen eines weiteren Tools nur <code>entry_points</code> erweitern — kein Code-Änderung in <code>uctl</code> selbst.</p>
     </div>
 

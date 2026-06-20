@@ -88,6 +88,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -151,7 +161,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>logaudit</code> — ein Tool zur forensischen Analyse von <code>auth.log</code>-Dateien und (als Bonus) nginx-Access-Logs.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── logaudit/
     ├── __init__.py
     ├── core.py
@@ -162,13 +172,13 @@
         ├── test_core.py
         └── fixtures/
             ├── sample_auth.log
-            └── sample_nginx.log</code></pre>
+            └── sample_nginx.log</code></pre></details>
     </div>
 
     <div class="lab-section" id="das-datenmodell">
       <div class="sec-heading">Das Datenmodell</div>
       <p>Definiere in <code>models.py</code>:</p>
-      <pre><code>from dataclasses import dataclass
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from dataclasses import dataclass
 from datetime import datetime
 
 @dataclass
@@ -180,7 +190,7 @@ class LogEntry:
     message: str
     ip: str | None          # extrahierte IP-Adresse, falls vorhanden
     event_type: str         # "ssh_fail", "ssh_success", "sudo", "other"
-    username: str | None    # betroffener Nutzer, falls erkennbar</code></pre>
+    username: str | None    # betroffener Nutzer, falls erkennbar</code></pre></details>
       <p>Du kannst das Modell erweitern, aber diese Felder müssen vorhanden sein.</p>
     </div>
 
@@ -246,12 +256,12 @@ class LogEntry:
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>logaudit /var/log/auth.log
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>logaudit /var/log/auth.log
 logaudit /var/log/auth.log --since "2026-06-01"
 logaudit /var/log/auth.log --top 5 --format json
-logaudit /var/log/auth.log --since "2026-06-01" --until "2026-06-30"</code></pre>
+logaudit /var/log/auth.log --since "2026-06-01" --until "2026-06-30"</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>LOG FORENSICS: /var/log/auth.log
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>LOG FORENSICS: /var/log/auth.log
 Zeitraum: 2026-06-01 — 2026-06-19
 Analysiert: 15.234 Einträge
 
@@ -267,21 +277,21 @@ STUNDEN-HISTOGRAMM
 ...
 23: ████████████░░░░░░░░ 61%
 
-Login-Erfolgsquote: 3.2%</code></pre>
+Login-Erfolgsquote: 3.2%</code></pre></details>
     </div>
 
     <div class="lab-section" id="test-fixtures">
       <div class="sec-heading">Test-Fixtures</div>
       <p>Erstelle <code>tests/fixtures/sample_auth.log</code> mit mindestens 20 Zeilen — echtes Format, anonymisierte IPs:</p>
-      <pre><code>Jun  1 03:14:15 hostname sshd[12345]: Failed password for invalid user admin from 192.168.1.1 port 45678 ssh2
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>Jun  1 03:14:15 hostname sshd[12345]: Failed password for invalid user admin from 192.168.1.1 port 45678 ssh2
 Jun  1 03:14:16 hostname sshd[12345]: Failed password for root from 192.168.1.1 port 45679 ssh2
 Jun  1 03:14:17 hostname sshd[12345]: Accepted publickey for alice from 10.0.0.5 port 52341 ssh2
-Jun  1 04:00:01 hostname sudo:  alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/bin/ls</code></pre>
+Jun  1 04:00:01 hostname sudo:  alice : TTY=pts/0 ; PWD=/home/alice ; USER=root ; COMMAND=/bin/ls</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Parst ohne Fehler
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Parst ohne Fehler
 python -m logaudit tests/fixtures/sample_auth.log
 
 # JSON-Output ist valides JSON
@@ -289,7 +299,7 @@ python -m logaudit tests/fixtures/sample_auth.log --format json | python -m json
 
 # Zeitraum-Filter funktioniert
 python -m logaudit tests/fixtures/sample_auth.log --since "2026-06-01" --until "2026-06-01"
-# → Nur Einträge vom 1. Juni</code></pre>
+# → Nur Einträge vom 1. Juni</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -328,11 +338,11 @@ python -m logaudit tests/fixtures/sample_auth.log --since "2026-06-01" --until "
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def parse_auth_log(path: Path) -> list[LogEntry]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def parse_auth_log(path: Path) -> list[LogEntry]:
     """Parst auth.log und gibt strukturierte Einträge zurück."""
 
 def aggregate_ssh_failures(entries: list[LogEntry]) -> dict[str, int]:
-    """Zählt SSH-Fehlversuche pro IP, sortiert nach Häufigkeit."""</code></pre>
+    """Zählt SSH-Fehlversuche pro IP, sortiert nach Häufigkeit."""</code></pre></details>
     </div>
 
   </main>

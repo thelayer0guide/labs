@@ -49,6 +49,16 @@
   .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -106,7 +116,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Inode-Zeitstempel lesen</h3>
-      <pre><code>from pathlib import Path
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from pathlib import Path
 from datetime import datetime
 
 def file_timestamps(path: Path) -&gt; dict:
@@ -118,9 +128,9 @@ def file_timestamps(path: Path) -&gt; dict:
         'atime': datetime.fromtimestamp(s.st_atime),  # last accessed
         'ctime': datetime.fromtimestamp(s.st_ctime),  # inode changed (not "created"!)
         'ext':   path.suffix.lower(),
-    }</code></pre>
+    }</code></pre></details>
       <h3>Zeitleiste aufbauen</h3>
-      <pre><code>def build_timeline(root: Path, ts_field: str = 'mtime',
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def build_timeline(root: Path, ts_field: str = 'mtime',
                    since=None, until=None, exts=None):
     events = []
     for p in root.rglob('*'):
@@ -135,9 +145,9 @@ def file_timestamps(path: Path) -&gt; dict:
         if until and ts &gt; until:
             continue
         events.append(entry)
-    return sorted(events, key=lambda e: e[ts_field])</code></pre>
+    return sorted(events, key=lambda e: e[ts_field])</code></pre></details>
       <h3>HTML-Report generieren</h3>
-      <pre><code>def render_html(events: list[dict], title: str) -&gt; str:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def render_html(events: list[dict], title: str) -&gt; str:
     rows = '\n'.join(
         f'&lt;tr&gt;&lt;td&gt;{e["mtime"].strftime("%Y-%m-%d %H:%M:%S")}&lt;/td&gt;'
         f'&lt;td&gt;{e["ext"] or "—"}&lt;/td&gt;'
@@ -153,12 +163,12 @@ th,td{{padding:6px 10px;border-bottom:1px solid #30363d;text-align:left}}
 th{{color:#58a6ff}}&lt;/style&gt;&lt;/head&gt;
 &lt;body&gt;&lt;h1&gt;{title}&lt;/h1&gt;&lt;table&gt;
 &lt;tr&gt;&lt;th&gt;Timestamp&lt;/th&gt;&lt;th&gt;Ext&lt;/th&gt;&lt;th&gt;Path&lt;/th&gt;&lt;th&gt;Size&lt;/th&gt;&lt;/tr&gt;
-{rows}&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;"""</code></pre>
+{rows}&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;"""</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — timeline.py</div>
-      <pre><code># Alle Dateien nach mtime sortiert
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Alle Dateien nach mtime sortiert
 timeline.py /var/www
 
 # Nur PHP-Dateien, letzte 48 Stunden
@@ -171,7 +181,7 @@ timeline.py /home/user --ts atime --since "2025-06-19 08:00"
 timeline.py /var/www --format csv --out timeline.csv
 
 # HTML-Report erstellen
-timeline.py /var/www --format html --out report.html --title "Incident 2025-06-19"</code></pre>
+timeline.py /var/www --format html --out report.html --title "Incident 2025-06-19"</code></pre></details>
       <blockquote><p>Wichtig: <code>ctime</code> ist auf Linux <em>nicht</em> der Erstellungszeitpunkt, sondern der Zeitpunkt der letzten Inode-Änderung (inkl. Berechtigungsänderungen). Das sollte in der Dokumentation des Tools klargestellt sein.</p></blockquote>
     </div>
 

@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -148,14 +158,14 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>pathlib — sicher und lesbar</h3>
-        <pre><code>from pathlib import Path
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from pathlib import Path
 
 log_dir = Path("/var/log")
 for log_file in log_dir.rglob("*.log"):
     size = log_file.stat().st_size
-    print(f"{log_file.name:30} {size / 1024:6.1f} KB")</code></pre>
+    print(f"{log_file.name:30} {size / 1024:6.1f} KB")</code></pre></details>
         <h3>subprocess ohne shell=True</h3>
-        <pre><code>import subprocess
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import subprocess
 
 result = subprocess.run(
     ["df", "-h", "/"],
@@ -164,9 +174,9 @@ result = subprocess.run(
 if result.returncode == 0:
     print(result.stdout)
 else:
-    print("Fehler:", result.stderr)</code></pre>
+    print("Fehler:", result.stderr)</code></pre></details>
         <h3>argparse mit Subcommands</h3>
-        <pre><code>import argparse
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import argparse
 
 parser = argparse.ArgumentParser(description="syscheck")
 sub = parser.add_subparsers(dest="cmd")
@@ -177,9 +187,9 @@ disk_p.add_argument("path", nargs="?", default="/")
 env_p = sub.add_parser("env", help="Umgebungsvariable abfragen")
 env_p.add_argument("key")
 
-args = parser.parse_args()</code></pre>
+args = parser.parse_args()</code></pre></details>
         <h3>ipaddress Validierung</h3>
-        <pre><code>import ipaddress
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import ipaddress
 
 def parse_ip(raw: str) -> ipaddress.IPv4Address | None:
     try:
@@ -188,7 +198,7 @@ def parse_ip(raw: str) -> ipaddress.IPv4Address | None:
         return None
 
 net = ipaddress.IPv4Network("192.168.1.0/24")
-print(ipaddress.IPv4Address("192.168.1.50") in net)  # True</code></pre>
+print(ipaddress.IPv4Address("192.168.1.50") in net)  # True</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -219,7 +229,7 @@ print(ipaddress.IPv4Address("192.168.1.50") in net)  # True</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python syscheck.py disk / --warn 80
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python syscheck.py disk / --warn 80
 # → Disk /: 45.2 GB / 100.0 GB (45%) — OK
 
 python syscheck.py env HOME
@@ -230,7 +240,7 @@ python syscheck.py env NICHT_GESETZT; echo $?
 # → 1
 
 python syscheck.py run ls -la /tmp
-# → (Ausgabe von ls)</code></pre>
+# → (Ausgabe von ls)</code></pre></details>
       </div>
 
     </div>

@@ -49,6 +49,16 @@
   .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -106,7 +116,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Hex-IP dekodieren (Little-Endian)</h3>
-      <pre><code>import socket, struct
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import socket, struct
 
 def hex_to_ip(hex_addr: str) -&gt; str:
     # Linux speichert IPv4 in /proc/net/tcp als Little-Endian-Hex
@@ -118,9 +128,9 @@ def hex_to_port(hex_port: str) -&gt; int:
 
 # Beispiel: "0F02000A:1F90"  →  "10.0.2.15", Port 8080
 ip, port_hex = "0F02000A", "1F90"
-print(hex_to_ip(ip), hex_to_port(port_hex))   # 10.0.2.15 8080</code></pre>
+print(hex_to_ip(ip), hex_to_port(port_hex))   # 10.0.2.15 8080</code></pre></details>
       <h3>/proc/net/tcp parsen</h3>
-      <pre><code>TCP_STATES = {
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>TCP_STATES = {
     '01': 'ESTABLISHED', '02': 'SYN_SENT', '03': 'SYN_RECV',
     '04': 'FIN_WAIT1',   '05': 'FIN_WAIT2', '06': 'TIME_WAIT',
     '07': 'CLOSE',       '08': 'CLOSE_WAIT','09': 'LAST_ACK',
@@ -143,9 +153,9 @@ def parse_tcp_table(path='/proc/net/tcp'):
                 'state':       TCP_STATES.get(cols[3], cols[3]),
                 'inode':       int(cols[9]),
             })
-    return rows</code></pre>
+    return rows</code></pre></details>
       <h3>Inode → PID zuordnen</h3>
-      <pre><code>from pathlib import Path
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from pathlib import Path
 
 def inode_to_pid() -&gt; dict[int, int]:
     mapping = {}
@@ -161,12 +171,12 @@ def inode_to_pid() -&gt; dict[int, int]:
                     mapping[inode] = int(pid_dir.name)
         except (PermissionError, FileNotFoundError):
             pass
-    return mapping</code></pre>
+    return mapping</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — netscope.py</div>
-      <pre><code># Alle aktiven Verbindungen
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Alle aktiven Verbindungen
 netscope.py
 
 # Nur LISTEN-Sockets (offene Ports)
@@ -179,7 +189,7 @@ netscope.py --external
 netscope.py --state established --resolve
 
 # Als JSON exportieren
-netscope.py --format json &gt; connections.json</code></pre>
+netscope.py --format json &gt; connections.json</code></pre></details>
       <p>Ausgabe-Spalten: <code>STATE | LOCAL_ADDR:PORT | REMOTE_ADDR:PORT | PID | PROCESS</code></p>
       <blockquote><p>RFC1918 = 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 und 127.0.0.0/8. Alle anderen Adressen sind "extern" und werden in der Ausgabe hervorgehoben.</p></blockquote>
     </div>

@@ -72,6 +72,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -132,14 +142,14 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>procmon</code> — einen Prozess-Baseline-Monitor der verdächtige Prozesse erkennt und neue Prozesse seit dem letzten Snapshot aufzeigt.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── procmon/
     ├── __init__.py
     ├── core.py
     ├── cli.py
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
       <p>Nutze <code>BaselineStore</code> aus <code>shared/baseline.py</code> (Lab 10).</p>
     </div>
 
@@ -154,7 +164,7 @@
             <li>Key: <code>str(pid)</code> (String für JSON-Kompatibilität)</li>
             <li>Für jeden Prozess:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "pid": int,
     "name": str,
     "exe": str | None,           # Pfad zur Binary
@@ -164,7 +174,7 @@
     "exe_hash": str | None,      # SHA256 der Binary (wenn lesbar)
     "status": str,               # "running", "sleeping", etc.
     "suspicious_flags": list[str],  # (zunächst leer, wird von check_heuristics gefüllt)
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li>Bei <code>psutil.AccessDenied</code> oder <code>psutil.NoSuchProcess</code>: Prozess überspringen</li>
             <li><code>exe_hash</code>: nur wenn Binary &lt; 50 MB (Sicherheitslimit, keine ISO-Dateien hashen)</li>
@@ -185,12 +195,12 @@
           <ul>
             <li>Nutzt das gleiche Diff-Pattern wie <code>diff_baselines</code> aus Lab 10:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "new_processes":     list[dict],   # neue PIDs
     "terminated":        list[dict],   # beendete PIDs
     "suspicious":        list[dict],   # Prozesse mit suspicious_flags
     "whitelisted_new":   int,          # neue Prozesse in Whitelist (nur Statistik)
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li><code>whitelist</code>: Set von Prozessnamen die ignoriert werden sollen</li>
           </ul>
@@ -213,12 +223,12 @@
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>procmon snapshot
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>procmon snapshot
 procmon scan
 procmon scan --whitelist whitelist.txt
-procmon scan --format json</code></pre>
+procmon scan --format json</code></pre></details>
       <p>Beispiel-Output <code>procmon scan</code>:</p>
-      <pre><code>PROCESS BASELINE SCAN
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>PROCESS BASELINE SCAN
 Baseline vom: 2026-06-19T08:00:00
 ══════════════════════════════════════════
 
@@ -240,12 +250,12 @@ BEENDET (3)
   PID 1236  sleep      (beendet)
 
 ══════════════════════════════════════════
-Gesamt: 124 Prozesse · 2 neu · 1 verdächtig · 3 beendet</code></pre>
+Gesamt: 124 Prozesse · 2 neu · 1 verdächtig · 3 beendet</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Snapshot erstellen
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Snapshot erstellen
 python -m procmon snapshot --baseline /tmp/proc-baseline.json
 # → Keine Fehler, JSON-Datei erstellt
 
@@ -276,7 +286,7 @@ flags = check_heuristics(normal)
 assert 'exe_from_tmp' not in flags
 
 print('Heuristiken OK')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -313,11 +323,11 @@ print('Heuristiken OK')
 
     <div class="lab-section" id="schnittstelle-uctl">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def snapshot_processes() -&gt; dict[str, dict]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def snapshot_processes() -&gt; dict[str, dict]:
     """Erstellt Snapshot aller laufenden Prozesse."""
 
 def diff_process_snapshots(old: dict, new: dict, whitelist: set[str]) -&gt; dict:
-    """Vergleicht zwei Prozess-Snapshots."""</code></pre>
+    """Vergleicht zwei Prozess-Snapshots."""</code></pre></details>
     </div>
 
   </div><!-- /content -->

@@ -51,6 +51,16 @@
   .final-badge{display:inline-flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--accent) 8%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:8px;padding:12px 18px;margin-top:12px}
   .final-badge-text{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -109,7 +119,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Scanner-Interface (Plugin-Vertrag)</h3>
-      <pre><code># Jedes Scanner-Modul (logparse, hashguard, ...) muss diese Funktion exportieren:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Jedes Scanner-Modul (logparse, hashguard, ...) muss diese Funktion exportieren:
 def run_scan(target: str, config: dict) -&gt; dict:
     """
     Führt den Scan aus und gibt strukturiertes Ergebnis zurück.
@@ -122,9 +132,9 @@ def run_scan(target: str, config: dict) -&gt; dict:
         'status':   'ok',           # ok | warn | error
         'findings': [...],          # Liste von Finding-Dicts
         'summary':  '47 Fehler gefunden, 3 kritisch',
-    }</code></pre>
+    }</code></pre></details>
       <h3>Parallele Scanner-Ausführung</h3>
-      <pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def run_all_scanners(target: str, config: dict,
                      scanners: list) -&gt; list[dict]:
@@ -144,9 +154,9 @@ def run_all_scanners(target: str, config: dict,
                     'findings': [],
                     'summary': str(e),
                 })
-    return results</code></pre>
+    return results</code></pre></details>
       <h3>HTML-Report-Generator</h3>
-      <pre><code>def render_report(results: list[dict], meta: dict) -&gt; str:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def render_report(results: list[dict], meta: dict) -&gt; str:
     sections = '\n'.join(render_section(r) for r in results)
     status_counts = {
         s: sum(1 for r in results if r['status'] == s)
@@ -160,12 +170,12 @@ def run_all_scanners(target: str, config: dict,
         warn=status_counts['warn'],
         errors=status_counts['error'],
         sections=sections,
-    )</code></pre>
+    )</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — forensickit.py</div>
-      <pre><code># Vollständiger Forensik-Scan
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Vollständiger Forensik-Scan
 forensickit.py --target /var/www --logs /var/log --out report/
 
 # Nur bestimmte Scanner aktivieren
@@ -175,7 +185,7 @@ forensickit.py --target /srv --scanners logs integrity secrets
 forensickit.py --target /var/www --config forensickit.toml
 
 # Report ohne Ausführung aus vorhandenen JSON-Ergebnissen
-forensickit.py --from-json results/*.json --out report.html</code></pre>
+forensickit.py --from-json results/*.json --out report.html</code></pre></details>
       <p>Der Output-Report <code>forensickit_YYYYMMDD_HHMMSS.html</code> enthält:</p>
       <ul>
         <li>Executive Summary: Anzahl Scanner, Gesamtbefunde, kritische Funde</li>

@@ -49,6 +49,16 @@
   .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -106,7 +116,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Statistik ohne NumPy</h3>
-      <pre><code>import statistics, math
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import statistics, math
 
 def column_stats(values: list[float]) -&gt; dict:
     n = len(values)
@@ -124,20 +134,20 @@ def column_stats(values: list[float]) -&gt; dict:
         'median': statistics.median(values),
         'stdev':  statistics.stdev(values) if n &gt; 1 else 0,
         'q1': q1, 'q3': q3, 'iqr': iqr,
-    }</code></pre>
+    }</code></pre></details>
       <h3>IQR-Ausreißer</h3>
-      <pre><code>def iqr_outliers(values: list[float], k: float = 1.5) -&gt; list[float]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def iqr_outliers(values: list[float], k: float = 1.5) -&gt; list[float]:
     stats = column_stats(values)
     lo = stats['q1'] - k * stats['iqr']
     hi = stats['q3'] + k * stats['iqr']
-    return [v for v in values if v &lt; lo or v &gt; hi]</code></pre>
+    return [v for v in values if v &lt; lo or v &gt; hi]</code></pre></details>
       <h3>Z-Score-Ausreißer</h3>
-      <pre><code>def zscore_outliers(values: list[float], threshold: float = 3.0) -&gt; list[float]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def zscore_outliers(values: list[float], threshold: float = 3.0) -&gt; list[float]:
     mean = statistics.mean(values)
     std  = statistics.stdev(values) if len(values) &gt; 1 else 1
-    return [v for v in values if abs((v - mean) / std) &gt; threshold]</code></pre>
+    return [v for v in values if abs((v - mean) / std) &gt; threshold]</code></pre></details>
       <h3>Datentyp-Inferenz</h3>
-      <pre><code>def infer_type(samples: list[str]) -&gt; str:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def infer_type(samples: list[str]) -&gt; str:
     non_null = [s for s in samples if s.strip()]
     if not non_null:
         return 'empty'
@@ -147,12 +157,12 @@ def column_stats(values: list[float]) -&gt; dict:
         except ValueError: pass
     ratio = numeric / len(non_null)
     if ratio &gt; 0.9: return 'numeric'
-    return 'categorical'</code></pre>
+    return 'categorical'</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — dataprofiler.py</div>
-      <pre><code># CSV profilen — tabellarische Ausgabe
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># CSV profilen — tabellarische Ausgabe
 dataprofiler.py data.csv
 
 # JSON-Datei profilen
@@ -165,7 +175,7 @@ dataprofiler.py data.csv --outliers iqr --column response_time_ms
 dataprofiler.py data.csv --export report.json
 
 # Nur Null-Anteile anzeigen
-dataprofiler.py data.csv --nulls</code></pre>
+dataprofiler.py data.csv --nulls</code></pre></details>
       <p>Ausgabe je Spalte: <code>Name | Typ | Count | Null% | Min | Max | Mean | Median | Stdev | Top-3-Werte</code></p>
       <blockquote><p>Kein <code>pandas</code>, kein <code>numpy</code>. Das <code>statistics</code>-Modul aus der Stdlib enthält alles was du brauchst. Für Median/Quartile: erst sortieren.</p></blockquote>
     </div>

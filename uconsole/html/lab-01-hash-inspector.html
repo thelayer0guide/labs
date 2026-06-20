@@ -142,6 +142,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -198,14 +208,14 @@
         <div class="sec-heading">Aufgabe</div>
         <p>Implementiere <code>hashinspect</code> — ein CLI-Tool, das Dateien hasht, mehrere Algorithmen parallel unterstützt und Prüfsummenlisten abgleicht.</p>
         <h3>Projektstruktur</h3>
-        <pre><code>security-lab/
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── hashinspect/
     ├── __init__.py
     ├── core.py      ← reine Hash-Logik, kein print(), kein sys.exit()
     ├── cli.py       ← argparse, Ausgabe, Exit-Code
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
       </div>
 
       <div class="lab-section" id="anforderungen">
@@ -264,24 +274,24 @@
 
       <div class="lab-section" id="cli-schnittstelle">
         <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-        <pre><code>hashinspect hash [--algo ALGO] DATEI [DATEI ...]
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>hashinspect hash [--algo ALGO] DATEI [DATEI ...]
 hashinspect check [--algo ALGO] CHECKSUMMEN_DATEI
-hashinspect hash --help</code></pre>
+hashinspect hash --help</code></pre></details>
         <p>Beispiel-Output <code>hash</code>:</p>
-        <pre><code>SHA256  a4f2c8d1e9b3f7a2...  kali-linux-2026.iso   (3.8 GB · 4.2s)
-MD5     c3b1a9e8d7f2b4c1...  kali-linux-2026.iso</code></pre>
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>SHA256  a4f2c8d1e9b3f7a2...  kali-linux-2026.iso   (3.8 GB · 4.2s)
+MD5     c3b1a9e8d7f2b4c1...  kali-linux-2026.iso</code></pre></details>
         <p>Beispiel-Output <code>check</code>:</p>
-        <pre><code>✓  kali-linux-2026.iso     SHA256  match
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>✓  kali-linux-2026.iso     SHA256  match
 ✗  ubuntu-24.iso           SHA256  mismatch
    erwartet: a4f2c8d1...
    gefunden: deadbeef...
 
-Ergebnis: 1/2 Dateien OK</code></pre>
+Ergebnis: 1/2 Dateien OK</code></pre></details>
       </div>
 
       <div class="lab-section" id="akzeptanzkriterien">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code># Erstellt eine Testdatei und prüft den Hash
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Erstellt eine Testdatei und prüft den Hash
 python -c "open('test.bin','wb').write(b'hello'*1000)"
 python -m hashinspect hash test.bin --algo sha256
 # → muss SHA256 + Hex-String ausgeben
@@ -299,12 +309,12 @@ echo $?    # → 1
 
 # Unbekannter Algorithmus
 python -m hashinspect hash test.bin --algo xxhash
-# → Fehlermeldung auf stderr, Exit-Code != 0</code></pre>
+# → Fehlermeldung auf stderr, Exit-Code != 0</code></pre></details>
         <p>Die Kernfunktion muss in Tests ohne CLI nutzbar sein:</p>
-        <pre><code>from hashinspect.core import hash_file
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from hashinspect.core import hash_file
 result = hash_file(Path("test.bin"), ["sha256", "md5"])
 assert "sha256" in result
-assert len(result["sha256"]) == 64</code></pre>
+assert len(result["sha256"]) == 64</code></pre></details>
       </div>
 
       <div class="lab-section" id="tests">
@@ -343,7 +353,7 @@ assert len(result["sha256"]) == 64</code></pre>
       <div class="lab-section" id="schnittstelle-fur-uctl">
         <div class="sec-heading">Schnittstelle für uctl</div>
         <p>Diese Funktion wird später 1:1 als <code>uctl hash</code>-Subcommand verwendet:</p>
-        <pre><code>def hash_file(path: Path, algos: list[str]) -> dict[str, str]:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def hash_file(path: Path, algos: list[str]) -> dict[str, str]:
     """Berechnet kryptografische Hashes für eine Datei.
 
     Args:
@@ -356,7 +366,7 @@ assert len(result["sha256"]) == 64</code></pre>
     Raises:
         ValueError: Bei unbekanntem Algorithmus
         FileNotFoundError: Wenn die Datei nicht existiert
-    """</code></pre>
+    """</code></pre></details>
         <p>Halte diese Signatur genau so — Änderungen würden spätere Integration erschweren.</p>
       </div>
 

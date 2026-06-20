@@ -76,6 +76,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -135,7 +145,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>hwaudit</code> — ein Hardware-Inventarisierungstool.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── hwaudit/
     ├── __init__.py
     ├── core.py
@@ -146,7 +156,7 @@
         └── fixtures/
             ├── lsusb_output.txt
             ├── lsblk_output.json
-            └── lsmod_output.txt</code></pre>
+            └── lsmod_output.txt</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -159,10 +169,10 @@
             <li>Wenn <code>lsusb_output</code> None: führt <code>lsusb</code> als Subprocess aus</li>
             <li>Wenn übergeben: parst den String direkt (für Tests)</li>
             <li>Parst das <code>lsusb</code>-Format:
-              <pre><code>Bus 001 Device 003: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 G2</code></pre>
+              <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>Bus 001 Device 003: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 G2</code></pre></details>
             </li>
             <li>Gibt zurück:
-              <pre><code>[
+              <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[
     {
         "bus": str,              # "001"
         "device": str,           # "003"
@@ -170,7 +180,7 @@
         "product_id": str,       # "1666"
         "description": str,      # "Kingston Technology DataTraveler..."
     }
-]</code></pre>
+]</code></pre></details>
             </li>
             <li>Bei fehlendem <code>lsusb</code>: gibt leere Liste zurück mit Warnung auf stderr</li>
           </ul>
@@ -180,7 +190,7 @@
             <li>Wenn <code>lsblk_json</code> None: führt <code>lsblk --json --output NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL,VENDOR</code> aus</li>
             <li>Parst das JSON-Output von <code>lsblk</code> direkt (kein Regex nötig)</li>
             <li>Gibt flache Liste aller Devices zurück (rekursiv durch <code>children</code>):
-              <pre><code>[
+              <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[
     {
         "name": str,          # "sda"
         "size": str,          # "500G"
@@ -190,7 +200,7 @@
         "model": str | None,
         "vendor": str | None,
     }
-]</code></pre>
+]</code></pre></details>
             </li>
           </ul>
         </li>
@@ -198,8 +208,8 @@
           <ul>
             <li>Wenn <code>lsmod_output</code> None: führt <code>lsmod</code> aus</li>
             <li>Parst <code>lsmod</code>-Output:
-              <pre><code>Module                  Size  Used by
-usb_storage            73728  0</code></pre>
+              <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>Module                  Size  Used by
+usb_storage            73728  0</code></pre></details>
             </li>
             <li>Gibt zurück: <code>[{"name": str, "size": int, "used_by": list[str]}, ...]</code></li>
           </ul>
@@ -207,14 +217,14 @@ usb_storage            73728  0</code></pre>
         <li class="task"><span class="chk"></span>Funktion <code>check_security_relevant_modules(modules: list[dict]) -> list[dict]</code>
           <ul>
             <li>Gibt Liste von Security-relevanten Modulen zurück mit Bewertung:
-              <pre><code>[
+              <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[
     {
         "name": "usb_storage",
         "loaded": bool,
         "risk": "MEDIUM",
         "note": "USB-Massenspeicher aktiv — Datenexfiltration per USB möglich"
     }
-]</code></pre>
+]</code></pre></details>
             </li>
             <li>Mindestens diese Module prüfen:
               <ul>
@@ -255,12 +265,12 @@ usb_storage            73728  0</code></pre>
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>hwaudit                        # einfaches Inventar
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>hwaudit                        # einfaches Inventar
 hwaudit --save                 # Baseline erstellen/aktualisieren
 hwaudit --diff                 # Vergleich mit Baseline
-hwaudit --format json</code></pre>
+hwaudit --format json</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>HARDWARE INVENTORY
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>HARDWARE INVENTORY
 ══════════════════════════════════════════
 
 USB-GERÄTE (3)
@@ -280,24 +290,24 @@ KERNEL-MODULE (Security)
   [MED] usb_storage     geladen — USB-Massenspeicher aktiv
   [OK]  nf_conntrack    geladen — Firewall-Tracking (normal)
 
-══════════════════════════════════════════</code></pre>
+══════════════════════════════════════════</code></pre></details>
       <p>Beispiel <code>hwaudit --diff</code>:</p>
-      <pre><code>HARDWARE-DIFF seit 2026-06-19 09:00:00
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>HARDWARE-DIFF seit 2026-06-19 09:00:00
 
 NEUES USB-GERÄT
   [!] ID 0951:1666  Kingston DataTraveler 100 G3
       Bus 001 · Device 002
 
-KEINE weiteren Änderungen</code></pre>
+KEINE weiteren Änderungen</code></pre></details>
     </div>
 
     <div class="lab-section" id="test-fixtures">
       <div class="sec-heading">Test-Fixtures</div>
       <p>Erstelle <code>tests/fixtures/lsusb_output.txt</code>:</p>
-      <pre><code>Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-Bus 001 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 G2</code></pre>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 G2</code></pre></details>
       <p>Erstelle <code>tests/fixtures/lsblk_output.json</code>:</p>
-      <pre><code>{
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "blockdevices": [
         {
             "name": "sda", "size": "7.5G", "type": "disk",
@@ -308,12 +318,12 @@ Bus 001 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100 G3/G4/SE9 
             ]
         }
     ]
-}</code></pre>
+}</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># USB-Parsing ohne echtes lsusb
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># USB-Parsing ohne echtes lsusb
 python -c "
 from hwaudit.core import list_usb_devices
 output = 'Bus 001 Device 002: ID 0951:1666 Kingston Technology DataTraveler 100'
@@ -339,7 +349,7 @@ sample = json.dumps({'blockdevices': [
 devices = list_block_devices(lsblk_json=sample)
 assert len(devices) == 2  # disk + partition
 print('Block-Device-Parsing OK')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -367,14 +377,14 @@ print('Block-Device-Parsing OK')
     <div class="lab-section" id="hinweise">
       <div class="sec-heading">Hinweise</div>
       <p><strong>subprocess.run sicher nutzen:</strong></p>
-      <pre><code>result = subprocess.run(
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>result = subprocess.run(
     ["lsusb"],
     capture_output=True,
     text=True,
     timeout=10,
 )
 if result.returncode != 0:
-    return []  # Nicht absturzen</code></pre>
+    return []  # Nicht absturzen</code></pre></details>
       <p><strong>lsblk JSON:</strong> <code>lsblk --json</code> gibt ein Objekt mit <code>blockdevices</code>-Array zurück. Rekursiv <code>children</code> traversieren für Partitionen.</p>
       <p><strong>lsusb Regex:</strong> <code>r"Bus (\d+) Device (\d+): ID ([0-9a-f]{4}):([0-9a-f]{4})\s+(.+)"</code> — fünf Gruppen.</p>
       <p><strong>uConsole-Realität:</strong> Auf der uConsole gibt es spezifische Hardware (Rockchip RK3566, NIC, 4G-Modem als USB-Device). Teste das Tool explizit dort — das interne 4G-Modem sollte als USB-Device erscheinen.</p>
@@ -382,14 +392,14 @@ if result.returncode != 0:
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def list_usb_devices(lsusb_output: str | None = None) -> list[dict]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def list_usb_devices(lsusb_output: str | None = None) -> list[dict]:
     """Listet angeschlossene USB-Geräte."""
 
 def create_hardware_snapshot() -> dict:
     """Erstellt vollständigen Hardware-Snapshot."""
 
 def diff_hardware_snapshots(old: dict, new: dict) -> dict:
-    """Vergleicht zwei Hardware-Snapshots."""</code></pre>
+    """Vergleicht zwei Hardware-Snapshots."""</code></pre></details>
     </div>
 
   </div>

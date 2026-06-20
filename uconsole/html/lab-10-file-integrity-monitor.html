@@ -72,6 +72,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -130,7 +140,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>fim</code> — einen File Integrity Monitor mit <code>init</code> (Baseline erstellen) und <code>scan</code> (Vergleichen) Subcommands.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 ├── shared/
 │   ├── __init__.py
 │   └── baseline.py      ← BaselineStore-Klasse (für Labs 10 &amp; 11)
@@ -140,13 +150,13 @@
     ├── cli.py
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
     </div>
 
     <div class="lab-section" id="baselinestore">
       <div class="sec-heading">Die BaselineStore-Klasse (in shared/baseline.py)</div>
       <p>Diese Klasse wird von Lab 10 (Dateien) und Lab 11 (Prozesse) verwendet:</p>
-      <pre><code>class BaselineStore:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>class BaselineStore:
     """Persistiert und verwaltet einen Zustandssnapshot als JSON."""
 
     def __init__(self, path: Path):
@@ -162,9 +172,9 @@
         """Gibt True zurück wenn eine Baseline-Datei existiert."""
 
     def get_metadata(self) -> dict:
-        """Gibt Metadaten des letzten Snapshots zurück (Zeitstempel etc.)."""</code></pre>
+        """Gibt Metadaten des letzten Snapshots zurück (Zeitstempel etc.)."""</code></pre></details>
       <p>Das JSON-Format:</p>
-      <pre><code>{
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "_meta": {
         "created": "2026-06-19T10:00:00",
         "tool": "fim",
@@ -174,7 +184,7 @@
         "/etc/ssh/sshd_config": { ... },
         ...
     }
-}</code></pre>
+}</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -187,14 +197,14 @@
             <li>Scannt <code>root</code> rekursiv mit <code>pathlib.rglob("*")</code></li>
             <li>Für jede Datei (kein Verzeichnis, kein Symlink):</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "hash_sha256": str,     # aus Lab 01 wiederverwenden
     "size": int,
     "mtime": float,         # UNIX-Timestamp
     "permissions": str,     # oktales Format: "644"
     "uid": int,
     "gid": int,
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li>Schließt Pfade aus, die auf einen der <code>exclude_patterns</code> matchen (Glob-Matching mit <code>fnmatch</code>)</li>
             <li>Bei Lesefehler: Datei überspringen, Warnung auf stderr</li>
@@ -205,21 +215,21 @@
           <ul>
             <li>Vergleicht zwei Snapshots:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "added":   list[str],    # neue Dateien
     "removed": list[str],    # gelöschte Dateien
     "changed": list[dict],   # geänderte Dateien mit Detailinfos
     "unchanged": int,        # Anzahl unveränderte (für Statistik)
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li><code>changed</code>-Einträge:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "path": str,
     "changes": list[str],    # z. B. ["hash_changed", "permissions_changed"]
     "old": dict,
     "new": dict,
-}</code></pre>
+}</code></pre></details>
         </li>
         <li class="task"><span class="chk"></span>Funktion <code>format_diff_report(diff: dict, fmt: str) -&gt; str</code>
           <ul>
@@ -250,13 +260,13 @@
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>fim init /etc --baseline /var/lib/fim/etc-baseline.json
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>fim init /etc --baseline /var/lib/fim/etc-baseline.json
 fim init /etc --exclude "/etc/mtab" --exclude "/etc/resolv.conf"
 fim scan /etc
 fim scan /etc --format json > fim-report.json
-fim scan /etc --accept    (akzeptiert Änderungen und aktualisiert Baseline)</code></pre>
+fim scan /etc --accept    (akzeptiert Änderungen und aktualisiert Baseline)</code></pre></details>
       <p>Beispiel-Output <code>fim scan</code>:</p>
-      <pre><code>FILE INTEGRITY SCAN: /etc
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>FILE INTEGRITY SCAN: /etc
 Baseline vom: 2026-06-15T09:00:00
 ══════════════════════════════════════════
 
@@ -278,13 +288,13 @@ NEU (1)
 GELÖSCHT (0)
 
 ══════════════════════════════════════════
-Gescannt: 847 Dateien | Unverändert: 843 | Geändert: 3 | Neu: 1 | Gelöscht: 0</code></pre>
+Gescannt: 847 Dateien | Unverändert: 843 | Geändert: 3 | Neu: 1 | Gelöscht: 0</code></pre></details>
     </div>
 
     <div class="lab-section" id="standard-ausschlusse">
       <div class="sec-heading">Standard-Ausschlüsse</div>
       <p>Implementiere diese Ausschlüsse als Standard (immer aktiv, überschreibbar):</p>
-      <pre><code>DEFAULT_EXCLUDES = [
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>DEFAULT_EXCLUDES = [
     "*/proc/*",
     "*/sys/*",
     "*/dev/*",
@@ -292,12 +302,12 @@ Gescannt: 847 Dateien | Unverändert: 843 | Geändert: 3 | Neu: 1 | Gelöscht: 0
     "/tmp/*",
     "/var/log/*",
     "*/lost+found/*",
-]</code></pre>
+]</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Init + Scan auf einem kleinen Verzeichnis
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Init + Scan auf einem kleinen Verzeichnis
 mkdir -p /tmp/fim-test/
 echo "original" > /tmp/fim-test/config.txt
 python -m fim init /tmp/fim-test --baseline /tmp/test-baseline.json
@@ -314,7 +324,7 @@ python -m fim scan /tmp/fim-test --baseline /tmp/test-baseline.json
 # Neue Datei
 touch /tmp/fim-test/new-file.txt
 python -m fim scan /tmp/fim-test --baseline /tmp/test-baseline.json
-# → zeigt new-file.txt als "NEU"</code></pre>
+# → zeigt new-file.txt als "NEU"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -356,11 +366,11 @@ python -m fim scan /tmp/fim-test --baseline /tmp/test-baseline.json
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def scan_path(root: Path, exclude_patterns: list[str]) -> dict[str, dict]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def scan_path(root: Path, exclude_patterns: list[str]) -> dict[str, dict]:
     """Scannt Verzeichnis und gibt Snapshot-Dict zurück."""
 
 def diff_baselines(old: dict, new: dict) -> dict:
-    """Vergleicht zwei Snapshots und gibt strukturiertes Diff zurück."""</code></pre>
+    """Vergleicht zwei Snapshots und gibt strukturiertes Diff zurück."""</code></pre></details>
     </div>
 
   </div>

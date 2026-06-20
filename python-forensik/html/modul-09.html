@@ -49,6 +49,16 @@
   .nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.prev::before{content:'← '}.nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -106,7 +116,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Top-N größte Dateien</h3>
-      <pre><code>import heapq
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import heapq
 from pathlib import Path
 
 def top_files(root: Path, n: int = 20) -&gt; list[tuple[int, Path]]:
@@ -115,9 +125,9 @@ def top_files(root: Path, n: int = 20) -&gt; list[tuple[int, Path]]:
         for p in root.rglob('*')
         if p.is_file()
     )
-    return heapq.nlargest(n, files, key=lambda x: x[0])</code></pre>
+    return heapq.nlargest(n, files, key=lambda x: x[0])</code></pre></details>
       <h3>Duplikat-Erkennung per Hash-Bucketing</h3>
-      <pre><code>from collections import defaultdict
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from collections import defaultdict
 import hashlib
 
 def find_duplicates(root: Path) -&gt; dict[str, list[Path]]:
@@ -130,19 +140,19 @@ def find_duplicates(root: Path) -&gt; dict[str, list[Path]]:
             buckets[h].append(p)
         except (PermissionError, OSError):
             pass
-    return {h: paths for h, paths in buckets.items() if len(paths) &gt; 1}</code></pre>
+    return {h: paths for h, paths in buckets.items() if len(paths) &gt; 1}</code></pre></details>
       <h3>Lesbare Größenformatierung</h3>
-      <pre><code>def human_size(n_bytes: int) -&gt; str:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def human_size(n_bytes: int) -&gt; str:
     for unit in ('B', 'KB', 'MB', 'GB', 'TB'):
         if n_bytes &lt; 1024:
             return f'{n_bytes:.1f} {unit}'
         n_bytes /= 1024
-    return f'{n_bytes:.1f} PB'</code></pre>
+    return f'{n_bytes:.1f} PB'</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
       <div class="sec-heading">Aufgabe — diskforensics.py</div>
-      <pre><code># Top-20 größte Dateien
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Top-20 größte Dateien
 diskforensics.py /data --top 20
 
 # Verzeichnisgrößen (wie du -sh */)
@@ -158,7 +168,7 @@ diskforensics.py scan /data --out snap1.json
 diskforensics.py diff snap1.json snap2.json
 
 # Alles kombiniert als JSON-Report
-diskforensics.py /data --top 20 --dupes --format json --out disk_report.json</code></pre>
+diskforensics.py /data --top 20 --dupes --format json --out disk_report.json</code></pre></details>
       <blockquote><p>Duplikat-Scan auf großen Filesystems ist IO-intensiv. Für einen ersten schnellen Pass: erst Dateien nach Größe gruppieren — gleiche Größe ist Voraussetzung für Duplikat. Nur Dateien in einer Größengruppe müssen gehasht werden.</p></blockquote>
     </div>
 

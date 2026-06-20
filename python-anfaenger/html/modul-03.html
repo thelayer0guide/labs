@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -147,25 +157,25 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Funktionssignatur mit Type Hints</h3>
-        <pre><code>def scan_directory(path: str, extension: str = ".log") -> list[str]:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def scan_directory(path: str, extension: str = ".log") -> list[str]:
     """Gibt alle Dateien mit gegebener Endung zurück."""
     from pathlib import Path
-    return [str(f) for f in Path(path).rglob(f"*{extension}")]</code></pre>
+    return [str(f) for f in Path(path).rglob(f"*{extension}")]</code></pre></details>
         <h3>Mehrere Rückgabewerte</h3>
-        <pre><code>def file_stats(path: str) -> tuple[int, int, int]:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def file_stats(path: str) -> tuple[int, int, int]:
     """Gibt (Zeilen, Wörter, Bytes) zurück."""
     text = open(path).read()
     return len(text.splitlines()), len(text.split()), len(text.encode())
 
-lines, words, size = file_stats("server.log")</code></pre>
+lines, words, size = file_stats("server.log")</code></pre></details>
         <h3>Keyword-Only Args</h3>
-        <pre><code>def backup(source: str, dest: str, *, dry_run: bool = False) -> None:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def backup(source: str, dest: str, *, dry_run: bool = False) -> None:
     if dry_run:
         print(f"[DRY] {source} → {dest}")
         return
     # ... echtes Backup
 
-backup("/data", "/backup", dry_run=True)</code></pre>
+backup("/data", "/backup", dry_run=True)</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -199,7 +209,7 @@ backup("/data", "/backup", dry_run=True)</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python file_report.py /etc
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python file_report.py /etc
 
 # Beispiel-Ausgabe:
 # Verzeichnis: /etc
@@ -208,7 +218,7 @@ backup("/data", "/backup", dry_run=True)</code></pre>
 #   .d    : 18
 #   (kein Typ): 31
 # Gesamt: 1.2 MB in 91 Dateien
-# Größte Datei: /etc/services — 19.4 KB</code></pre>
+# Größte Datei: /etc/services — 19.4 KB</code></pre></details>
       </div>
 
     </div>

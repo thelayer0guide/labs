@@ -82,6 +82,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -141,7 +151,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>configaudit</code> — einen Konfigurationsauditor für SSH und Firewall-Regeln.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── configaudit/
     ├── __init__.py
     ├── core.py
@@ -158,13 +168,13 @@
             ├── sshd_config_secure
             ├── sshd_config_insecure
             ├── iptables_save_good
-            └── iptables_save_bad</code></pre>
+            └── iptables_save_bad</code></pre></details>
     </div>
 
     <div class="lab-section" id="findings-modell">
       <div class="sec-heading">Das Findings-Modell</div>
       <p>Definiere in <code>core.py</code>:</p>
-      <pre><code>from dataclasses import dataclass
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from dataclasses import dataclass
 
 @dataclass
 class Finding:
@@ -176,7 +186,7 @@ class Finding:
     file: str             # geprüfte Datei
     line: int | None      # relevante Zeile (wenn anwendbar)
     current_value: str | None  # aktuell gefundener Wert
-    expected_value: str | None # empfohlener Wert</code></pre>
+    expected_value: str | None # empfohlener Wert</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -202,7 +212,7 @@ class Finding:
             <li>Parst Output von <code>iptables-save</code> (als String, nicht direkt ausgeführt)</li>
             <li>Gibt zurück:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "chains": {
         "INPUT":   {"policy": "ACCEPT"|"DROP"|"REJECT"|None, "rules": list[str]},
         "OUTPUT":  {...},
@@ -210,7 +220,7 @@ class Finding:
     },
     "has_default_drop_input": bool,
     "wide_open_accepts": list[str],  # Regeln mit -j ACCEPT und -s 0.0.0.0/0
-}</code></pre>
+}</code></pre></details>
         </li>
         <li class="task"><span class="chk"></span>Funktion <code>parse_nft_ruleset(content: str) -&gt; dict</code>
           <ul>
@@ -281,12 +291,12 @@ class Finding:
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>configaudit sshd
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>configaudit sshd
 configaudit sshd /path/to/sshd_config --format markdown
 configaudit firewall iptables-rules.txt --type iptables
-configaudit sshd --format json | python -m json.tool</code></pre>
+configaudit sshd --format json | python -m json.tool</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>SSH CONFIG AUDIT: /etc/ssh/sshd_config
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>SSH CONFIG AUDIT: /etc/ssh/sshd_config
 ════════════════════════════════════════════
 
 [HIGH] SSH-001 — PermitRootLogin
@@ -305,34 +315,34 @@ configaudit sshd --format json | python -m json.tool</code></pre>
   Empfehlung:  Schränke SSH-Zugriff auf bestimmte Nutzer ein
 
 ════════════════════════════════════════════
-Findings: 3 total (1 HIGH, 1 MEDIUM, 0 LOW, 1 INFO)</code></pre>
+Findings: 3 total (1 HIGH, 1 MEDIUM, 0 LOW, 1 INFO)</code></pre></details>
     </div>
 
     <div class="lab-section" id="test-fixtures">
       <div class="sec-heading">Test-Fixtures</div>
       <p>Erstelle <code>tests/fixtures/sshd_config_insecure</code>:</p>
-      <pre><code>PermitRootLogin yes
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>PermitRootLogin yes
 PasswordAuthentication yes
 X11Forwarding yes
-PermitEmptyPasswords no</code></pre>
+PermitEmptyPasswords no</code></pre></details>
       <p>Erstelle <code>tests/fixtures/sshd_config_secure</code>:</p>
-      <pre><code>PermitRootLogin no
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>PermitRootLogin no
 PasswordAuthentication no
 X11Forwarding no
 MaxAuthTries 3
 LoginGraceTime 20
-AllowUsers alice bob</code></pre>
+AllowUsers alice bob</code></pre></details>
       <p>Erstelle <code>tests/fixtures/iptables_save_bad</code>:</p>
-      <pre><code>*filter
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>*filter
 :INPUT ACCEPT [0:0]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
-COMMIT</code></pre>
+COMMIT</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Insichere Config → findet Findings
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Insichere Config → findet Findings
 python -c "
 from configaudit.core import audit_sshd_config
 from pathlib import Path
@@ -350,7 +360,7 @@ findings = audit_sshd_config(Path('tests/fixtures/sshd_config_secure'))
 high = [f for f in findings if f.severity == 'HIGH']
 assert len(high) == 0, f'Sichere Config sollte keine HIGH-Findings haben, bekam: {high}'
 print('Sichere Config: OK')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -370,12 +380,12 @@ print('Sichere Config: OK')
       <div class="sec-heading">Bonus-Aufgaben</div>
       <ul>
         <li class="task"><span class="chk"></span><strong>Eigenes Regelwerk:</strong> Lade zusätzliche Regeln aus einer TOML-Datei:
-          <pre><code>[[rules]]
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[[rules]]
 id = "CUSTOM-001"
 key = "Banner"
 expected = "/etc/issue.net"
 severity = "LOW"
-title = "Kein Login-Banner"</code></pre>
+title = "Kein Login-Banner"</code></pre></details>
         </li>
         <li class="task"><span class="chk"></span><strong>CIS-Benchmark-Links:</strong> Ergänze jeden Finding mit dem entsprechenden CIS-Benchmark-Referenzlink</li>
         <li class="task"><span class="chk"></span><strong>nft-Support:</strong> Vollständiger Parser für <code>nft list ruleset</code>-Output</li>
@@ -391,11 +401,11 @@ title = "Kein Login-Banner"</code></pre>
 
     <div class="lab-section" id="schnittstelle-uctl">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def audit_sshd_config(path: Path) -&gt; list[Finding]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def audit_sshd_config(path: Path) -&gt; list[Finding]:
     """Auditiert sshd_config und gibt Findings zurück."""
 
 def audit_iptables(path: Path) -&gt; list[Finding]:
-    """Auditiert iptables-save-Output und gibt Findings zurück."""</code></pre>
+    """Auditiert iptables-save-Output und gibt Findings zurück."""</code></pre></details>
     </div>
 
   </div><!-- /content -->

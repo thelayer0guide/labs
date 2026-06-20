@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -147,16 +157,16 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>configparser — INI lesen</h3>
-        <pre><code>import configparser
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import configparser
 
 cfg = configparser.ConfigParser()
 cfg.read("backup.conf", encoding="utf-8")
 
 host = cfg["database"]["host"]             # str
 port = cfg["database"].getint("port")      # int
-debug = cfg["app"].getboolean("debug")     # bool</code></pre>
+debug = cfg["app"].getboolean("debug")     # bool</code></pre></details>
         <h3>PyYAML — Docker Compose erzeugen</h3>
-        <pre><code>import yaml
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import yaml
 
 def make_compose(services: list[dict]) -> str:
     compose = {"version": "3.8", "services": {}}
@@ -165,15 +175,15 @@ def make_compose(services: list[dict]) -> str:
             "image": svc["image"],
             "ports": [f"{svc['port']}:{svc['port']}"],
         }
-    return yaml.dump(compose, default_flow_style=False)</code></pre>
+    return yaml.dump(compose, default_flow_style=False)</code></pre></details>
         <h3>tomllib — TOML lesen (Python 3.11+)</h3>
-        <pre><code>import tomllib
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import tomllib
 
 with open("pyproject.toml", "rb") as f:  # rb — Binärmodus!
     config = tomllib.load(f)
 
 version = config["project"]["version"]
-deps = config["project"].get("dependencies", [])</code></pre>
+deps = config["project"].get("dependencies", [])</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -206,13 +216,13 @@ deps = config["project"].get("dependencies", [])</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code># INI erstellen und konvertieren:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># INI erstellen und konvertieren:
 python config_converter.py app.conf --to yaml
 ls app.yaml  # → existiert
 python -c "import yaml; print(yaml.safe_load(open('app.yaml')))"  # kein Fehler
 
 python config_converter.py app.conf --to json
-python -c "import json; json.load(open('app.json'))"  # kein Fehler</code></pre>
+python -c "import json; json.load(open('app.json'))"  # kein Fehler</code></pre></details>
       </div>
 
     </div>

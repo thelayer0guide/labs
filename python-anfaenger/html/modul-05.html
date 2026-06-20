@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -147,7 +157,7 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Klasse mit Zustand</h3>
-        <pre><code>class Server:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>class Server:
     def __init__(self, hostname: str, ip: str) -> None:
         self.hostname = hostname
         self.ip = ip
@@ -158,9 +168,9 @@
 
     def __repr__(self) -> str:
         status = "online" if self.online else "offline"
-        return f"Server({self.hostname!r}, {status})"</code></pre>
+        return f"Server({self.hostname!r}, {status})"</code></pre></details>
         <h3>@dataclass</h3>
-        <pre><code>from dataclasses import dataclass, field
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from dataclasses import dataclass, field
 
 @dataclass
 class LogEntry:
@@ -170,9 +180,9 @@ class LogEntry:
     tags: list[str] = field(default_factory=list)
 
     def is_error(self) -> bool:
-        return self.level == "ERROR"</code></pre>
+        return self.level == "ERROR"</code></pre></details>
         <h3>frozen Dataclass</h3>
-        <pre><code>from dataclasses import dataclass
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class DBConfig:
@@ -182,7 +192,7 @@ class DBConfig:
 
 # Unveränderlich — wirft FrozenInstanceError bei Zuweisung
 cfg = DBConfig(host="db.intern")
-print(cfg.host, cfg.port)</code></pre>
+print(cfg.host, cfg.port)</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -216,7 +226,7 @@ print(cfg.host, cfg.port)</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>pool = ServerPool()
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>pool = ServerPool()
 pool.add(Server(ServerConfig('web01', 8080, 'Ubuntu 24', 'web')))
 pool.add(Server(ServerConfig('db01', 5432, 'Debian 12', 'db')))
 pool.servers[0].online = True
@@ -226,7 +236,7 @@ print(pool.summary())
 # {'total': 2, 'online': 1, 'with_errors': 1}
 
 print(pool.servers_by_role('web'))
-# [Server(web01, online)]</code></pre>
+# [Server(web01, online)]</code></pre></details>
       </div>
 
     </div>

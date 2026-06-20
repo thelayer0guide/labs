@@ -76,6 +76,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -123,7 +133,7 @@
 
     <div class="lab-section" id="ziel-vision">
       <div class="sec-heading">Ziel-Vision</div>
-      <pre><code># Alle deine Tools unter einem Dach
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Alle deine Tools unter einem Dach
 uctl hash       kali-linux-2026.iso
 uctl enc        decode "SGVsbG8="
 uctl entropy    ~/Downloads --threshold 7.5
@@ -138,7 +148,7 @@ uctl procs      --diff
 uctl config     /etc/ssh/sshd_config
 uctl pcap       capture.pcap
 uctl cve        --source pip
-uctl hw         --diff</code></pre>
+uctl hw         --diff</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -170,7 +180,7 @@ uctl hw         --diff</code></pre>
       <h3>Zentrale Konfiguration</h3>
       <ul>
         <li class="task"><span class="chk"></span><code>~/.config/uctl/config.toml</code> als zentrale Konfigurationsdatei:
-          <pre><code>[defaults]
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[defaults]
 output_format = "text"   # "text", "json"
 
 [entropy]
@@ -183,7 +193,7 @@ warn_days = 30
 baseline_dir = "~/.local/share/uctl/fim"
 
 [secrets]
-exclude_dirs = ["node_modules", ".venv", "__pycache__"]</code></pre>
+exclude_dirs = ["node_modules", ".venv", "__pycache__"]</code></pre></details>
         </li>
         <li class="task"><span class="chk"></span>Konfiguration wird beim Start geladen und als <code>dict</code> an alle Plugins weitergegeben</li>
         <li class="task"><span class="chk"></span>CLI-Argumente überschreiben Konfigurationsdatei-Werte (CLI hat höhere Priorität)</li>
@@ -221,14 +231,14 @@ exclude_dirs = ["node_modules", ".venv", "__pycache__"]</code></pre>
       <h3>Packaging</h3>
       <ul>
         <li class="task"><span class="chk"></span><code>pyproject.toml</code> vollständig für Distribution:
-          <pre><code>[project]
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[project]
 name = "uctl"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = ["typer", "rich", "psutil", "cryptography", "httpx", "Pillow", "pypdf", "packaging"]
 
 [project.scripts]
-uctl = "uctl.app:main"</code></pre>
+uctl = "uctl.app:main"</code></pre></details>
         </li>
         <li class="task"><span class="chk"></span><code>pipx install .</code> installiert <code>uctl</code> als eigenständiges CLI-Tool</li>
         <li class="task"><span class="chk"></span><code>uctl --version</code> gibt Version aus</li>
@@ -238,7 +248,7 @@ uctl = "uctl.app:main"</code></pre>
     <div class="lab-section" id="uconsole-test">
       <div class="sec-heading">uConsole End-to-End-Test</div>
       <p>Führe nach der Installation auf der uConsole folgende Befehle aus — alle müssen funktionieren:</p>
-      <pre><code># Installation
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Installation
 pipx install .
 uctl --version
 
@@ -264,7 +274,7 @@ uctl ports --format json | python -m json.tool
 uctl hash /bin/ls --format json | jq .sha256
 
 # Terminal-Breite
-uctl entropy /etc | cat   # muss ohne Umbruchs-Fehler funktionieren</code></pre>
+uctl entropy /etc | cat   # muss ohne Umbruchs-Fehler funktionieren</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
@@ -295,7 +305,7 @@ uctl entropy /etc | cat   # muss ohne Umbruchs-Fehler funktionieren</code></pre>
 
     <div class="lab-section" id="plugin-interface">
       <div class="sec-heading">Plugin-Interface (finales Design)</div>
-      <pre><code>from shared.plugin import SecurityTool
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>from shared.plugin import SecurityTool
 import typer
 
 class SecurityToolV2(SecurityTool):
@@ -310,12 +320,12 @@ class SecurityToolV2(SecurityTool):
     @property
     def online_only(self) -> bool:
         """True wenn Tool Internetzugriff benötigt."""
-        return False</code></pre>
+        return False</code></pre></details>
     </div>
 
     <div class="lab-section" id="architektur">
       <div class="sec-heading">Architektur-Übersicht</div>
-      <pre><code>uctl/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>uctl/
 ├── app.py           ← Typer-App, Plugin-Dispatcher, Config-Loading
 ├── config.py        ← Config-Handling (TOML laden, mergen)
 ├── logging_setup.py ← Logging-Konfiguration
@@ -328,7 +338,7 @@ shared/
 
 hashinspect/
 entropyscanner/
-... (alle Tools)</code></pre>
+... (alle Tools)</code></pre></details>
     </div>
 
     <div class="lab-section" id="bonus-anforderungen">
@@ -347,7 +357,7 @@ entropyscanner/
       <p><strong>Typer-Integration:</strong> Typer und argparse können koexistieren. Du kannst bestehende argparse-basierte Plugins auch ohne Umbau integrieren, indem du einen Typer-Callback erzeugst der <code>argparse.parse_args()</code> intern aufruft.</p>
       <p><strong>rich.console:</strong> Erstelle eine einzelne <code>Console</code>-Instanz in <code>uctl/output.py</code> und importiere sie überall — das verhindert mehrere Konsolen-Initialisierungen.</p>
       <p><strong>TOML mit tomllib:</strong></p>
-      <pre><code>import tomllib
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import tomllib
 from pathlib import Path
 
 config_path = Path.home() / ".config" / "uctl" / "config.toml"
@@ -355,7 +365,7 @@ if config_path.exists():
     with open(config_path, "rb") as f:
         config = tomllib.load(f)
 else:
-    config = {}</code></pre>
+    config = {}</code></pre></details>
       <p><strong>pipx auf ARM64:</strong> Teste <code>pipx install .</code> früh auf der uConsole. Manche Dependencies (z. B. <code>Pillow</code>, <code>cryptography</code>) müssen aus dem Source kompiliert werden wenn kein ARM64-Wheel verfügbar ist.</p>
     </div>
 

@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -147,46 +157,46 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Dict-Comprehension</h3>
-        <pre><code>log_levels = ["INFO", "WARNING", "ERROR", "INFO", "ERROR"]
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>log_levels = ["INFO", "WARNING", "ERROR", "INFO", "ERROR"]
 counts = {}
 for lvl in log_levels:
     counts[lvl] = counts.get(lvl, 0) + 1
 # kompakter:
-counts = {lvl: log_levels.count(lvl) for lvl in set(log_levels)}</code></pre>
+counts = {lvl: log_levels.count(lvl) for lvl in set(log_levels)}</code></pre></details>
         <h3>enumerate & zip</h3>
-        <pre><code>hosts = ["web01", "db01", "cache01"]
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>hosts = ["web01", "db01", "cache01"]
 ips   = ["10.0.0.1", "10.0.0.2", "10.0.0.3"]
 
 for i, (host, ip) in enumerate(zip(hosts, ips), start=1):
-    print(f"{i:2}. {host:<10} → {ip}")</code></pre>
+    print(f"{i:2}. {host:<10} → {ip}")</code></pre></details>
         <h3>for-else Muster</h3>
-        <pre><code>def find_user(users: list[str], target: str) -> None:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def find_user(users: list[str], target: str) -> None:
     for user in users:
         if user == target:
             print(f"Gefunden: {user}")
             break
     else:
-        print(f"{target} nicht in der Liste")</code></pre>
+        print(f"{target} nicht in der Liste")</code></pre></details>
         <h3>match/case</h3>
-        <pre><code>def handle_status(code: int) -> str:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def handle_status(code: int) -> str:
     match code:
         case 200: return "OK"
         case 404: return "Not Found"
         case 500 | 503: return "Server Error"
-        case _: return f"Unbekannt: {code}"</code></pre>
+        case _: return f"Unbekannt: {code}"</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
         <div class="sec-heading">Aufgabe</div>
         <p>Schreibe <code>log_stats.py</code> — ein Skript, das eine hartcodierte Liste von Log-Einträgen (als Liste von Dicts) auswertet:</p>
-        <pre><code>LOG_ENTRIES = [
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>LOG_ENTRIES = [
     {"level": "INFO",    "service": "nginx",  "msg": "request handled"},
     {"level": "ERROR",   "service": "db",     "msg": "connection timeout"},
     {"level": "WARNING", "service": "nginx",  "msg": "slow response"},
     {"level": "ERROR",   "service": "nginx",  "msg": "upstream failed"},
     {"level": "INFO",    "service": "db",     "msg": "query ok"},
     # ... mindestens 10 Einträge total
-]</code></pre>
+]</code></pre></details>
         <p>Das Skript soll ausgeben:</p>
         <ul>
           <li>Anzahl Einträge je Log-Level (via Dict-Comprehension)</li>
@@ -214,7 +224,7 @@ for i, (host, ip) in enumerate(zip(hosts, ips), start=1):
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python log_stats.py
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python log_stats.py
 
 # Erwartete Ausgabe (Beispiel):
 # Log-Level-Verteilung:
@@ -228,7 +238,7 @@ for i, (host, ip) in enumerate(zip(hosts, ips), start=1):
 #   ...
 #
 # Services: {'nginx', 'db'}
-# Meiste Fehler: nginx (2)</code></pre>
+# Meiste Fehler: nginx (2)</code></pre></details>
       </div>
 
     </div>

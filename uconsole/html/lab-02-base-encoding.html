@@ -142,6 +142,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -197,14 +207,14 @@
         <div class="sec-heading">Aufgabe</div>
         <p>Implementiere <code>enc</code> — ein CLI-Tool für Encoding und Decoding verschiedener Formate, sowohl für Strings als auch für Binärdateien.</p>
         <h3>Projektstruktur</h3>
-        <pre><code>security-lab/
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── encodingtool/
     ├── __init__.py
     ├── core.py
     ├── cli.py
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
       </div>
 
       <div class="lab-section" id="anforderungen">
@@ -255,15 +265,15 @@
 
       <div class="lab-section" id="cli-schnittstelle">
         <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-        <pre><code>enc encode --format base64 "Hello, World!"
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>enc encode --format base64 "Hello, World!"
 enc decode --format base64 "SGVsbG8sIFdvcmxkIQ=="
 enc encode --format hex --file bild.png
 enc decode --format hex "48656c6c6f"
 enc decode --auto "SGVsbG8="
 enc encode --format url "hello world &amp; more"
-enc encode --format base64,hex "hello"   (Bonus: Ketten)</code></pre>
+enc encode --format base64,hex "hello"   (Bonus: Ketten)</code></pre></details>
         <p>Beispiel-Output:</p>
-        <pre><code>$ enc encode --format base64 "Hello"
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>$ enc encode --format base64 "Hello"
 SGVsbG8=
 
 $ enc decode --format base64 "SGVsbG8="
@@ -271,12 +281,12 @@ Hello
 
 $ enc decode --auto "48656c6c6f"
 [hex erkannt]
-Hello</code></pre>
+Hello</code></pre></details>
       </div>
 
       <div class="lab-section" id="akzeptanzkriterien">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code># Roundtrip: encode dann decode muss original ergeben
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Roundtrip: encode dann decode muss original ergeben
 python -c "
 from encodingtool.core import encode, decode
 original = b'Test \x00\x01\x02 binary data'
@@ -298,7 +308,7 @@ except ValueError as e:
 # CLI-Pipeline
 echo "Hello World" | python -m encodingtool encode --format base64 | \
   python -m encodingtool decode --format base64
-# → Hello World</code></pre>
+# → Hello World</code></pre></details>
       </div>
 
       <div class="lab-section" id="tests">
@@ -348,11 +358,11 @@ echo "Hello World" | python -m encodingtool encode --format base64 | \
 
       <div class="lab-section" id="schnittstelle-fur-uctl">
         <div class="sec-heading">Schnittstelle für uctl</div>
-        <pre><code>def encode(data: bytes, fmt: str) -> bytes:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def encode(data: bytes, fmt: str) -> bytes:
     """Kodiert Bytes in das angegebene Format."""
 
 def decode(data: bytes, fmt: str) -> bytes:
-    """Dekodiert Bytes aus dem angegebenen Format."""</code></pre>
+    """Dekodiert Bytes aus dem angegebenen Format."""</code></pre></details>
         <p>Diese Funktionen werden als <code>uctl enc encode</code> / <code>uctl enc decode</code> verwendet.</p>
       </div>
 

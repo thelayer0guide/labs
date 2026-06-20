@@ -72,6 +72,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -131,14 +141,14 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>portinv</code> — ein Tool, das listening TCP/UDP-Ports inventarisiert, zugehörige Prozesse anzeigt und gegen eine Whitelist prüft.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── portinventory/
     ├── __init__.py
     ├── core.py
     ├── cli.py
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -152,7 +162,7 @@
             <li>Filtert auf <code>status == "LISTEN"</code> (TCP) und Ports ohne Verbindungsstatus (UDP)</li>
             <li>Für jeden Port:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "protocol":  str,       # "tcp" oder "udp"
     "local_ip":  str,       # gebundene IP oder "0.0.0.0" / "::"
     "local_port": int,
@@ -162,7 +172,7 @@
     "process_user": str | None,
     "process_cmdline": str | None,   # erster Teil der Kommandozeile
     "ipv6": bool,
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li>Bei <code>pid=None</code> (kein Prozess zugeordnet): Felder als <code>None</code></li>
             <li>Bei Berechtigungsfehlern beim Prozess-Lookup: Felder mit <code>"&lt;permission denied&gt;"</code> befüllen</li>
@@ -179,7 +189,7 @@
           <ul>
             <li>Parst eine TOML-Datei (nutze <code>tomllib</code> aus der Stdlib ab Python 3.11):</li>
           </ul>
-          <pre><code>[[ports]]
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[[ports]]
 port = 22
 protocol = "tcp"
 description = "SSH"
@@ -187,7 +197,7 @@ description = "SSH"
 [[ports]]
 port = 80
 protocol = "tcp"
-description = "HTTP"</code></pre>
+description = "HTTP"</code></pre></details>
           <ul>
             <li>Gibt zurück: <code>{(port, protocol): description}</code></li>
             <li>Gibt leeres Dict zurück wenn Datei nicht existiert</li>
@@ -213,13 +223,13 @@ description = "HTTP"</code></pre>
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>portinv
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>portinv
 portinv --proto tcp
 portinv --range 1-1024
 portinv --whitelist ~/ports.toml --only-unknown
-portinv --format json > ports.json</code></pre>
+portinv --format json > ports.json</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>LOCAL PORT INVENTORY
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>LOCAL PORT INVENTORY
 ═══════════════════════════════════════════════════
 PROTO  PORT   IP              PROZESS        USER
 ───────────────────────────────────────────────────
@@ -229,12 +239,12 @@ tcp    3000   127.0.0.1       node           alice    [!] nicht whitelisted
 udp    53     0.0.0.0         systemd-r...   systemd-resolve
 tcp6   443    ::              nginx          www-data
 ═══════════════════════════════════════════════════
-Gesamt: 5 Ports (1 nicht whitelisted)</code></pre>
+Gesamt: 5 Ports (1 nicht whitelisted)</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Grundfunktion (erfordert laufendes System)
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Grundfunktion (erfordert laufendes System)
 python -m portinventory
 # → mind. Port 22 (SSH) sollte erscheinen wenn SSH läuft
 
@@ -261,7 +271,7 @@ tcp_only = filter_ports(test_ports, 'tcp', None)
 assert len(tcp_only) == 1
 assert tcp_only[0]['local_port'] == 22
 print('Filter OK')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -301,11 +311,11 @@ print('Filter OK')
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def list_listening_ports() -> list[dict]:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def list_listening_ports() -> list[dict]:
     """Listet alle lauschenden TCP/UDP-Ports mit Prozess-Informationen."""
 
 def filter_ports(ports: list[dict], protocol: str | None, port_range: tuple[int, int] | None) -> list[dict]:
-    """Filtert Port-Liste nach Protokoll und Port-Range."""</code></pre>
+    """Filtert Port-Liste nach Protokoll und Port-Range."""</code></pre></details>
     </div>
 
   </div>

@@ -63,6 +63,16 @@
   .nav-mod-link:hover{color:var(--accent)}
   .nav-mod-link.next::after{content:' →'}
   @media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -121,7 +131,7 @@
     <div class="lab-section" id="konzepte">
       <div class="sec-heading">Schlüsselkonzepte</div>
       <h3>Logformate und Regex-Muster</h3>
-      <pre><code>import re
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import re
 from datetime import datetime
 
 # syslog: "Jun 19 14:23:01 hostname sshd[1234]: Failed password..."
@@ -134,16 +144,16 @@ SYSLOG_RE = re.compile(
 ACCESS_RE = re.compile(
     r'(?P&lt;ip&gt;[\d.]+) \S+ \S+ \[(?P&lt;time&gt;[^\]]+)\] '
     r'"(?P&lt;method&gt;\w+) (?P&lt;path&gt;\S+)[^"]*" (?P&lt;status&gt;\d+) (?P&lt;size&gt;\d+)'
-)</code></pre>
+)</code></pre></details>
       <h3>Speichereffizientes Lesen mit Generator</h3>
-      <pre><code>def parse_lines(filepath: str, pattern: re.Pattern):
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def parse_lines(filepath: str, pattern: re.Pattern):
     with open(filepath, encoding='utf-8', errors='replace') as f:
         for line in f:                   # streamt Zeile für Zeile, kein list()
             m = pattern.match(line.rstrip())
             if m:
-                yield m.groupdict()</code></pre>
+                yield m.groupdict()</code></pre></details>
       <h3>Zeitraumfilter</h3>
-      <pre><code>def in_range(entry: dict, since: datetime | None, until: datetime | None) -&gt; bool:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def in_range(entry: dict, since: datetime | None, until: datetime | None) -&gt; bool:
     ts = entry.get('timestamp')
     if ts is None:
         return True
@@ -151,9 +161,9 @@ ACCESS_RE = re.compile(
         return False
     if until and ts &gt; until:
         return False
-    return True</code></pre>
+    return True</code></pre></details>
       <h3>CLI-Grundstruktur</h3>
-      <pre><code>import argparse, sys, json
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import argparse, sys, json
 
 def build_parser() -&gt; argparse.ArgumentParser:
     p = argparse.ArgumentParser(description='Universeller Logparser')
@@ -165,7 +175,7 @@ def build_parser() -&gt; argparse.ArgumentParser:
     p.add_argument('--until', help='Bis:  YYYY-MM-DD HH:MM')
     p.add_argument('--out', choices=['table','json','summary'], default='table')
     p.add_argument('-n', type=int, default=0, help='Letzte N Zeilen (0 = alle)')
-    return p</code></pre>
+    return p</code></pre></details>
     </div>
 
     <div class="lab-section" id="aufgabe">
@@ -177,7 +187,7 @@ def build_parser() -&gt; argparse.ArgumentParser:
         <li><strong>auto</strong> — Format an der ersten Zeile erkennen</li>
       </ul>
       <p>Das fertige Tool soll sich wie folgt aufrufen lassen:</p>
-      <pre><code># Alle SSH-Fehler der letzten Stunde
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Alle SSH-Fehler der letzten Stunde
 logparse.py /var/log/auth.log --level ERROR --since "2025-06-19 13:00"
 
 # Top-10 IPs nach Anzahl Requests
@@ -187,7 +197,7 @@ logparse.py /var/log/nginx/access.log --out summary
 logparse.py access.log --format access --out json | jq '[.[] | select(.status=="404")]'
 
 # Letzte 50 Einträge tabellarisch
-logparse.py /var/log/syslog -n 50 --out table</code></pre>
+logparse.py /var/log/syslog -n 50 --out table</code></pre></details>
       <blockquote><p>Kein <code>pandas</code>, kein <code>tabulate</code> — Tabellenformatierung mit <code>str.ljust()</code> / <code>str.rjust()</code> selbst implementieren.</p></blockquote>
     </div>
 

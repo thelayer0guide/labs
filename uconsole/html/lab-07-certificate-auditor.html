@@ -72,6 +72,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -132,14 +142,14 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>certaudit</code> — ein Tool, das TLS-Zertifikate von Hosts abruft, analysiert und bewertet.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── certaudit/
     ├── __init__.py
     ├── core.py
     ├── cli.py
     └── tests/
         ├── __init__.py
-        └── test_core.py</code></pre>
+        └── test_core.py</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -154,7 +164,7 @@
             <li>Parst Zertifikat mit <code>cryptography.x509.load_der_x509_certificate()</code> oder <code>load_pem_x509_certificate()</code></li>
             <li>Gibt folgendes Dict zurück:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "host": str,
     "port": int,
     "subject_cn": str,          # Common Name
@@ -167,7 +177,7 @@
     "signature_algorithm": str, # z. B. "sha256WithRSAEncryption"
     "serial_number": str,       # Hex
     "chain_length": int,        # Anzahl Zertifikate in der Kette
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li>Wirft <code>ConnectionError</code> bei Verbindungsproblemen</li>
             <li>Wirft <code>TimeoutError</code> bei Timeout</li>
@@ -178,11 +188,11 @@
           <ul>
             <li>Fügt Bewertungsfelder hinzu:</li>
           </ul>
-          <pre><code>{
+          <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     ...alle cert-Felder...,
     "status": "OK" | "WARNING" | "CRITICAL" | "EXPIRED",
     "warnings": list[str],   # Liste von Warnungen
-}</code></pre>
+}</code></pre></details>
           <ul>
             <li><code>EXPIRED</code> wenn <code>days_until_expiry &lt;= 0</code></li>
             <li><code>CRITICAL</code> wenn <code>days_until_expiry &lt;= 7</code></li>
@@ -212,12 +222,12 @@
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>certaudit github.com
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>certaudit github.com
 certaudit github.com gitlab.com codeberg.org
 certaudit --file hosts.txt --warn-days 14 --format json
-certaudit 192.168.1.1 --port 8443    (Heimnetz-Gerät)</code></pre>
+certaudit 192.168.1.1 --port 8443    (Heimnetz-Gerät)</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>CERTIFICATE AUDIT
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>CERTIFICATE AUDIT
 ═══════════════════════════════════════════════════
 
 HOST: github.com:443                         [OK]
@@ -235,12 +245,12 @@ HOST: expired.example.com:443           [EXPIRED]
   [!] Zertifikat abgelaufen am 2026-06-05
 
 ═══════════════════════════════════════════════════
-Zusammenfassung: 2 Hosts · 1 OK · 0 WARNING · 1 EXPIRED</code></pre>
+Zusammenfassung: 2 Hosts · 1 OK · 0 WARNING · 1 EXPIRED</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Grundlegende Funktion (erfordert Internetzugang)
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Grundlegende Funktion (erfordert Internetzugang)
 python -m certaudit github.com
 # → Muss Zertifikat-Info anzeigen ohne Absturz
 
@@ -264,7 +274,7 @@ cert = {'days_until_expiry': 5, 'signature_algorithm': 'sha256WithRSAEncryption'
 result = evaluate_certificate(cert, warn_days=30)
 assert result['status'] == 'CRITICAL'
 print('evaluate_certificate: OK')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -295,10 +305,10 @@ print('evaluate_certificate: OK')
       <div class="sec-heading">Hinweise</div>
       <h3>TLS ohne vollständige Validierung</h3>
       <p>Für reine Inspektion (kein echter Request) nutze:</p>
-      <pre><code>import ssl, socket
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import ssl, socket
 context = ssl.create_default_context()
 context.check_hostname = False
-context.verify_mode = ssl.CERT_NONE</code></pre>
+context.verify_mode = ssl.CERT_NONE</code></pre></details>
       <p>Dies erlaubt dir auch selbst-signierte Zertifikate zu inspizieren.</p>
       <h3>Zertifikat parsen</h3>
       <p><code>ssl.get_server_certificate((host, port))</code> gibt PEM-String zurück. Mit <code>cryptography.x509.load_pem_x509_certificate(pem.encode())</code> kommst du an alle X.509-Felder.</p>
@@ -312,11 +322,11 @@ context.verify_mode = ssl.CERT_NONE</code></pre>
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def fetch_certificate(host: str, port: int = 443, timeout: float = 10.0) -> dict:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def fetch_certificate(host: str, port: int = 443, timeout: float = 10.0) -> dict:
     """Ruft TLS-Zertifikat von einem Host ab und gibt strukturierte Daten zurück."""
 
 def evaluate_certificate(cert: dict, warn_days: int = 30) -> dict:
-    """Bewertet ein Zertifikat und gibt Status + Warnungen zurück."""</code></pre>
+    """Bewertet ein Zertifikat und gibt Status + Warnungen zurück."""</code></pre></details>
     </div>
 
   </div>

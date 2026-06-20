@@ -93,6 +93,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -149,7 +159,7 @@
       <div class="lab-section" id="konzepte">
         <div class="sec-heading">Schlüsselkonzepte</div>
         <h3>Projektstruktur mit __main__.py</h3>
-        <pre><code>admin-toolkit/
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>admin-toolkit/
 ├── .env
 ├── .gitignore         ← enthält .env
 ├── requirements.txt
@@ -160,9 +170,9 @@
 │   ├── inventory.py
 │   ├── monitor.py
 │   └── report.py
-└── tests/</code></pre>
+└── tests/</code></pre></details>
         <h3>__main__.py Muster</h3>
-        <pre><code>import sys
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import sys
 from toolkit.cli import build_parser
 from toolkit import inventory, monitor, report
 
@@ -175,9 +185,9 @@ def main() -> int:
     return args.func(args)  # jeder Subparser setzt args.func
 
 if __name__ == "__main__":
-    sys.exit(main())</code></pre>
+    sys.exit(main())</code></pre></details>
         <h3>Subcommand-Dispatch</h3>
-        <pre><code># In cli.py:
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># In cli.py:
 inv_p = sub.add_parser("inventory", help="Systeminventar als JSON")
 inv_p.add_argument("--output", "-o", default="inventory.json")
 inv_p.set_defaults(func=inventory.run)
@@ -185,7 +195,7 @@ inv_p.set_defaults(func=inventory.run)
 mon_p = sub.add_parser("monitor", help="URL auf Verfügbarkeit prüfen")
 mon_p.add_argument("url")
 mon_p.add_argument("--interval", type=int, default=60)
-mon_p.set_defaults(func=monitor.run)</code></pre>
+mon_p.set_defaults(func=monitor.run)</code></pre></details>
       </div>
 
       <div class="lab-section" id="aufgabe">
@@ -221,7 +231,7 @@ mon_p.set_defaults(func=monitor.run)</code></pre>
 
       <div class="lab-section" id="akzeptanz">
         <div class="sec-heading">Akzeptanzkriterien</div>
-        <pre><code>python -m toolkit inventory
+        <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>python -m toolkit inventory
 # → inventory.json erzeugt
 
 python -m toolkit monitor https://example.com --interval 5
@@ -232,7 +242,7 @@ python -m toolkit report monitor.csv
 # Uptime: 100.0% | Ø 0.218s | 0 Ausfälle
 
 python -m toolkit report monitor.csv --format json
-# {"uptime_pct": 100.0, "avg_response_s": 0.218, "failures": 0}</code></pre>
+# {"uptime_pct": 100.0, "avg_response_s": 0.218, "failures": 0}</code></pre></details>
       </div>
 
     </div>

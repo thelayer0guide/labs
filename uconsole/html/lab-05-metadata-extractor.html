@@ -83,6 +83,16 @@
     .sidebar, .sheets-panel { display: none; }
     .topnav, header { padding-left: 24px; padding-right: 24px; }
   }
+
+  /* CODE-SPOILER */
+  details.code-spoiler{margin:14px 0}
+  details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+  details.code-spoiler summary::-webkit-details-marker{display:none}
+  details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent,#58a6ff);opacity:.7;transition:transform .18s;flex-shrink:0}
+  details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+  details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent,#58a6ff)}
+  details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+  details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
 </style>
 </head>
 <body>
@@ -143,7 +153,7 @@
       <div class="sec-heading">Aufgabe</div>
       <p>Implementiere <code>meta</code> — ein Tool, das Metadaten aus verschiedenen Dateitypen extrahiert und in einem einheitlichen JSON-Format ausgibt.</p>
       <h3>Projektstruktur</h3>
-      <pre><code>security-lab/
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>security-lab/
 └── metaextract/
     ├── __init__.py
     ├── core.py
@@ -158,13 +168,13 @@
         ├── test_core.py
         └── fixtures/
             ├── sample.jpg    (kleines Testbild mit EXIF)
-            └── sample.pdf    (kleines Test-PDF)</code></pre>
+            └── sample.pdf    (kleines Test-PDF)</code></pre></details>
     </div>
 
     <div class="lab-section" id="das-datenmodell">
       <div class="sec-heading">Das Datenmodell</div>
       <p>Alle Extraktoren geben ein Dict mit folgendem Schema zurück:</p>
-      <pre><code>{
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>{
     "path": str,
     "type": str,          # "jpeg", "png", "pdf", "unknown"
     "size_bytes": int,
@@ -197,7 +207,7 @@
 
     # Anomalien (immer vorhanden, leer wenn keine):
     "anomalies": list[str],
-}</code></pre>
+}</code></pre></details>
     </div>
 
     <div class="lab-section" id="anforderungen">
@@ -270,12 +280,12 @@
 
     <div class="lab-section" id="cli-schnittstelle">
       <div class="sec-heading">CLI-Schnittstelle (vollständig)</div>
-      <pre><code>meta foto.jpg
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>meta foto.jpg
 meta dokument.pdf --format json
 meta ~/Dokumente --recursive --ext pdf
-meta foto1.jpg foto2.jpg foto3.jpg</code></pre>
+meta foto1.jpg foto2.jpg foto3.jpg</code></pre></details>
       <p>Beispiel-Output (Text):</p>
-      <pre><code>METADATA: foto.jpg
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>METADATA: foto.jpg
 ─────────────────────────────
 Typ         JPEG
 Größe       3.2 MB
@@ -292,12 +302,12 @@ GPS
   [!] Tipp: GPS-Koordinaten in Datei vorhanden — vor dem Teilen prüfen!
 
 ANOMALIEN
-  (keine)</code></pre>
+  (keine)</code></pre></details>
     </div>
 
     <div class="lab-section" id="akzeptanzkriterien">
       <div class="sec-heading">Akzeptanzkriterien</div>
-      <pre><code># Erstelle ein minimales Test-JPEG (ohne EXIF)
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Erstelle ein minimales Test-JPEG (ohne EXIF)
 python -c "
 from PIL import Image
 img = Image.new('RGB', (100, 100), color='red')
@@ -314,7 +324,7 @@ assert abs(lat - 48.134333) &lt; 0.001, f'Erwartet ~48.134, bekam {lat}'
 lat_s = gps_to_decimal(48, 8, 3.6, 'S')
 assert lat_s &lt; 0, 'Südlich muss negativ sein'
 print('GPS-Umrechnung OK')
-"</code></pre>
+"</code></pre></details>
     </div>
 
     <div class="lab-section" id="tests">
@@ -352,21 +362,21 @@ print('GPS-Umrechnung OK')
     <div class="lab-section" id="datenschutz-hinweis">
       <div class="sec-heading">Datenschutz-Hinweis (wichtiger Teil der Aufgabe)</div>
       <p>Implementiere einen expliziten Warnhinweis in der Ausgabe, wenn GPS-Koordinaten gefunden werden:</p>
-      <pre><code>[!] DATENSCHUTZ: Diese Datei enthält GPS-Koordinaten (48.1351° N, 11.5820° E).
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>[!] DATENSCHUTZ: Diese Datei enthält GPS-Koordinaten (48.1351° N, 11.5820° E).
     Wenn du diese Datei teilst, teilst du auch deinen Standort.
-    Zum Entfernen: exiftool -GPS:all= datei.jpg</code></pre>
+    Zum Entfernen: exiftool -GPS:all= datei.jpg</code></pre></details>
       <p>Dieser Hinweis soll Nutzer schulen, nicht erschrecken.</p>
     </div>
 
     <div class="lab-section" id="schnittstelle">
       <div class="sec-heading">Schnittstelle für uctl</div>
-      <pre><code>def extract_metadata(path: Path) -> dict:
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>def extract_metadata(path: Path) -> dict:
     """Extrahiert alle verfügbaren Metadaten einer Datei.
 
     Returns:
         Vollständiges Metadaten-Dict nach definiertem Schema.
         Enthält "error"-Feld bei nicht lesbaren Dateien.
-    """</code></pre>
+    """</code></pre></details>
     </div>
 
   </main>
