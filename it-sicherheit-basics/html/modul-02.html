@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Modul 02 &#8212; Authentifizierung & Autorisierung · IT-Sicherheitskonzepte</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#79c0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+.topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+.header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+.badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+.sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+.sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'&#8594;';color:var(--accent);opacity:.5}.sheet-lnk:hover{color:var(--accent)}
+.page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+.content{min-width:0}.lab-section{margin-bottom:44px}
+.sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+ul,ol{list-style:none;padding:0;margin-bottom:14px}
+li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+li.task{padding-left:26px}li.task::before{display:none}
+.chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+blockquote p{margin:0;font-size:13px;color:var(--muted)}
+.sidebar{position:sticky;top:60px}.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+.nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}.nav-mod-link.next::after{content:' &#8594;'}
+details.code-spoiler{margin:14px 0}
+details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+details.code-spoiler summary::-webkit-details-marker{display:none}
+details.code-spoiler summary::before{content:'&#9654;';font-size:9px;color:var(--accent);opacity:.7;transition:transform .18s;flex-shrink:0}
+details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent)}
+details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style></head><body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">&#8592; Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">IT-Sicherheitskonzepte</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 02 &#8212; Authentifizierung & Autorisierung</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 02</span>
+        <span class="badge badge-cat">Phase A</span>
+        <span class="badge badge-cat">1–2 h</span>
+        <span class="badge" style="background:transparent;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)"><span style="color:#e3b341">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span> Einsteiger</span>
+      </div>
+      <h1>Authentifizierung & Autorisierung</h1>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/bash-cheatsheet.html" class="sheet-lnk" target="_blank">bash</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+    <div class="lab-section" id="lernziele"><div class="sec-heading">Lernziele</div><ul>
+        <li>Authentifizierung (AuthN) und Autorisierung (AuthZ) unterscheiden</li>
+        <li>Faktor-Typen (Wissen, Besitz, Biometrie) kennen</li>
+        <li>MFA/2FA als Sicherheitsmaßnahme bewerten</li>
+        <li>RBAC und ABAC als Zugangskontrollmodelle erklären</li>
+    </ul></div>
+    <div class="lab-section" id="hintergrund"><div class="sec-heading">Hintergrund</div>
+      <p>Authentifizierung (AuthN) beantwortet: "Wer bist du?" — es wird die Identität geprüft. Autorisierung (AuthZ) beantwortet: "Was darfst du?" — es werden Berechtigungen geprüft. Häufiger Fehler: AuthN verwechseln mit AuthZ. Drei Faktor-Typen: Wissen (Passwort, PIN), Besitz (Hardware-Token, Smartphone), Biometrie (Fingerabdruck, Gesicht). MFA kombiniert mindestens zwei Faktoren.</p>
+      <p>Zugriffskontroll-Modelle: RBAC (Role-Based Access Control) — Berechtigungen werden Rollen zugewiesen, Benutzer erhalten Rollen (Admin, User, Gast). ABAC (Attribute-Based Access Control) — Entscheidung basiert auf Attributen (Abteilung, Zeit, Standort). DAC (Discretionary Access Control) — Ressourcen-Eigentümer vergibt Rechte (Unix-Dateiberechtigungen). MAC (Mandatory Access Control) — zentrale Richtlinie (SELinux).</p>
+    </div>
+    <div class="lab-section" id="konzepte"><div class="sec-heading">Schlüsselkonzepte</div>
+
+      <h3>Auth-Konzepte testen</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Linux-Authentifizierung prüfen
+cat /etc/passwd      # Benutzerkonten
+cat /etc/shadow      # Passwort-Hashes (nur root)
+id username          # Gruppen und UID
+getent group sudo    # Wer ist in sudo-Gruppe?
+
+# SSH-Key-Authentifizierung (Besitz-Faktor)
+ssh-keygen -t ed25519 -C "test"
+cat ~/.ssh/id_ed25519.pub  # Public Key
+
+# PAM-Konfiguration (Linux Auth-Stack)
+cat /etc/pam.d/common-auth
+
+# Berechtigungen prüfen (RBAC-ähnlich)
+ls -la /etc/shadow   # -rw-r----- root shadow
+groups username      # Gruppenmitgliedschaft
+sudo -l              # Was darf ich als sudo?</code></pre></details>
+    </div>
+    <div class="lab-section" id="aufgabe"><div class="sec-heading">Aufgabe</div><p>Demonstriere den Unterschied zwischen AuthN und AuthZ anhand eines Linux-Systems: prüfe Benutzeridentität und Gruppenberechtigungen.</p></div>
+    <div class="lab-section" id="anforderungen"><div class="sec-heading">Anforderungen</div><ol>
+        <li class="task"><span class="chk"></span>AuthN vs. AuthZ mit Beispiel erklären</li>
+        <li class="task"><span class="chk"></span>3 Faktor-Typen mit je einem Beispiel nennen</li>
+        <li class="task"><span class="chk"></span>MFA: Warum ist SMS als 2. Faktor schwächer als TOTP?</li>
+        <li class="task"><span class="chk"></span>RBAC auf Linux-Gruppen (sudo, docker) anwenden</li>
+        <li class="task"><span class="chk"></span>Privilege Escalation als AuthZ-Versagen erklären</li>
+    </ol></div>
+    <div class="lab-section" id="akzeptanz"><div class="sec-heading">Akzeptanzkriterien</div><ul>
+        <li class="task"><span class="chk"></span>AuthN vs. AuthZ klar unterschieden</li>
+        <li class="task"><span class="chk"></span>MFA-Typen verglichen</li>
+        <li class="task"><span class="chk"></span>Linux-RBAC mit Gruppen erklärt</li>
+    </ul></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-card"><div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele" class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund" class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte" class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe" class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz" class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card"><div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">&#8593; Alle Module</a>
+      <a href="modul-01.html" class="nav-mod-link">&#8592; Modul 01</a>
+      <a href="modul-03.html" class="nav-mod-link next">Modul 03</a>
+    </div>
+  </div>
+</div>
+</body></html>

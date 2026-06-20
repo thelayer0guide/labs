@@ -16,59 +16,113 @@
   header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(255,255,255,0.02),transparent)}
   h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);margin-bottom:10px}
   .header-brand{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--muted);margin-bottom:20px;letter-spacing:0.5px}
-  .header-sub{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.6}
+  .header-sub{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);max-width:520px;margin:0 auto;line-height:1.6}
   .header-count{display:inline-block;margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:5px 16px;color:var(--muted)}
   .header-count span{color:var(--text);font-weight:700}
 
   /* MAIN */
-  main{flex:1;padding:48px;max-width:1100px;margin:0 auto;width:100%}
+  main{flex:1;padding:48px;max-width:1300px;margin:0 auto;width:100%}
+
+  /* ROADMAP */
+  .roadmap{margin-bottom:56px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 32px}
+  .roadmap-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px}
+  .roadmap-track{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:4px}
+  .roadmap-step{flex:1;min-width:160px;display:flex;flex-direction:column;align-items:center;position:relative}
+  .roadmap-step + .roadmap-step::before{content:'';position:absolute;left:-1px;top:22px;width:calc(100% + 2px);height:2px;background:var(--border);z-index:0}
+  .roadmap-node{width:44px;height:44px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;z-index:1;background:var(--bg);position:relative}
+  .roadmap-connector{position:absolute;top:22px;left:calc(50% + 22px);right:0;height:2px;z-index:0}
+  .roadmap-step:last-child .roadmap-connector{display:none}
+  .roadmap-step-label{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;margin-top:10px;text-align:center}
+  .roadmap-step-sub{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--muted);text-align:center;margin-top:3px;line-height:1.4;max-width:140px}
+  .rm-1 .roadmap-node{color:#79c0ff;border-color:#79c0ff;box-shadow:0 0 14px rgba(121,192,255,0.2)}
+  .rm-1 .roadmap-connector{background:linear-gradient(90deg,#79c0ff 0%,#7ee787 100%)}
+  .rm-1 .roadmap-step-label{color:#79c0ff}
+  .rm-2 .roadmap-node{color:#7ee787;border-color:#7ee787;box-shadow:0 0 14px rgba(126,231,135,0.2)}
+  .rm-2 .roadmap-connector{background:linear-gradient(90deg,#7ee787 0%,#ff7b72 100%)}
+  .rm-2 .roadmap-step-label{color:#7ee787}
+  .rm-3 .roadmap-node{color:#ff7b72;border-color:#ff7b72;box-shadow:0 0 14px rgba(255,123,114,0.2)}
+  .rm-3 .roadmap-connector{background:linear-gradient(90deg,#ff7b72 0%,#a371f7 100%)}
+  .rm-3 .roadmap-step-label{color:#ff7b72}
+  .rm-4 .roadmap-node{color:#a371f7;border-color:#a371f7;box-shadow:0 0 14px rgba(163,113,247,0.2)}
+  .rm-4 .roadmap-step-label{color:#a371f7}
+  .rm-5 .roadmap-node{color:#ffa657;border-color:#ffa657;box-shadow:0 0 14px rgba(255,166,87,0.2)}
+  .rm-5 .roadmap-connector{background:linear-gradient(90deg,#ffa657 0%,#40d1ac 100%)}
+  .rm-5 .roadmap-step-label{color:#ffa657}
+  .rm-6 .roadmap-node{color:#40d1ac;border-color:#40d1ac;box-shadow:0 0 14px rgba(64,209,172,0.2)}
+  .rm-6 .roadmap-step-label{color:#40d1ac}
+
+  /* GROUP SECTION */
+  .group{margin-bottom:56px}
+  .group-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px}
+  .group-badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:3px;margin-top:3px;white-space:nowrap}
+  .group-title{font-size:22px;font-weight:800;letter-spacing:-0.5px}
+  .group-desc{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:20px;margin-left:calc(32px + 16px);line-height:1.6;max-width:640px}
+  .group-divider{height:1px;background:var(--border);margin-bottom:20px}
+
+  /* SUBGROUP */
+  .subgroup{margin-bottom:32px}
+  .subgroup-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .subgroup-label::after{content:'';flex:1;height:1px;background:var(--border)}
 
   /* CURRICULUM CARDS */
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-  @media(max-width:1200px){.grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:1200px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:900px){.grid,.grid-3{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.grid,.grid-3,.grid-2{grid-template-columns:1fr}}
 
-  .card{
-    display:block;text-decoration:none;
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:10px;
-    overflow:hidden;
-    transition:border-color 0.18s,transform 0.18s,box-shadow 0.18s;
-    position:relative;
-  }
+  .card{display:block;text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.18s,transform 0.18s,box-shadow 0.18s;position:relative}
   .card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
   .card-accent{height:3px;width:100%}
-  .card-body{padding:24px 26px 28px}
-  .card-icon-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-  .card-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
-  .card-name{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:10px}
-  .card-tagline{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);margin-bottom:18px;line-height:1.55}
-  .card-stats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
-  .stat{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 10px;border-radius:3px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,0.02)}
+  .card-body{padding:20px 22px 24px}
+  .card-icon-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .card-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+  .card-name{font-size:18px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px}
+  .card-tagline{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.55}
+  .card-stats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .stat{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,0.02)}
   .stat strong{font-weight:700}
-  .card-tags{display:flex;flex-wrap:wrap;gap:6px}
-  .tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:0.3px}
-  .card-arrow{position:absolute;bottom:22px;right:22px;font-family:'JetBrains Mono',monospace;font-size:16px;opacity:0.3;transition:opacity 0.18s,transform 0.18s}
+  .card-tags{display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:9.5px;padding:2px 7px;border-radius:3px;font-weight:600;letter-spacing:0.3px}
+  .card-arrow{position:absolute;bottom:18px;right:18px;font-family:'JetBrains Mono',monospace;font-size:14px;opacity:0.3;transition:opacity 0.18s,transform 0.18s}
   .card:hover .card-arrow{opacity:0.8;transform:translateX(3px)}
 
-  /* uConsole card */
+  /* CARD COLOR CLASSES */
+  /* Fundamentals */
+  .c-ig{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-bs{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-kz{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-pk{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-wg{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-sq{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-is{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-cl{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-rx{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  .c-sc{--ac:#79c0ff;--acs:rgba(121,192,255,0.10);--acb:rgba(121,192,255,0.25)}
+  /* Sprachen & Tools */
   .c-uc{--ac:#58a6ff;--acs:rgba(88,166,255,0.12);--acb:rgba(88,166,255,0.25)}
-  /* Python Jahreskurs card */
-  .c-py{--ac:#e3b341;--acs:rgba(227,179,65,0.12);--acb:rgba(227,179,65,0.25)}
-  /* Python für Anfänger card */
+  .c-py{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
   .c-pa{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
-  /* Python Forensik card */
-  .c-pf{--ac:#f0883e;--acs:rgba(240,136,62,0.12);--acb:rgba(240,136,62,0.25)}
-  /* Git für Anfänger card */
-  .c-gi{--ac:#e8774a;--acs:rgba(232,119,74,0.12);--acb:rgba(232,119,74,0.25)}
-  /* Team Red card */
+  .c-pf{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
+  .c-gi{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
+  .c-lb{--ac:#3fb950;--acs:rgba(63,185,80,0.12);--acb:rgba(63,185,80,0.25)}
+  /* Offensive */
   .c-tr{--ac:#ff7b72;--acs:rgba(255,123,114,0.12);--acb:rgba(255,123,114,0.25)}
-  /* Team Blue card */
+  .c-ar{--ac:#ffa657;--acs:rgba(255,166,87,0.12);--acb:rgba(255,166,87,0.25)}
+  .c-be{--ac:#ffa657;--acs:rgba(255,166,87,0.12);--acb:rgba(255,166,87,0.25)}
+  .c-wp{--ac:#ff7b72;--acs:rgba(255,123,114,0.12);--acb:rgba(255,123,114,0.25)}
+  /* Defensive */
   .c-tb{--ac:#388bfd;--acs:rgba(56,139,253,0.12);--acb:rgba(56,139,253,0.25)}
-  /* Kryptologie card */
-  .c-kr{--ac:#d2a8ff;--acs:rgba(210,168,255,0.12);--acb:rgba(210,168,255,0.25)}
+  .c-kr{--ac:#388bfd;--acs:rgba(56,139,253,0.12);--acb:rgba(56,139,253,0.25)}
+  .c-ab{--ac:#ffa657;--acs:rgba(255,166,87,0.12);--acb:rgba(255,166,87,0.25)}
+  /* Infra */
+  .c-nw{--ac:#388bfd;--acs:rgba(56,139,253,0.12);--acb:rgba(56,139,253,0.25)}
+  .c-cs{--ac:#40d1ac;--acs:rgba(64,209,172,0.12);--acb:rgba(64,209,172,0.25)}
+  .c-ds{--ac:#40d1ac;--acs:rgba(64,209,172,0.12);--acb:rgba(64,209,172,0.25)}
+  .c-px{--ac:#40d1ac;--acs:rgba(64,209,172,0.10);--acb:rgba(64,209,172,0.22)}
+  /* Spezial */
+  .c-ma{--ac:#ffa657;--acs:rgba(255,166,87,0.12);--acb:rgba(255,166,87,0.25)}
 
   .card .card-accent{background:var(--ac)}
   .card:hover{border-color:var(--ac)}
@@ -77,15 +131,14 @@
   .card-arrow{color:var(--ac)}
   .tag{background:var(--acs);border:1px solid var(--acb);color:var(--ac)}
 
-  /* STATUS-SYSTEM — nie klick-blockierend */
-  /* Stufen: In Arbeit → Alpha → Beta → Fertig (kein Label) */
+  /* STATUS RIBBONS */
   .s-ribbon{position:absolute;top:14px;right:-32px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 44px;transform:rotate(35deg);pointer-events:none;z-index:10}
   .s-ia    {background:#f0883e;color:#0d1117}
   .s-alpha {background:#a371f7;color:#0d1117}
   .s-beta  {background:#388bfd;color:#0d1117}
 
   /* DIFFICULTY LEGEND */
-  .diff-legend{margin-top:40px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px}
+  .diff-legend{margin-top:48px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px}
   .diff-legend-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
   .diff-levels{display:flex;flex-wrap:wrap;gap:10px 28px}
   .diff-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
@@ -94,7 +147,7 @@
   .diff-star-off{color:var(--border)}
   .diff-name{color:var(--text);font-weight:600}
 
-  @media(max-width:700px){header{padding:40px 24px 36px}main{padding:32px 24px}.diff-levels{flex-direction:column}}
+  @media(max-width:700px){header{padding:40px 24px 36px}main{padding:32px 24px}.diff-levels{flex-direction:column}.roadmap-track{gap:0}}
 </style>
 </head>
 <body>
@@ -102,259 +155,516 @@
 <header>
   <h1>Labs</h1>
   <div class="header-brand">TheLayer<span style="color:#a371f7;font-family:'JetBrains Mono',monospace;font-size:1.15em;-webkit-text-fill-color:#a371f7;">0</span>Guide</div>
-  <p class="header-sub">Vier Lehrpfade. Jeder Schritt baut auf dem vorherigen auf. Am Ende läuft dein Code auf echter Hardware.</p>
-  <div class="header-count"><span>8</span> Curricula &nbsp;·&nbsp; <span>103</span> Labs &amp; Module &nbsp;·&nbsp; <span>290–540 h</span></div>
+  <p class="header-sub">Von den Grundlagen bis zum Advanced Security Expert. Sechs Gruppen, ein klarer Lernpfad.</p>
+  <div class="header-count"><span>28</span> Curricula &nbsp;·&nbsp; <span>343</span> Labs &amp; Module &nbsp;·&nbsp; <span>760–1400 h</span></div>
 </header>
 
 <main>
-  <div class="grid">
 
-    <a href="uconsole/catalog.html" class="card c-uc">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">⬡</div>
-          <div class="card-name">uConsole<br>Security Lab</div>
-        </div>
-        <p class="card-tagline">18 Python-Labs + Capstone. Jedes Tool ist ein eigenständiges CLI-Programm. Am Ende vereint als <code style="background:rgba(88,166,255,0.08);color:#58a6ff;padding:1px 5px;border-radius:3px;font-size:0.9em">uctl</code> auf der uConsole (RK3566, ARM64).</p>
-        <div class="card-stats">
-          <span class="stat"><strong>19</strong> Labs</span>
-          <span class="stat"><strong>7</strong> Phasen</span>
-          <span class="stat"><strong>60–110 h</strong></span>
-          <span class="stat"><strong>ARM64</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">Kryptografie</span>
-          <span class="tag">Log-Forensik</span>
-          <span class="tag">Netzwerk</span>
-          <span class="tag">Integrität</span>
-          <span class="tag">PCAP</span>
-          <span class="tag">Plugin-System</span>
-          <span class="tag">CI/CD</span>
-        </div>
-        <span class="card-arrow">→</span>
+  <!-- ROADMAP -->
+  <div class="roadmap">
+    <div class="roadmap-label">Lernpfad &#8212; Empfohlene Reihenfolge</div>
+    <div class="roadmap-track">
+      <div class="roadmap-step rm-1">
+        <div class="roadmap-node">01</div>
+        <div class="roadmap-connector" style="background:linear-gradient(90deg,#79c0ff,#7ee787)"></div>
+        <div class="roadmap-step-label">Fundamentals</div>
+        <div class="roadmap-step-sub">IT, OS, Shell, Web,&#10;DB, Security-Basics</div>
       </div>
-    </a>
-
-    <a href="python-jahreskurs/catalog.html" class="card c-py">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">𝜆</div>
-          <div class="card-name">Python<br>Jahreskurs</div>
-        </div>
-        <p class="card-tagline">Vollzeit, 12 Monate, zero to pro. Kein Framework-Cargo-Cult — eigene Module, eigene Tools, eigene Architektur. Läuft parallel zum Security Lab.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>12</strong> Monate</span>
-          <span class="stat"><strong>48</strong> Wochen</span>
-          <span class="stat"><strong>7</strong> Milestones</span>
-          <span class="stat"><strong>stdlib-first</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">Basics &amp; OOP</span>
-          <span class="tag">Stdlib</span>
-          <span class="tag">CLI-Tools</span>
-          <span class="tag">Netzwerk</span>
-          <span class="tag">Asyncio</span>
-          <span class="tag">Testing</span>
-          <span class="tag">Packaging</span>
-        </div>
-        <span class="card-arrow">→</span>
+      <div class="roadmap-step rm-2">
+        <div class="roadmap-node">02</div>
+        <div class="roadmap-connector" style="background:linear-gradient(90deg,#7ee787,#ff7b72)"></div>
+        <div class="roadmap-step-label">Sprachen &amp; Tools</div>
+        <div class="roadmap-step-sub">Python, Git, Linux,&#10;Scripting, Cloud</div>
       </div>
-    </a>
-
-    <a href="python-anfaenger/catalog.html" class="card c-pa">
-      <div class="s-ribbon s-alpha">Alpha</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">🐍</div>
-          <div class="card-name">Python für<br>Anfänger</div>
-        </div>
-        <p class="card-tagline">14 Module, 3 Phasen. Keine Programmierkenntnisse vorausgesetzt — Bash-Grundkenntnisse genügen. Praxisaufgaben aus dem Admin-Alltag. Basiert auf <em>python-admins.friendlybytes.net</em>.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>14</strong> Module</span>
-          <span class="stat"><strong>3</strong> Phasen</span>
-          <span class="stat"><strong>50–90 h</strong></span>
-          <span class="stat"><strong>stdlib-first</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">Grundlagen</span>
-          <span class="tag">OOP</span>
-          <span class="tag">CSV/JSON</span>
-          <span class="tag">HTTP/APIs</span>
-          <span class="tag">Logging</span>
-          <span class="tag">Pandas</span>
-          <span class="tag">CLI-Tools</span>
-        </div>
-        <span class="card-arrow">→</span>
+      <div class="roadmap-step rm-3">
+        <div class="roadmap-node">03</div>
+        <div class="roadmap-connector" style="background:linear-gradient(90deg,#ff7b72,#388bfd)"></div>
+        <div class="roadmap-step-label">Security Core</div>
+        <div class="roadmap-step-sub">Offensive + Defensive&#10;Krypto, Netzwerke</div>
       </div>
-    </a>
-
-    <a href="python-forensik/catalog.html" class="card c-pf">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">🔍</div>
-          <div class="card-name">Python Forensik<br>&amp; Datenanalyse</div>
-        </div>
-        <p class="card-tagline">10 eigenständige CLI-Tools für Log-Analyse, Dateiintegrität, Netzwerkforensik, Fehlerkorrelation und Incident-Reporting. Stdlib-first, sofort im Arbeitsalltag einsetzbar.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>10</strong> Module</span>
-          <span class="stat"><strong>10</strong> Tools</span>
-          <span class="stat"><strong>25–45 h</strong></span>
-          <span class="stat"><strong>stdlib-first</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">IT-Forensik</span>
-          <span class="tag">Log-Analyse</span>
-          <span class="tag">Integrität</span>
-          <span class="tag">Netzwerk</span>
-          <span class="tag">Datenprofilierung</span>
-          <span class="tag">Incident Response</span>
-        </div>
-        <span class="card-arrow">→</span>
+      <div class="roadmap-step rm-4">
+        <div class="roadmap-node">04</div>
+        <div class="roadmap-connector" style="background:linear-gradient(90deg,#388bfd,#ffa657)"></div>
+        <div class="roadmap-step-label">Infra &amp; DevSecOps</div>
+        <div class="roadmap-step-sub">Container, Proxmox&#10;CI/CD, Cloud</div>
       </div>
-    </a>
-
-    <a href="git-anfaenger/catalog.html" class="card c-gi">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">⎇</div>
-          <div class="card-name">Git für<br>Anfänger</div>
-        </div>
-        <p class="card-tagline">12 Module von Installation bis Branching-Strategien. Versionskontrolle von Grund auf — commit, branch, merge, rebase, hooks und GitHub-Workflows.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>12</strong> Module</span>
-          <span class="stat"><strong>4</strong> Phasen</span>
-          <span class="stat"><strong>25–45 h</strong></span>
-          <span class="stat"><strong>Alle Level</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">Grundlagen</span>
-          <span class="tag">Branching</span>
-          <span class="tag">Merging</span>
-          <span class="tag">Remote</span>
-          <span class="tag">GitHub</span>
-          <span class="tag">Hooks</span>
-        </div>
-        <span class="card-arrow">→</span>
+      <div class="roadmap-step rm-5">
+        <div class="roadmap-node">05</div>
+        <div class="roadmap-connector" style="background:linear-gradient(90deg,#ffa657,#a371f7)"></div>
+        <div class="roadmap-step-label">Advanced Security</div>
+        <div class="roadmap-step-sub">AD, Binary Exploit&#10;Malware, Webapp</div>
       </div>
-    </a>
-
-    <a href="team-red/catalog.html" class="card c-tr">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">🔴</div>
-          <div class="card-name">Team Red<br>Offensive Sec</div>
-        </div>
-        <p class="card-tagline">12 Module Penetration Testing. OSINT, Web Hacking, SQLi, XSS, PrivEsc, Metasploit und professionelles Reporting. Nur auf autorisierten Systemen.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>12</strong> Module</span>
-          <span class="stat"><strong>4</strong> Phasen</span>
-          <span class="stat"><strong>45–80 h</strong></span>
-          <span class="stat"><strong>Ethical Only</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">OSINT</span>
-          <span class="tag">Web Hacking</span>
-          <span class="tag">SQLi / XSS</span>
-          <span class="tag">PrivEsc</span>
-          <span class="tag">Metasploit</span>
-          <span class="tag">Reporting</span>
-        </div>
-        <span class="card-arrow">→</span>
+      <div class="roadmap-step rm-6">
+        <div class="roadmap-node">&#9733;</div>
+        <div class="roadmap-step-label">Capstone</div>
+        <div class="roadmap-step-sub">uConsole Security&#10;Lab auf echter HW</div>
       </div>
-    </a>
+    </div>
+  </div>
 
-    <a href="team-blue/catalog.html" class="card c-tb">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">🔵</div>
-          <div class="card-name">Team Blue<br>Defensive Sec</div>
+  <!-- GROUP 1: FUNDAMENTALS -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-badge" style="background:rgba(121,192,255,0.12);color:#79c0ff;border:1px solid rgba(121,192,255,0.3)">Gruppe 01</span>
+      <span class="group-title" style="color:#79c0ff">Fundamentals</span>
+    </div>
+    <div class="group-desc">Die 10 wichtigsten Grundlagen-Curricula. Keine Vorkenntnisse erforderlich. Hier beginnt jeder Lernpfad &#8212; egal ob Offensive, Defensive oder DevSecOps.</div>
+    <div class="group-divider"></div>
+    <div class="grid">
+
+      <a href="it-grundlagen/catalog.html" class="card c-ig">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9112;</div><div class="card-name">IT &amp; Computer<br>Grundlagen</div></div>
+          <p class="card-tagline">12 Module: Zahlensysteme, CPU, RAM, Betriebssysteme, Dateisysteme, Prozesse, I/O und Netzwerk-Hardware.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>20&#8211;40 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Bits &amp; Bytes</span><span class="tag">CPU</span><span class="tag">RAM</span><span class="tag">OS</span><span class="tag">Dateisystem</span></div>
+          <span class="card-arrow">&#8594;</span>
         </div>
-        <p class="card-tagline">12 Module Defensive Security. Log-Analyse, Incident Response, Hardening, Threat Hunting, Cloud Security, Forensik und SOC-Abschlussszenario.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>12</strong> Module</span>
-          <span class="stat"><strong>4</strong> Phasen</span>
-          <span class="stat"><strong>45–80 h</strong></span>
-          <span class="stat"><strong>SOC-Level</strong></span>
+      </a>
+
+      <a href="betriebssysteme/catalog.html" class="card c-bs">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9903;</div><div class="card-name">Betriebssysteme<br>&amp; Dateisysteme</div></div>
+          <p class="card-tagline">12 Module: FHS, Benutzer, Rechte, systemd, Paketmanager, Logging, Cron und OS-Härtung.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>25&#8211;45 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Linux</span><span class="tag">Windows</span><span class="tag">systemd</span><span class="tag">Härtung</span><span class="tag">Forensik</span></div>
+          <span class="card-arrow">&#8594;</span>
         </div>
-        <div class="card-tags">
-          <span class="tag">Log-Analyse</span>
-          <span class="tag">Incident Response</span>
-          <span class="tag">Hardening</span>
-          <span class="tag">SIEM</span>
-          <span class="tag">Threat Hunting</span>
-          <span class="tag">Forensik</span>
+      </a>
+
+      <a href="kommandozeile/catalog.html" class="card c-kz">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">$_</div><div class="card-name">Kommandozeile<br>&amp; Shell</div></div>
+          <p class="card-tagline">12 Module: CMD, PowerShell, Bash, Pipes, sed/awk, Scripting, Berechtigungen und Terminal-Debugging.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>20&#8211;40 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Bash</span><span class="tag">PowerShell</span><span class="tag">Pipes</span><span class="tag">Scripting</span><span class="tag">Debugging</span></div>
+          <span class="card-arrow">&#8594;</span>
         </div>
-        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="programmier-konzepte/catalog.html" class="card c-pk">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#955;</div><div class="card-name">Programmier-<br>Konzepte</div></div>
+          <p class="card-tagline">12 Module: Algorithmen, Datentypen, OOP, Exceptions, Git, Testing und Clean Code.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>25&#8211;45 h</strong></span></div>
+          <div class="card-tags"><span class="tag">OOP</span><span class="tag">Algorithmen</span><span class="tag">Git</span><span class="tag">Testing</span><span class="tag">Clean Code</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="web-grundlagen/catalog.html" class="card c-wg">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9728;</div><div class="card-name">Web &amp; HTTP<br>Grundlagen</div></div>
+          <p class="card-tagline">12 Module: DNS, HTTP/TLS, HTML, CSS, JS, REST-APIs, Cookies, CORS, OWASP und CDN.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>25&#8211;45 h</strong></span></div>
+          <div class="card-tags"><span class="tag">HTTP/TLS</span><span class="tag">REST</span><span class="tag">JWT</span><span class="tag">CORS</span><span class="tag">OWASP</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="datenbanken-sql/catalog.html" class="card c-sq">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#8853;</div><div class="card-name">Datenbanken<br>&amp; SQL</div></div>
+          <p class="card-tagline">12 Module: ER-Modell, SELECT, JOINs, Transaktionen, NoSQL, SQLi und DB-Sicherheit.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>25&#8211;45 h</strong></span></div>
+          <div class="card-tags"><span class="tag">SQL</span><span class="tag">JOINs</span><span class="tag">ACID</span><span class="tag">NoSQL</span><span class="tag">SQLi</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="it-sicherheit-basics/catalog.html" class="card c-is">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9760;</div><div class="card-name">IT-Sicherheits-<br>konzepte</div></div>
+          <p class="card-tagline">12 Module: CIA-Triade, CVSS, OWASP, Social Engineering, Malware, Kryptographie und Incident Response.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>25&#8211;50 h</strong></span></div>
+          <div class="card-tags"><span class="tag">CIA</span><span class="tag">CVSS</span><span class="tag">OWASP</span><span class="tag">Malware</span><span class="tag">IR</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="cloud-grundlagen/catalog.html" class="card c-cl">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9729;</div><div class="card-name">Cloud-<br>Grundlagen</div></div>
+          <p class="card-tagline">12 Module: AWS IAM, S3, Lambda, VPC, Kubernetes, Terraform, CI/CD und Cloud Security.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>30&#8211;55 h</strong></span></div>
+          <div class="card-tags"><span class="tag">AWS</span><span class="tag">IAM</span><span class="tag">K8s</span><span class="tag">Terraform</span><span class="tag">FinOps</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="regex-grundlagen/catalog.html" class="card c-rx">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">.*</div><div class="card-name">Reguläre<br>Ausdrücke</div></div>
+          <p class="card-tagline">12 Module: Zeichenklassen, Quantoren, Gruppen, Lookahead, Python re, YARA und Sigma.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>20&#8211;40 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Regex</span><span class="tag">Python re</span><span class="tag">YARA</span><span class="tag">grep/sed</span><span class="tag">ReDoS</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="scripting-basics/catalog.html" class="card c-sc">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9881;</div><div class="card-name">Scripting<br>Grundlagen</div></div>
+          <p class="card-tagline">12 Module: Bash, Python-Netzwerk, Sockets, Sicherheitsbibliotheken, PowerShell und Security-Toolkit.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>30&#8211;55 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Bash</span><span class="tag">Python</span><span class="tag">Sockets</span><span class="tag">PowerShell</span><span class="tag">ShellCheck</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 2: SPRACHEN & TOOLS -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-badge" style="background:rgba(63,185,80,0.12);color:#3fb950;border:1px solid rgba(63,185,80,0.3)">Gruppe 02</span>
+      <span class="group-title" style="color:#3fb950">Sprachen &amp; Tools</span>
+    </div>
+    <div class="group-desc">Vertiefung in Programmiersprachen und Werkzeuge. Python von Anfänger bis Experte, Git-Workflows und Linux-Mastery. Empfohlen nach den Fundamentals.</div>
+    <div class="group-divider"></div>
+    <div class="grid grid-3">
+
+      <a href="python-anfaenger/catalog.html" class="card c-pa">
+        <div class="s-ribbon s-alpha">Alpha</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#128013;</div><div class="card-name">Python für<br>Anfänger</div></div>
+          <p class="card-tagline">14 Module, 3 Phasen. Keine Vorkenntnisse. Praxisaufgaben aus dem Admin-Alltag.</p>
+          <div class="card-stats"><span class="stat"><strong>14</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>50&#8211;90 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Grundlagen</span><span class="tag">OOP</span><span class="tag">CSV/JSON</span><span class="tag">HTTP</span><span class="tag">CLI-Tools</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="python-jahreskurs/catalog.html" class="card c-py">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#955;</div><div class="card-name">Python<br>Jahreskurs</div></div>
+          <p class="card-tagline">12 Monate, zero to pro. Stdlib-first, eigene Module, eigene Tools, eigene Architektur.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Monate</span><span class="stat"><strong>48</strong> Wochen</span><span class="stat"><strong>7</strong> Milestones</span></div>
+          <div class="card-tags"><span class="tag">OOP</span><span class="tag">Stdlib</span><span class="tag">Asyncio</span><span class="tag">Testing</span><span class="tag">Packaging</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="python-forensik/catalog.html" class="card c-pf">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#128269;</div><div class="card-name">Python Forensik<br>&amp; Datenanalyse</div></div>
+          <p class="card-tagline">10 CLI-Tools: Log-Analyse, Dateiintegrität, Netzwerkforensik, Fehlerkorrelation und Reporting.</p>
+          <div class="card-stats"><span class="stat"><strong>10</strong> Module</span><span class="stat"><strong>10</strong> Tools</span><span class="stat"><strong>25&#8211;45 h</strong></span></div>
+          <div class="card-tags"><span class="tag">IT-Forensik</span><span class="tag">Log-Analyse</span><span class="tag">Netzwerk</span><span class="tag">IR</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="git-anfaenger/catalog.html" class="card c-gi">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#8887;</div><div class="card-name">Git für<br>Anfänger</div></div>
+          <p class="card-tagline">12 Module von Installation bis Branching. commit, branch, merge, rebase, hooks und GitHub.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>4</strong> Phasen</span><span class="stat"><strong>25&#8211;45 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Grundlagen</span><span class="tag">Branching</span><span class="tag">Remote</span><span class="tag">GitHub</span><span class="tag">Hooks</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="linux-bash/catalog.html" class="card c-lb">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">$_</div><div class="card-name">Linux &amp;<br>Bash Mastery</div></div>
+          <p class="card-tagline">12 Module von Filesystem bis Bash-Profi. Pipes, Regex, SSH, Cron, Scripting und Automatisierung.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>4</strong> Phasen</span><span class="stat"><strong>30&#8211;55 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Filesystem</span><span class="tag">Bash</span><span class="tag">SSH</span><span class="tag">Systemd</span><span class="tag">Automatisierung</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 3: SECURITY -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-badge" style="background:rgba(255,123,114,0.12);color:#ff7b72;border:1px solid rgba(255,123,114,0.3)">Gruppe 03</span>
+      <span class="group-title" style="color:#ff7b72">Security</span>
+    </div>
+    <div class="group-desc">Offensive und Defensive Security sowie Kryptologie. Parallel nutzbar &#8212; Red und Blue ergänzen sich. Voraussetzung: Fundamentals + Sprachen &amp; Tools.</div>
+    <div class="group-divider"></div>
+
+    <div class="subgroup">
+      <div class="subgroup-label" style="color:#ff7b72">Offensive Security</div>
+      <div class="grid grid-2">
+
+        <a href="team-red/catalog.html" class="card c-tr">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#128308;</div><div class="card-name">Team Red<br>Offensive Sec</div></div>
+            <p class="card-tagline">12 Module Penetration Testing. OSINT, Web Hacking, SQLi, XSS, PrivEsc, Metasploit und Reporting.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>4</strong> Phasen</span><span class="stat"><strong>45&#8211;80 h</strong></span><span class="stat"><strong>Ethical Only</strong></span></div>
+            <div class="card-tags"><span class="tag">OSINT</span><span class="tag">Web Hacking</span><span class="tag">SQLi</span><span class="tag">PrivEsc</span><span class="tag">Reporting</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+        <a href="webapp-profi/catalog.html" class="card c-wp">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#127760;</div><div class="card-name">Webapp Profi<br>Advanced</div></div>
+            <p class="card-tagline">12 Module fortgeschrittene Web-Sicherheit. OAuth, JWT, GraphQL, SSTI, Race Conditions, Deserialization.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>40&#8211;70 h</strong></span><span class="stat"><strong>Erfahren</strong></span></div>
+            <div class="card-tags"><span class="tag">OAuth</span><span class="tag">GraphQL</span><span class="tag">SSTI</span><span class="tag">Deserialization</span><span class="tag">Bug Bounty</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
       </div>
-    </a>
+    </div>
 
-    <a href="kryptologie/catalog.html" class="card c-kr">
-      <div class="s-ribbon s-ia">In Arbeit</div>
-      <div class="card-accent"></div>
-      <div class="card-body">
-        <div class="card-icon-row">
-          <div class="card-icon">🔐</div>
-          <div class="card-name">Kryptologie<br>für Anfänger</div>
-        </div>
-        <p class="card-tagline">12 Module von Caesar bis Post-Quantum. Symmetrisch, asymmetrisch, Hashing, Signaturen, TLS, PKI, Steganographie und NIST PQC-Standards 2024.</p>
-        <div class="card-stats">
-          <span class="stat"><strong>12</strong> Module</span>
-          <span class="stat"><strong>4</strong> Phasen</span>
-          <span class="stat"><strong>35–65 h</strong></span>
-          <span class="stat"><strong>Alle Level</strong></span>
-        </div>
-        <div class="card-tags">
-          <span class="tag">Klassische Krypto</span>
-          <span class="tag">AES / RSA</span>
-          <span class="tag">TLS / PKI</span>
-          <span class="tag">Hashing</span>
-          <span class="tag">Signaturen</span>
-          <span class="tag">Post-Quantum</span>
-        </div>
-        <span class="card-arrow">→</span>
+    <div class="subgroup">
+      <div class="subgroup-label" style="color:#388bfd">Defensive Security</div>
+      <div class="grid grid-3">
+
+        <a href="team-blue/catalog.html" class="card c-tb">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#128309;</div><div class="card-name">Team Blue<br>Defensive Sec</div></div>
+            <p class="card-tagline">12 Module. Log-Analyse, Incident Response, Hardening, Threat Hunting, Cloud Security und SOC.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>4</strong> Phasen</span><span class="stat"><strong>45&#8211;80 h</strong></span></div>
+            <div class="card-tags"><span class="tag">Log-Analyse</span><span class="tag">Hardening</span><span class="tag">SIEM</span><span class="tag">Threat Hunting</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+        <a href="kryptologie/catalog.html" class="card c-kr">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#128272;</div><div class="card-name">Kryptologie<br>für Anfänger</div></div>
+            <p class="card-tagline">12 Module von Caesar bis Post-Quantum. AES, RSA, TLS, PKI, Steganographie und NIST PQC 2024.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>4</strong> Phasen</span><span class="stat"><strong>35&#8211;65 h</strong></span></div>
+            <div class="card-tags"><span class="tag">AES/RSA</span><span class="tag">TLS/PKI</span><span class="tag">Signaturen</span><span class="tag">Post-Quantum</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+        <a href="netzwerke/catalog.html" class="card c-nw">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#8644;</div><div class="card-name">Netzwerke<br>Grundlagen</div></div>
+            <p class="card-tagline">12 Module von OSI bis IPv6. TCP/IP, DNS, TLS, Wireshark, Routing, Firewalls, VPN und WLAN.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>4</strong> Phasen</span><span class="stat"><strong>30&#8211;55 h</strong></span></div>
+            <div class="card-tags"><span class="tag">OSI</span><span class="tag">TCP/IP</span><span class="tag">DNS</span><span class="tag">Wireshark</span><span class="tag">VPN</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
       </div>
-    </a>
+    </div>
+  </div>
 
+  <!-- GROUP 4: INFRASTRUKTUR & DEVSECOPS -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-badge" style="background:rgba(64,209,172,0.12);color:#40d1ac;border:1px solid rgba(64,209,172,0.3)">Gruppe 04</span>
+      <span class="group-title" style="color:#40d1ac">Infrastruktur &amp; DevSecOps</span>
+    </div>
+    <div class="group-desc">Container, Kubernetes, CI/CD-Pipelines und eigene Hypervisor-Infrastruktur. Für alle die ihre eigene Security-Lab-Umgebung aufbauen wollen.</div>
+    <div class="group-divider"></div>
+    <div class="grid">
+
+      <a href="container-security/catalog.html" class="card c-cs">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#11041;</div><div class="card-name">Container<br>Security</div></div>
+          <p class="card-tagline">12 Module Docker und Kubernetes Security. Container-Escape, RBAC, Network Policies, Falco, Supply Chain.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>35&#8211;65 h</strong></span></div>
+          <div class="card-tags"><span class="tag">Docker</span><span class="tag">K8s</span><span class="tag">RBAC</span><span class="tag">Falco</span><span class="tag">Trivy</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="devsecops/catalog.html" class="card c-ds">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#9881;</div><div class="card-name">DevSecOps<br>Pipeline</div></div>
+          <p class="card-tagline">12 Module CI/CD-Security. SAST, SCA, Secret-Scanning, DAST, IaC-Security, Compliance as Code.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>35&#8211;65 h</strong></span></div>
+          <div class="card-tags"><span class="tag">SAST</span><span class="tag">SCA</span><span class="tag">GitHub Actions</span><span class="tag">DAST</span><span class="tag">IaC</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+      <a href="proxmox/catalog.html" class="card c-px">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#128421;</div><div class="card-name">Proxmox VE<br>Lab</div></div>
+          <p class="card-tagline">12 Module eigene Hypervisor-Infrastruktur. VMs, LXC, Cluster, Backups, Terraform und Security-Lab.</p>
+          <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>35&#8211;65 h</strong></span></div>
+          <div class="card-tags"><span class="tag">KVM</span><span class="tag">LXC</span><span class="tag">Cluster</span><span class="tag">Terraform</span><span class="tag">Ansible</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- GROUP 5: ADVANCED SECURITY -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-badge" style="background:rgba(255,166,87,0.12);color:#ffa657;border:1px solid rgba(255,166,87,0.3)">Gruppe 05</span>
+      <span class="group-title" style="color:#ffa657">Advanced Security</span>
+    </div>
+    <div class="group-desc">Spezialisierte offensive und defensive Vertiefungen. Active Directory, Binary Exploitation und Malware-Analyse. Empfohlene Voraussetzung: Security Core abgeschlossen.</div>
+    <div class="group-divider"></div>
+
+    <div class="subgroup">
+      <div class="subgroup-label" style="color:#ff7b72">Active Directory</div>
+      <div class="grid grid-2">
+
+        <a href="active-directory-red/catalog.html" class="card c-ar">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#128308;</div><div class="card-name">AD Red Team<br>Angriffe</div></div>
+            <p class="card-tagline">12 Module AD Offensive. LDAP-Enum, Kerberoasting, BloodHound, DCSync, Golden Tickets, Domain Compromise.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>40&#8211;70 h</strong></span></div>
+            <div class="card-tags"><span class="tag">Kerberoasting</span><span class="tag">BloodHound</span><span class="tag">DCSync</span><span class="tag">Golden Ticket</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+        <a href="active-directory-blue/catalog.html" class="card c-ab">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#128309;</div><div class="card-name">AD Blue Team<br>Defense</div></div>
+            <p class="card-tagline">12 Module AD Defense. Tiered Admin, Sysmon, MDI, SIEM-Regeln, DCSync-Schutz und Purple Team.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>35&#8211;65 h</strong></span></div>
+            <div class="card-tags"><span class="tag">Härtung</span><span class="tag">Sysmon</span><span class="tag">MDI</span><span class="tag">Detection</span><span class="tag">Purple Team</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="subgroup">
+      <div class="subgroup-label" style="color:#ffa657">Binary &amp; Malware</div>
+      <div class="grid grid-2">
+
+        <a href="binary-exploitation/catalog.html" class="card c-be">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#128165;</div><div class="card-name">Binary<br>Exploitation</div></div>
+            <p class="card-tagline">12 Module von Assembly bis CTF. Stack-Overflow, ROP, ret2libc, Format-Strings, Heap und Ghidra.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>45&#8211;80 h</strong></span><span class="stat"><strong>Fortgeschritten</strong></span></div>
+            <div class="card-tags"><span class="tag">Assembly</span><span class="tag">GDB</span><span class="tag">ROP</span><span class="tag">pwntools</span><span class="tag">Ghidra</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+        <a href="malware-analysis/catalog.html" class="card c-ma">
+          <div class="s-ribbon s-ia">In Arbeit</div>
+          <div class="card-accent"></div>
+          <div class="card-body">
+            <div class="card-icon-row"><div class="card-icon">&#129440;</div><div class="card-name">Malware<br>Analysis</div></div>
+            <p class="card-tagline">12 Module statische, dynamische und Speicher-Forensik. Packer, Ransomware, RAT, Volatility und YARA.</p>
+            <div class="card-stats"><span class="stat"><strong>12</strong> Module</span><span class="stat"><strong>3</strong> Phasen</span><span class="stat"><strong>40&#8211;70 h</strong></span></div>
+            <div class="card-tags"><span class="tag">Statisch</span><span class="tag">Dynamisch</span><span class="tag">Volatility</span><span class="tag">YARA</span><span class="tag">ATT&amp;CK</span></div>
+            <span class="card-arrow">&#8594;</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUP 6: CAPSTONE -->
+  <div class="group">
+    <div class="group-header">
+      <span class="group-badge" style="background:rgba(88,166,255,0.12);color:#58a6ff;border:1px solid rgba(88,166,255,0.3)">Capstone</span>
+      <span class="group-title" style="color:#58a6ff">uConsole Security Lab</span>
+    </div>
+    <div class="group-desc">19 Labs auf echter Hardware: Raspberry Pi uConsole (RK3566, ARM64). Alle Tools laufen am Ende als <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(88,166,255,0.08);color:#58a6ff;padding:1px 5px;border-radius:3px">uctl</code>-CLI-Suite zusammen.</div>
+    <div class="group-divider"></div>
+    <div class="grid grid-2">
+
+      <a href="uconsole/catalog.html" class="card c-uc">
+        <div class="s-ribbon s-ia">In Arbeit</div>
+        <div class="card-accent"></div>
+        <div class="card-body">
+          <div class="card-icon-row"><div class="card-icon">&#11041;</div><div class="card-name">uConsole<br>Security Lab</div></div>
+          <p class="card-tagline">18 Python-Labs + Capstone. Jedes Tool ist ein eigenständiges CLI-Programm. Kryptografie, Log-Forensik, Netzwerk, PCAP, Plugin-System und CI/CD auf ARM64.</p>
+          <div class="card-stats"><span class="stat"><strong>19</strong> Labs</span><span class="stat"><strong>7</strong> Phasen</span><span class="stat"><strong>60&#8211;110 h</strong></span><span class="stat"><strong>ARM64</strong></span></div>
+          <div class="card-tags"><span class="tag">Kryptografie</span><span class="tag">Log-Forensik</span><span class="tag">Netzwerk</span><span class="tag">PCAP</span><span class="tag">Plugin-System</span><span class="tag">CI/CD</span></div>
+          <span class="card-arrow">&#8594;</span>
+        </div>
+      </a>
+
+    </div>
   </div>
 
   <div class="diff-legend">
     <div class="diff-legend-label">Schwierigkeits-Skala</div>
     <div class="diff-levels">
       <div class="diff-item">
-        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></div>
-        <span class="diff-name">Einsteiger</span><span>— Erste Schritte, kaum Vorkenntnisse</span>
+        <div class="diff-stars"><span class="diff-star-on">&#9733;</span><span class="diff-star-off">&#9733;</span><span class="diff-star-off">&#9733;</span><span class="diff-star-off">&#9733;</span><span class="diff-star-off">&#9733;</span></div>
+        <span class="diff-name">Einsteiger</span><span>&#8212; Erste Schritte, kaum Vorkenntnisse</span>
       </div>
       <div class="diff-item">
-        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></div>
-        <span class="diff-name">Grundkenntnisse</span><span>— Python-Grundlagen erforderlich</span>
+        <div class="diff-stars"><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-off">&#9733;</span><span class="diff-star-off">&#9733;</span><span class="diff-star-off">&#9733;</span></div>
+        <span class="diff-name">Grundkenntnisse</span><span>&#8212; Python-Grundlagen erforderlich</span>
       </div>
       <div class="diff-item">
-        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span><span class="diff-star-off">★</span></div>
-        <span class="diff-name">Fortgeschritten</span><span>— OOP, Stdlib, mehrere Konzepte kombiniert</span>
+        <div class="diff-stars"><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-off">&#9733;</span><span class="diff-star-off">&#9733;</span></div>
+        <span class="diff-name">Fortgeschritten</span><span>&#8212; OOP, Stdlib, mehrere Konzepte kombiniert</span>
       </div>
       <div class="diff-item">
-        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-off">★</span></div>
-        <span class="diff-name">Erfahren</span><span>— Systemkenntnisse, Netzwerk, komplexes Design</span>
+        <div class="diff-stars"><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-off">&#9733;</span></div>
+        <span class="diff-name">Erfahren</span><span>&#8212; Systemkenntnisse, Netzwerk, komplexes Design</span>
       </div>
       <div class="diff-item">
-        <div class="diff-stars"><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span><span class="diff-star-on">★</span></div>
-        <span class="diff-name">Experte</span><span>— Binärformate, Plugin-Systeme, Capstone</span>
+        <div class="diff-stars"><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span><span class="diff-star-on">&#9733;</span></div>
+        <span class="diff-name">Experte</span><span>&#8212; Binärformate, Plugin-Systeme, Capstone</span>
       </div>
     </div>
   </div>
+
 </main>
 
 </body>

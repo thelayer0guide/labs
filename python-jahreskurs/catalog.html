@@ -23,11 +23,11 @@
   .nav-back { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); text-decoration:none; transition:color .15s }
   .nav-back:hover { color:var(--text) }
   .nav-sep { color:var(--border); font-size:16px }
-  .nav-here { font-family:'JetBrains Mono',monospace; font-size:11px; color:#e3b341 }
+  .nav-here { font-family:'JetBrains Mono',monospace; font-size:11px; color:#3fb950 }
 
   /* HEADER */
   header { background:linear-gradient(135deg,#0d1117 0%,#12100a 60%,#0d1117 100%); border-bottom:1px solid var(--border); padding:48px 48px 40px; position:relative; overflow:hidden; text-align:center }
-  header::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(227,179,65,.04),transparent) }
+  header::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 800px 300px at 50% 50%,rgba(63,185,80,.04),transparent) }
   h1 { font-size:clamp(28px,4vw,52px); font-weight:800; letter-spacing:-1.5px; line-height:1; color:var(--text); margin-bottom:8px; position:relative }
   .header-brand { font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:600; color:var(--muted); margin-bottom:18px; position:relative }
   .header-sub { font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--muted); max-width:520px; margin:0 auto; line-height:1.6; position:relative }
@@ -47,7 +47,7 @@
   .pb-c { color:#d2a8ff; background:rgba(210,168,255,.08); border-color:rgba(210,168,255,.3) }
   .pb-d { color:#ffa657; background:rgba(255,166,87,.08); border-color:rgba(255,166,87,.3) }
   .pb-e { color:#ff7b72; background:rgba(255,123,114,.08); border-color:rgba(255,123,114,.3) }
-  .pb-f { color:#e3b341; background:rgba(227,179,65,.08); border-color:rgba(227,179,65,.3) }
+  .pb-f { color:#3fb950; background:rgba(63,185,80,.08); border-color:rgba(63,185,80,.3) }
 
   /* ── MONATS-GRID — FIXED 4 COLUMNS ── */
   .months-grid {
@@ -80,15 +80,15 @@
   .card-top { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-wrap:wrap }
   .month-num { font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; padding:2px 7px; border-radius:3px; letter-spacing:.5px; text-transform:uppercase; white-space:nowrap }
   .phase-tag { font-family:'JetBrains Mono',monospace; font-size:8px; font-weight:600; padding:2px 5px; border-radius:3px; color:var(--muted); background:rgba(255,255,255,.03); border:1px solid var(--border) }
-  .ms-badge { font-family:'JetBrains Mono',monospace; font-size:8.5px; padding:2px 6px; border-radius:3px; color:#e3b341; background:rgba(227,179,65,.08); border:1px solid rgba(227,179,65,.25); margin-left:auto; white-space:nowrap }
+  .ms-badge { font-family:'JetBrains Mono',monospace; font-size:8.5px; padding:2px 6px; border-radius:3px; color:#3fb950; background:rgba(63,185,80,.08); border:1px solid rgba(63,185,80,.25); margin-left:auto; white-space:nowrap }
   .week-range { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); margin-left:auto; white-space:nowrap }
 
   .card-name { font-size:13.5px; font-weight:800; letter-spacing:-.2px; margin-bottom:4px; line-height:1.25 }
   .card-tagline { font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); line-height:1.55; margin-bottom:9px }
 
   /* milestone box */
-  .ms-info { display:flex; align-items:center; gap:7px; background:rgba(227,179,65,.05); border:1px solid rgba(227,179,65,.18); border-radius:4px; padding:5px 9px; margin-bottom:9px }
-  .ms-lbl { font-family:'JetBrains Mono',monospace; font-size:7.5px; text-transform:uppercase; letter-spacing:1px; color:#e3b341; white-space:nowrap }
+  .ms-info { display:flex; align-items:center; gap:7px; background:rgba(63,185,80,.05); border:1px solid rgba(63,185,80,.18); border-radius:4px; padding:5px 9px; margin-bottom:9px }
+  .ms-lbl { font-family:'JetBrains Mono',monospace; font-size:7.5px; text-transform:uppercase; letter-spacing:1px; color:#3fb950; white-space:nowrap }
   .ms-name { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 
   /* stars */
@@ -420,25 +420,25 @@
   <div class="card">
     <a href="html/monat-11.html" class="card-link"></a>
     <span class="s-chip s-ia">In Arbeit</span>
-    <div class="card-accent" style="background:#e3b341"></div>
+    <div class="card-accent" style="background:#3fb950"></div>
     <div class="card-body">
       <div class="card-top">
-        <span class="month-num" style="color:#e3b341;background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.25)">Monat 11</span>
+        <span class="month-num" style="color:#3fb950;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25)">Monat 11</span>
         <span class="phase-tag">Phase F</span>
         <span class="ms-badge">★ M6</span>
       </div>
-      <div class="card-name" style="color:#e3b341">Testing, Packaging &amp; Architektur</div>
+      <div class="card-name" style="color:#3fb950">Testing, Packaging &amp; Architektur</div>
       <div class="card-tagline">pytest · mypy · ruff · pyproject.toml · Design Patterns</div>
       <div class="ms-info"><span class="ms-lbl">★ Milestone 6</span><span class="ms-name">Früheres Projekt neu gebaut</span></div>
       <div class="diff-row">
-        <div class="stars"><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:#e3b341">★</span><span style="color:var(--border)">★</span></div>
-        <span class="diff-lbl" style="color:#e3b341">Erfahren</span>
+        <div class="stars"><span style="color:#3fb950">★</span><span style="color:#3fb950">★</span><span style="color:#3fb950">★</span><span style="color:#3fb950">★</span><span style="color:var(--border)">★</span></div>
+        <span class="diff-lbl" style="color:#3fb950">Erfahren</span>
       </div>
       <div class="card-tags">
-        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" style="color:#e3b341;background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.25)" target="_blank">python</a>
-        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" style="color:#e3b341;background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.25)" target="_blank">git</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="tag" style="color:#3fb950;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25)" target="_blank">python</a>
+        <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/git-cheatsheet.html" class="tag" style="color:#3fb950;background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25)" target="_blank">git</a>
       </div>
-      <span class="card-arrow" style="color:#e3b341">→</span>
+      <span class="card-arrow" style="color:#3fb950">→</span>
     </div>
   </div>
 
@@ -476,23 +476,23 @@
   <div class="dl-label">Schwierigkeits-Skala</div>
   <div class="dl-levels">
     <div class="dl-item">
-      <span style="color:#e3b341">★</span><span style="color:var(--border)">★★★★</span>
+      <span style="color:#3fb950">★</span><span style="color:var(--border)">★★★★</span>
       &nbsp;<span class="dl-name">Einsteiger</span><span>— Erste Schritte</span>
     </div>
     <div class="dl-item">
-      <span style="color:#e3b341">★★</span><span style="color:var(--border)">★★★</span>
+      <span style="color:#3fb950">★★</span><span style="color:var(--border)">★★★</span>
       &nbsp;<span class="dl-name">Grundkenntnisse</span><span>— Python-Basics vorausgesetzt</span>
     </div>
     <div class="dl-item">
-      <span style="color:#e3b341">★★★</span><span style="color:var(--border)">★★</span>
+      <span style="color:#3fb950">★★★</span><span style="color:var(--border)">★★</span>
       &nbsp;<span class="dl-name">Fortgeschritten</span><span>— mehrere Konzepte kombiniert</span>
     </div>
     <div class="dl-item">
-      <span style="color:#e3b341">★★★★</span><span style="color:var(--border)">★</span>
+      <span style="color:#3fb950">★★★★</span><span style="color:var(--border)">★</span>
       &nbsp;<span class="dl-name">Erfahren</span><span>— systemnahe Integration</span>
     </div>
     <div class="dl-item">
-      <span style="color:#e3b341">★★★★★</span>
+      <span style="color:#3fb950">★★★★★</span>
       &nbsp;<span class="dl-name">Experte</span><span>— eigenständiges Projekt</span>
     </div>
   </div>
