@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Modul 11 — Verlet-Integration & Constraints · Python Physik-Simulationen</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#3fb950}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+.topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+.header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+.badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+.sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+.sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'→';color:var(--accent);opacity:.5}.sheet-lnk:hover{color:var(--accent)}
+.page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+.content{min-width:0}.lab-section{margin-bottom:44px}
+.sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+ul,ol{list-style:none;padding:0;margin-bottom:14px}
+li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+li.task{padding-left:26px}li.task::before{display:none}
+.chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+blockquote p{margin:0;font-size:13px;color:var(--muted)}
+.sidebar{position:sticky;top:60px}.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+.nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}.nav-mod-link.next::after{content:' →'}
+details.code-spoiler{margin:14px 0}
+details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+details.code-spoiler summary::-webkit-details-marker{display:none}
+details.code-spoiler summary::before{content:'▶';font-size:9px;color:var(--accent);opacity:.7;transition:transform .18s;flex-shrink:0}
+details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent)}
+details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style></head><body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">← Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Physik-Simulationen</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 11 — Verlet-Integration & Constraints</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 11</span>
+        <span class="badge badge-cat">Phase C</span>
+        <span class="badge badge-cat">3–4 h</span>
+        <span class="badge" style="background:transparent;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)"><span style="color:#e3b341">&#9733;</span><span style="color:#e3b341">&#9733;</span><span style="color:#e3b341">&#9733;</span><span style="color:#e3b341">&#9733;</span><span style="color:#30363d">&#9733;</span> Erfahren</span>
+      </div>
+      <h1>Verlet-Integration & Constraints</h1>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+    <div class="lab-section" id="lernziele"><div class="sec-heading">Lernziele</div><ul>
+        <li>Positionsbasierte Verlet-Integration implementieren</li>
+        <li>Stick-Constraints (Starre Abstands-Verbindungen) iterativ lösen</li>
+        <li>Ein Seil (Rope) aus Constraints bauen</li>
+        <li>Ein einfaches Tuch-Gitter (Cloth) mit Constraint-Solver simulieren</li>
+    </ul></div>
+    <div class="lab-section" id="hintergrund"><div class="sec-heading">Hintergrund</div>
+      <p>Verlet-Integration ist numerisch stabiler als Euler für Constraint-Systeme. Statt Geschwindigkeit speichern wir nur die aktuelle und vorherige Position. Geschwindigkeit ist implizit: v ≈ (pos - pos_old) / dt. Update: pos_new = 2*pos - pos_old + acc*dt². pos_old = pos; pos = pos_new. Der große Vorteil: Constraints (Abstands-Bedingungen) können direkt auf Positionen angewandt werden, ohne die Geschwindigkeit manuell zu korrigieren.</p>
+      <p>Stick-Constraint: Zwei Punkte A, B sollen immer Abstand L haben. Delta = B-A. dist = |Delta|. Fehler = (dist-L)/dist. A += Delta * 0.5 * Fehler; B -= Delta * 0.5 * Fehler. Iteratives Auflösen (5–20 Iterationen): je mehr, desto steifer. Seil: Kette von Punkten mit Stick-Constraints. Tuch: 2D-Gitter mit horizontalen, vertikalen und diagonalen Constraints.</p>
+    </div>
+    <div class="lab-section" id="konzepte"><div class="sec-heading">Schlüsselkonzepte</div>
+
+      <h3>Verlet + Cloth-Simulation</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import pygame, random
+pygame.init()
+W, H = 800, 600
+screen = pygame.display.set_mode((W, H))
+clock  = pygame.time.Clock()
+font   = pygame.font.SysFont("Arial", 14)
+
+COLS, ROWS  = 18, 14
+SPACING     = 36
+ITERATIONS  = 8
+START_X     = (W - COLS*SPACING)//2
+START_Y     = 60
+GRAVITY_Y   = 500
+
+class Point:
+    def __init__(self, x, y, pinned=False):
+        self.pos     = pygame.math.Vector2(x, y)
+        self.old_pos = pygame.math.Vector2(x, y)
+        self.pinned  = pinned
+
+    def update(self, dt):
+        if self.pinned: return
+        vel       = (self.pos - self.old_pos) * 0.99  # Dämpfung
+        self.old_pos = pygame.math.Vector2(self.pos)
+        self.pos += vel + pygame.math.Vector2(0, GRAVITY_Y) * dt * dt
+        # Grenzen
+        if self.pos.y > H-5: self.pos.y = H-5
+        if self.pos.x < 5:   self.pos.x = 5
+        if self.pos.x > W-5: self.pos.x = W-5
+
+class Stick:
+    def __init__(self, a, b):
+        self.a    = a
+        self.b    = b
+        self.rest = (b.pos - a.pos).length()
+        self.active = True
+
+    def solve(self):
+        if not self.active: return
+        delta = self.b.pos - self.a.pos
+        dist  = delta.length()
+        if dist < 0.001: return
+        diff  = (dist - self.rest) / dist
+        if not self.a.pinned: self.a.pos += delta * 0.5 * diff
+        if not self.b.pinned: self.b.pos -= delta * 0.5 * diff
+
+# Tuch aufbauen
+points = []
+for row in range(ROWS):
+    for col in range(COLS):
+        pinned = (row == 0 and col % 3 == 0)
+        points.append(Point(START_X + col*SPACING, START_Y + row*SPACING, pinned))
+
+sticks = []
+for row in range(ROWS):
+    for col in range(COLS):
+        idx = row*COLS + col
+        if col < COLS-1: sticks.append(Stick(points[idx], points[idx+1]))
+        if row < ROWS-1: sticks.append(Stick(points[idx], points[idx+COLS]))
+
+drag_point = None
+running = True
+while running:
+    dt = min(clock.tick(60)/1000, 0.033)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mx, my = event.pos
+            best = min(points, key=lambda p: (p.pos.x-mx)**2+(p.pos.y-my)**2)
+            if event.button == 1: drag_point = best
+            if event.button == 3:  # Rechtsklick: Sticks in Nähe zerschneiden
+                for s in sticks:
+                    c = (s.a.pos + s.b.pos) / 2
+                    if (c - pygame.math.Vector2(mx,my)).length() < 20: s.active = False
+        if event.type == pygame.MOUSEBUTTONUP: drag_point = None
+        if event.type == pygame.MOUSEMOTION and drag_point:
+            drag_point.pos.xy = event.pos
+            drag_point.old_pos.xy = event.pos
+
+    for p in points: p.update(dt)
+    for _ in range(ITERATIONS):
+        for s in sticks: s.solve()
+
+    screen.fill((13,17,23))
+    for s in sticks:
+        if not s.active: continue
+        col = (63,185,80) if s.a.pos.y < 100 else (88,166,255)
+        pygame.draw.line(screen, col, (int(s.a.pos.x),int(s.a.pos.y)),(int(s.b.pos.x),int(s.b.pos.y)),1)
+    for p in points:
+        col = (255,255,255) if p.pinned else (125,133,144)
+        pygame.draw.circle(screen, col, (int(p.pos.x),int(p.pos.y)), 3 if p.pinned else 2)
+    screen.blit(font.render("Ziehen=Linksklick  Tuch zerschneiden=Rechtsklick", True,(125,133,144)),(10,10))
+    pygame.display.flip()
+
+pygame.quit()</code></pre></details>
+      <blockquote><p>ITERATIONS=8 reicht für weiches Tuch. Für ein Seil mit kaum Elastizität: 20+ Iterationen.</p></blockquote>
+    </div>
+    <div class="lab-section" id="aufgabe"><div class="sec-heading">Aufgabe</div><p>Baue eine interaktive Tuch-Simulation (mind. 12×10 Punkte). Linksklick zieht, Rechtsklick zerschneidet. Obere Reihe oben fixiert (jeder 3. Punkt).</p></div>
+    <div class="lab-section" id="anforderungen"><div class="sec-heading">Anforderungen</div><ol>
+        <li class="task"><span class="chk"></span>Verlet-Update: pos_new = 2*pos - pos_old + g*dt²</li>
+        <li class="task"><span class="chk"></span>old_pos = pos vor dem Update</li>
+        <li class="task"><span class="chk"></span>Stick-Constraint: diff = (dist-rest)/dist</li>
+        <li class="task"><span class="chk"></span>Iterativer Solver: 8+ Iterationen</li>
+        <li class="task"><span class="chk"></span>Pinned-Punkte werden nicht bewegt</li>
+        <li class="task"><span class="chk"></span>Zerschneiden: Stick.active = False</li>
+    </ol></div>
+    <div class="lab-section" id="akzeptanz"><div class="sec-heading">Akzeptanzkriterien</div><ul>
+        <li class="task"><span class="chk"></span>Tuch hängt realistisch durch Gravitation</li>
+        <li class="task"><span class="chk"></span>Zerschneiden hinterlässt sichtbare Lücken</li>
+        <li class="task"><span class="chk"></span>Ziehen zieht das Tuch mit</li>
+    </ul></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-card"><div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele"     class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund"   class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte"      class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe"       class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz"     class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card"><div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">↑ Alle Module</a>
+      <a href="modul-10.html" class="nav-mod-link">← Modul 10</a>
+      <a href="modul-12.html" class="nav-mod-link next">Modul 12</a>
+    </div>
+  </div>
+</div>
+</body></html>

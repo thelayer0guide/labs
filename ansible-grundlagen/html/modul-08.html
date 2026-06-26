@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Modul 08 &#8212; Facts, Magic Variables & Custom Facts · Ansible & Configuration Management</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#40d1ac}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+.topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+.header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+.badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+.sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+.sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'&#8594;';color:var(--accent);opacity:.5}.sheet-lnk:hover{color:var(--accent)}
+.page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+.content{min-width:0}.lab-section{margin-bottom:44px}
+.sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+ul,ol{list-style:none;padding:0;margin-bottom:14px}
+li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+li.task{padding-left:26px}li.task::before{display:none}
+.chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+blockquote p{margin:0;font-size:13px;color:var(--muted)}
+.sidebar{position:sticky;top:60px}.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+.nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}.nav-mod-link.next::after{content:' &#8594;'}
+details.code-spoiler{margin:14px 0}
+details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+details.code-spoiler summary::-webkit-details-marker{display:none}
+details.code-spoiler summary::before{content:'&#9654;';font-size:9px;color:var(--accent);opacity:.7;transition:transform .18s;flex-shrink:0}
+details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent)}
+details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style></head><body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">&#8592; Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Ansible & Configuration Management</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 08 &#8212; Facts, Magic Variables & Custom Facts</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 08</span>
+        <span class="badge badge-cat">Phase B</span>
+        <span class="badge badge-cat">2–3 h</span>
+        <span class="badge" style="background:transparent;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)"><span style="color:#e3b341">&#9733;</span><span style="color:#e3b341">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span> Grundkenntnisse</span>
+      </div>
+      <h1>Facts, Magic Variables & Custom Facts</h1>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/linux-cheatsheet.html" class="sheet-lnk" target="_blank">linux</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+    <div class="lab-section" id="lernziele"><div class="sec-heading">Lernziele</div><ul>
+        <li>Ansible-Facts verstehen und im Playbook gezielt abfragen</li>
+        <li>Das setup-Modul und gather_facts: false korrekt einsetzen</li>
+        <li>Magic Variables wie hostvars, groups und inventory_hostname nutzen</li>
+        <li>Custom Facts in /etc/ansible/facts.d hinterlegen</li>
+    </ul></div>
+    <div class="lab-section" id="hintergrund"><div class="sec-heading">Hintergrund</div>
+      <p>Facts sind automatisch gesammelte Informationen über das Zielsystem: OS-Familie, IP-Adressen, CPU-Anzahl, freier Speicher, Netzwerk-Interfaces, gemountete Dateisysteme. Sie werden durch gather_facts: true (default) zu Beginn jedes Plays gesammelt. Zugriff: ansible_facts["os_family"] oder kurz ansible_os_family (in ansible.cfg: inject_facts_as_vars = true).</p>
+      <p>Magic Variables sind durch Ansible selbst gesetzt: inventory_hostname (Name im Inventory), ansible_host (IP/Hostname für SSH), groups["webserver"] (Liste aller Hosts in der Gruppe), hostvars["web02"]["ansible_host"] (Facts/Vars eines anderen Hosts). Custom Facts: Dateien in /etc/ansible/facts.d/*.fact (Shell-Script oder JSON) werden automatisch geladen in ansible_local.dateiname.schluessel.</p>
+    </div>
+    <div class="lab-section" id="konzepte"><div class="sec-heading">Schlüsselkonzepte</div>
+
+      <h3>Facts nutzen</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>---
+- name: Facts nutzen und anzeigen
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Wichtige System-Facts
+      debug:
+        msg:
+          - "Hostname:      {{ ansible_hostname }}"
+          - "OS-Familie:    {{ ansible_os_family }}"
+          - "Distribution:  {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "Architektur:   {{ ansible_architecture }}"
+          - "CPUs:          {{ ansible_processor_vcpus }}"
+          - "RAM (MB):      {{ ansible_memtotal_mb }}"
+          - "Freier RAM:    {{ ansible_memory_mb.nocache.free }} MB"
+          - "IP (eth0):     {{ ansible_default_ipv4.address | default('n/a') }}"
+          - "Kernel:        {{ ansible_kernel }}"
+          - "Python:        {{ ansible_python_version }}"
+
+    - name: Nur Facts sammeln ohne Playbook (Ad-hoc)
+      # ansible all -m setup -a "filter=ansible_memory*"
+      # ansible all -m setup -a "filter=ansible_network*"
+      debug:
+        msg: "OS-spezifisches Paket-Tool: {{ 'apt' if ansible_os_family=='Debian' else 'yum' }}"
+
+    - name: Niedrigen RAM erkennen
+      debug:
+        msg: "WARNUNG: Weniger als 512 MB RAM!"
+      when: ansible_memtotal_mb < 512
+
+    # Selektives Fact-Gathering (schneller)
+    # gather_facts: true
+    # gather_subset:
+    #   - network
+    #   - hardware
+    #   - "!facter"
+    #   - "!ohai"</code></pre></details>
+      <h3>Magic Variables & Custom Facts</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code># Magic Variables in Playbooks
+---
+- name: Magic Variables demonstrieren
+  hosts: all
+
+  tasks:
+    - name: Inventory-Informationen
+      debug:
+        msg:
+          - "Mein Name im Inventory: {{ inventory_hostname }}"
+          - "Kurzname:               {{ inventory_hostname_short }}"
+          - "Alle Webserver:         {{ groups['webserver'] | join(', ') }}"
+          - "Bin ich ein Webserver?: {{ inventory_hostname in groups['webserver'] }}"
+          - "Anzahl Hosts in all:    {{ groups['all'] | length }}"
+
+    - name: Variablen anderer Hosts lesen
+      debug:
+        msg: "IP von web01: {{ hostvars['web01']['ansible_host'] | default('unbekannt') }}"
+      when: inventory_hostname != 'web01'
+
+# Custom Facts — Datei auf dem Target
+# /etc/ansible/facts.d/app.fact (JSON)
+# {
+#   "version": "2.3.1",
+#   "environment": "production",
+#   "deployed_at": "2024-01-15"
+# }
+
+# Oder Shell-Script (muss gültiges JSON ausgeben):
+# #!/bin/bash
+# echo '{"disk_free_gb": '$(df -BG / | awk 'NR==2{print $4}' | tr -d G)'}'
+
+# Zugriff im Playbook:
+# {{ ansible_local.app.version }}
+# {{ ansible_local.app.environment }}
+
+# Custom Fact deployen und laden:
+- name: Custom Fact hinterlegen
+  copy:
+    src: files/app.fact
+    dest: /etc/ansible/facts.d/app.fact
+    mode: "0644"
+
+- name: Facts neu laden
+  setup:
+    filter: ansible_local</code></pre></details>
+      <blockquote><p>setup: filter: ansible_local lädt nur Custom Facts neu — viel schneller als alle Facts neu zu sammeln.</p></blockquote>
+    </div>
+    <div class="lab-section" id="aufgabe"><div class="sec-heading">Aufgabe</div><p>Schreibe ein Playbook, das Facts sammelt, OS-spezifisch reagiert, Magic Variables für einen Cross-Host-Check nutzt und einen Custom Fact deployed.</p></div>
+    <div class="lab-section" id="anforderungen"><div class="sec-heading">Anforderungen</div><ol>
+        <li class="task"><span class="chk"></span>gather_facts und ansible_os_family für OS-Zweige genutzt</li>
+        <li class="task"><span class="chk"></span>ansible_memtotal_mb und ansible_processor_vcpus in Logik eingebaut</li>
+        <li class="task"><span class="chk"></span>hostvars["anderer_host"] korrekt referenziert</li>
+        <li class="task"><span class="chk"></span>groups["gruppe"] für Mitgliedschaftsprüfung genutzt</li>
+        <li class="task"><span class="chk"></span>Custom Fact als JSON-Datei in facts.d deployed</li>
+        <li class="task"><span class="chk"></span>setup: filter: ansible_local zum Reload</li>
+    </ol></div>
+    <div class="lab-section" id="akzeptanz"><div class="sec-heading">Akzeptanzkriterien</div><ul>
+        <li class="task"><span class="chk"></span>Facts stehen im Playbook korrekt zur Verfügung</li>
+        <li class="task"><span class="chk"></span>Custom Fact per ansible_local.name.key abrufbar</li>
+        <li class="task"><span class="chk"></span>Cross-Host-Referenz liefert korrekten Wert</li>
+    </ul></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-card"><div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele"     class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund"   class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte"      class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe"       class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz"     class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card"><div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">&#8593; Alle Module</a>
+      <a href="modul-07.html" class="nav-mod-link">&#8592; Modul 07</a>
+      <a href="modul-09.html" class="nav-mod-link next">Modul 09</a>
+    </div>
+  </div>
+</div>
+</body></html>

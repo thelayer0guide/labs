@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Modul 08 &#8212; UI, Menüs & HUD · Python Spieleentwicklung</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#3fb950}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+.topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+.header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+.badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+.sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+.sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'&#8594;';color:var(--accent);opacity:.5}.sheet-lnk:hover{color:var(--accent)}
+.page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+.content{min-width:0}.lab-section{margin-bottom:44px}
+.sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+ul,ol{list-style:none;padding:0;margin-bottom:14px}
+li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+li.task{padding-left:26px}li.task::before{display:none}
+.chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+blockquote p{margin:0;font-size:13px;color:var(--muted)}
+.sidebar{position:sticky;top:60px}.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+.nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}.nav-mod-link.next::after{content:' &#8594;'}
+details.code-spoiler{margin:14px 0}
+details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+details.code-spoiler summary::-webkit-details-marker{display:none}
+details.code-spoiler summary::before{content:'&#9654;';font-size:9px;color:var(--accent);opacity:.7;transition:transform .18s;flex-shrink:0}
+details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent)}
+details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style></head><body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">&#8592; Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Python Spieleentwicklung</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 08 &#8212; UI, Menüs & HUD</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 08</span>
+        <span class="badge badge-cat">Phase C</span>
+        <span class="badge badge-cat">2–3 h</span>
+        <span class="badge" style="background:transparent;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)"><span style="color:#e3b341">&#9733;</span><span style="color:#e3b341">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span> Grundkenntnisse</span>
+      </div>
+      <h1>UI, Menüs & HUD</h1>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/python-cheatsheet.html" class="sheet-lnk" target="_blank">python</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+    <div class="lab-section" id="lernziele"><div class="sec-heading">Lernziele</div><ul>
+        <li>Ein Hauptmenü mit klickbaren Buttons implementieren</li>
+        <li>Einen Pause-Zustand mit Overlay korrekt umsetzen</li>
+        <li>Ein Game-Over-Screen mit Score-Anzeige bauen</li>
+        <li>Einen einfachen State Machine-Ansatz für Spielzustände nutzen</li>
+    </ul></div>
+    <div class="lab-section" id="hintergrund"><div class="sec-heading">Hintergrund</div>
+      <p>Ein Spiel besteht aus mehreren Zuständen: MENU, PLAYING, PAUSED, GAME_OVER. Eine State Machine steuert, welcher Zustand aktiv ist und welche Logik läuft. Einfachste Implementierung: eine Variable current_state, die im Event-Handler und Update-Zweig geprüft wird. Fortgeschrittener: eine State-Klasse mit enter(), update(), draw(), exit()-Methoden.</p>
+      <p>Button-Implementierung: Ein Button ist ein Rect mit Label. Prüfen ob Mausposition im Rect liegt: button_rect.collidepoint(mouse_pos). Hover-Effekt: Farbe/Rahmen bei Hover ändern. Click-Handler: bei MOUSEBUTTONDOWN und collidepoint die Aktion ausführen. Pause-Overlay: halbtransparenter Surface über das Spielbild bliten (SRCALPHA oder Surface mit set_alpha()). Text zentrieren: font.render().get_rect(center=(x,y)).</p>
+    </div>
+    <div class="lab-section" id="konzepte"><div class="sec-heading">Schlüsselkonzepte</div>
+
+      <h3>State Machine & Menü-System</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>import pygame, sys
+
+pygame.init()
+screen = pygame.display.set_mode((800, 600))
+clock  = pygame.time.Clock()
+font_h = pygame.font.SysFont("Arial", 48, bold=True)
+font_m = pygame.font.SysFont("Arial", 24)
+font_s = pygame.font.SysFont("Arial", 18)
+
+STATE_MENU     = "menu"
+STATE_PLAYING  = "playing"
+STATE_PAUSED   = "paused"
+STATE_GAMEOVER = "gameover"
+current_state  = STATE_MENU
+score, lives   = 0, 3
+
+BG = (13,17,23); GREEN=(63,185,80); MUTED=(125,133,144); WHITE=(230,237,243)
+
+class Button:
+    def __init__(self, text, center, action):
+        self.text   = text
+        self.action = action
+        surf = font_m.render(text, True, WHITE)
+        self.rect   = surf.get_rect(center=center).inflate(40, 16)
+
+    def draw(self, surface):
+        mx, my = pygame.mouse.get_pos()
+        hovered = self.rect.collidepoint(mx, my)
+        col_fill   = (30,40,30) if hovered else (22,27,34)
+        col_border = GREEN      if hovered else (48,54,61)
+        pygame.draw.rect(surface, col_fill,   self.rect, border_radius=6)
+        pygame.draw.rect(surface, col_border, self.rect, 2, border_radius=6)
+        lbl = font_m.render(self.text, True, GREEN if hovered else WHITE)
+        surface.blit(lbl, lbl.get_rect(center=self.rect.center))
+
+    def handle(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if self.rect.collidepoint(event.pos):
+                self.action()
+
+def start_game():
+    global current_state, score, lives
+    current_state = STATE_PLAYING; score = 0; lives = 3
+
+def quit_game(): pygame.quit(); sys.exit()
+
+btn_start = Button("Spielen",  (400, 300), start_game)
+btn_quit  = Button("Beenden",  (400, 360), quit_game)
+
+pause_surf = pygame.Surface((800,600), pygame.SRCALPHA)
+pause_surf.fill((0,0,0,140))
+
+running = True
+while running:
+    dt = clock.tick(60) / 1000
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: running = False
+        if current_state == STATE_MENU:
+            btn_start.handle(event); btn_quit.handle(event)
+        if current_state == STATE_PLAYING:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: current_state = STATE_PAUSED
+                if event.key == pygame.K_SPACE:  score += 10
+                if event.key == pygame.K_h:      lives -= 1
+        if current_state == STATE_PAUSED:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                current_state = STATE_PLAYING
+        if current_state == STATE_GAMEOVER:
+            if event.type == pygame.KEYDOWN: current_state = STATE_MENU
+
+    if current_state == STATE_PLAYING and lives <= 0:
+        current_state = STATE_GAMEOVER
+
+    screen.fill(BG)
+    if current_state == STATE_MENU:
+        t = font_h.render("MEIN SPIEL", True, GREEN)
+        screen.blit(t, t.get_rect(center=(400, 200)))
+        btn_start.draw(screen); btn_quit.draw(screen)
+    elif current_state == STATE_PLAYING:
+        screen.blit(font_m.render(f"Score: {score}  Leben: {'♥ '*lives}", True, WHITE), (20,20))
+        screen.blit(font_s.render("SPACE=+Score  H=Treffer  ESC=Pause", True, MUTED), (20,560))
+    elif current_state == STATE_PAUSED:
+        screen.blit(font_m.render(f"Score: {score}", True, WHITE), (20,20))
+        screen.blit(pause_surf, (0,0))
+        t = font_h.render("PAUSE", True, WHITE)
+        screen.blit(t, t.get_rect(center=(400,280)))
+        screen.blit(font_s.render("ESC zum Fortfahren", True, MUTED), font_s.render("ESC zum Fortfahren",True,MUTED).get_rect(center=(400,340)))
+    elif current_state == STATE_GAMEOVER:
+        t = font_h.render("GAME OVER", True, (255,123,114))
+        screen.blit(t, t.get_rect(center=(400,250)))
+        s = font_m.render(f"Score: {score}", True, WHITE)
+        screen.blit(s, s.get_rect(center=(400,320)))
+        screen.blit(font_s.render("Beliebige Taste für Menü", True, MUTED), font_s.render("Beliebige Taste",True,MUTED).get_rect(center=(400,370)))
+
+    pygame.display.flip()
+
+pygame.quit(); sys.exit()</code></pre></details>
+      <blockquote><p>State-Variablen klar benennen (STATE_MENU statt "menu") verhindert Tipp-Fehler. Eine echte State-Klasse mit enter/exit lohnt sich ab 5+ Zuständen.</p></blockquote>
+    </div>
+    <div class="lab-section" id="aufgabe"><div class="sec-heading">Aufgabe</div><p>Implementiere ein vollständiges Menü-System mit Hauptmenü (2 Buttons), Pause-Overlay, und Game-Over-Screen. Nutze eine State-Variable für klare Zustandstrennung.</p></div>
+    <div class="lab-section" id="anforderungen"><div class="sec-heading">Anforderungen</div><ol>
+        <li class="task"><span class="chk"></span>4 Spielzustände: MENU, PLAYING, PAUSED, GAME_OVER</li>
+        <li class="task"><span class="chk"></span>Button-Klasse: Hover-Effekt, Click-Handler</li>
+        <li class="task"><span class="chk"></span>Pause: ESC toggelt, halbtransparentes Overlay</li>
+        <li class="task"><span class="chk"></span>Game-Over-Screen zeigt finalen Score</li>
+        <li class="task"><span class="chk"></span>State-Übergänge korrekt und vollständig</li>
+    </ol></div>
+    <div class="lab-section" id="akzeptanz"><div class="sec-heading">Akzeptanzkriterien</div><ul>
+        <li class="task"><span class="chk"></span>Alle Zustände erreichbar und korrekt</li>
+        <li class="task"><span class="chk"></span>Buttons reagieren auf Hover und Klick</li>
+        <li class="task"><span class="chk"></span>Pause hält Spiellogik an, Overlay sichtbar</li>
+    </ul></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-card"><div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele"    class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund"  class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte"     class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe"      class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz"    class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card"><div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">&#8593; Alle Module</a>
+      <a href="modul-07.html" class="nav-mod-link">&#8592; Modul 07</a>
+      <a href="modul-09.html" class="nav-mod-link next">Modul 09</a>
+    </div>
+  </div>
+</div>
+</body></html>

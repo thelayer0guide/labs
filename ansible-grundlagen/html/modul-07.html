@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1117'/><text x='50' y='78' font-family='monospace' font-size='80' font-weight='700' text-anchor='middle' fill='%23a371f7'>0</text></svg>">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Modul 07 &#8212; Idempotenz, Tags & Check-Mode · Ansible & Configuration Management</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#7d8590;--code-bg:#10161d;--accent:#40d1ac}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+.topnav{padding:0 48px;height:46px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:8px}
+.nav-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}.nav-back:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:18px}.nav-crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+header{border-bottom:2px solid var(--accent);padding:40px 48px 32px;position:relative;overflow:hidden;background:linear-gradient(135deg,#0d1117 0%,#0d1420 60%,#0d1117 100%)}
+header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 250px at 65% 50%,color-mix(in srgb,var(--accent) 8%,transparent),transparent)}
+.header-grid{display:grid;grid-template-columns:1fr auto;align-items:start;gap:32px;position:relative;max-width:1240px}
+.badge-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.badge-mod{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.badge-cat{color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border)}
+h1{font-size:clamp(24px,3.5vw,44px);font-weight:800;letter-spacing:-1px;line-height:1.1;color:var(--text);margin-bottom:12px}
+.sheets-panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px}
+.sheets-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sheet-lnk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.sheet-lnk:last-child{border-bottom:none}
+.sheet-lnk::before{content:'&#8594;';color:var(--accent);opacity:.5}.sheet-lnk:hover{color:var(--accent)}
+.page-body{display:grid;grid-template-columns:1fr 220px;gap:40px;max-width:1240px;margin:0 auto;padding:48px;align-items:start}
+.content{min-width:0}.lab-section{margin-bottom:44px}
+.sec-heading{font-size:14px;font-weight:700;letter-spacing:.5px;color:var(--accent);padding-bottom:8px;margin-bottom:18px;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,transparent)}
+h3{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px}
+p{font-size:13.5px;line-height:1.75;color:#c9d1d9;margin-bottom:10px}
+ul,ol{list-style:none;padding:0;margin-bottom:14px}
+li{font-size:13.5px;line-height:1.7;color:#c9d1d9;padding:3px 0 3px 20px;position:relative}li::before{content:'·';position:absolute;left:6px;color:var(--accent);opacity:.7}
+li.task{padding-left:26px}li.task::before{display:none}
+.chk{display:inline-block;width:14px;height:14px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:3px;background:color-mix(in srgb,var(--accent) 6%,transparent);position:absolute;left:0;top:6px}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--code-bg);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:#e6edf3}
+pre{background:var(--code-bg);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:18px 20px;overflow-x:auto;margin:14px 0}
+pre code{background:none;border:none;padding:0;font-size:12.5px;line-height:1.65}
+blockquote{border-left:3px solid var(--accent);padding:12px 16px;background:color-mix(in srgb,var(--accent) 6%,transparent);border-radius:0 6px 6px 0;margin:14px 0}
+blockquote p{margin:0;font-size:13px;color:var(--muted)}
+.sidebar{position:sticky;top:60px}.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.sidebar-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.toc-lnk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;padding:5px 0;border-bottom:1px solid var(--border);transition:color .15s}.toc-lnk:last-child{border-bottom:none}.toc-lnk:hover{color:var(--accent)}
+.nav-mod-link{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;text-decoration:none;padding:5px 0;color:var(--muted);border-bottom:1px solid var(--border);transition:color .15s}.nav-mod-link:last-child{border-bottom:none}.nav-mod-link:hover{color:var(--accent)}.nav-mod-link.next::after{content:' &#8594;'}
+details.code-spoiler{margin:14px 0}
+details.code-spoiler summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;user-select:none;transition:color .15s,border-color .15s}
+details.code-spoiler summary::-webkit-details-marker{display:none}
+details.code-spoiler summary::before{content:'&#9654;';font-size:9px;color:var(--accent);opacity:.7;transition:transform .18s;flex-shrink:0}
+details.code-spoiler[open] summary::before{transform:rotate(90deg)}
+details.code-spoiler summary:hover{color:var(--text);border-color:var(--accent)}
+details.code-spoiler[open] summary{border-radius:6px 6px 0 0;border-bottom:1px solid var(--border)}
+details.code-spoiler pre{margin-top:0;border-radius:0 0 6px 6px;border-top:none;margin-bottom:0}
+@media(max-width:900px){.page-body{grid-template-columns:1fr;padding:32px 24px}.header-grid{grid-template-columns:1fr}.sidebar,.sheets-panel{display:none}.topnav,header{padding-left:24px;padding-right:24px}}
+</style></head><body>
+<nav class="topnav">
+  <a href="../../index.html" class="nav-back">&#8592; Labs</a>
+  <span class="nav-sep">/</span>
+  <a href="../catalog.html" class="nav-back">Ansible & Configuration Management</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-crumb">Modul 07 &#8212; Idempotenz, Tags & Check-Mode</span>
+</nav>
+<header>
+  <div class="header-grid">
+    <div>
+      <div class="badge-row">
+        <span class="badge badge-mod">Modul 07</span>
+        <span class="badge badge-cat">Phase B</span>
+        <span class="badge badge-cat">2–3 h</span>
+        <span class="badge" style="background:transparent;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)"><span style="color:#e3b341">&#9733;</span><span style="color:#e3b341">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span><span style="color:#30363d">&#9733;</span> Grundkenntnisse</span>
+      </div>
+      <h1>Idempotenz, Tags & Check-Mode</h1>
+    </div>
+    <div class="sheets-panel">
+      <div class="sheets-label">Cheat Sheets</div>
+      <a href="https://thelayer0guide.github.io/cheat-sheets/sheets/linux-cheatsheet.html" class="sheet-lnk" target="_blank">linux</a>
+    </div>
+  </div>
+</header>
+<div class="page-body">
+  <div class="content">
+    <div class="lab-section" id="lernziele"><div class="sec-heading">Lernziele</div><ul>
+        <li>Das Idempotenz-Prinzip verstehen und aktiv sicherstellen</li>
+        <li>changed_when und failed_when für Custom-Logic einsetzen</li>
+        <li>Tags für selektive Task-Ausführung vergeben</li>
+        <li>Check-Mode (Dry-run) und Diff-Mode für sichere Änderungen nutzen</li>
+    </ul></div>
+    <div class="lab-section" id="hintergrund"><div class="sec-heading">Hintergrund</div>
+      <p>Idempotenz bedeutet: ein Playbook mehrfach ausführen → immer dasselbe Ergebnis, keine unerwarteten Seiteneffekte. Die meisten Ansible-Module sind automatisch idempotent. command und shell sind es nicht — sie laufen immer. Lösungen: creates=/pfad (überspringen wenn Datei existiert), registers + when, oder das stat-Modul um Zustände zu prüfen.</p>
+      <p>changed_when: false sagt Ansible, dass ein Task nie als "geändert" gilt — gut für reine Lesebefehle. changed_when: result.stdout != "" setzt changed dynamisch. failed_when: result.rc != 0 and "Not found" not in result.stderr erlaubt differenziertere Fehlerbehandlung als der default (rc != 0). Tags ermöglichen ansible-playbook --tags install oder --skip-tags debug um selektiv Teile auszuführen.</p>
+    </div>
+    <div class="lab-section" id="konzepte"><div class="sec-heading">Schlüsselkonzepte</div>
+
+      <h3>Idempotenz für command/shell</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>---
+- name: Idempotente command-Tasks
+  hosts: all
+  become: true
+
+  tasks:
+    # SCHLECHT: läuft immer, immer "changed"
+    # - command: useradd deploy
+
+    # GUT: Variante 1 — creates (überspringt wenn Datei existiert)
+    - name: Zertifikat erstellen (einmalig)
+      command: openssl req -x509 -newkey rsa:4096 -keyout /etc/ssl/key.pem -out /etc/ssl/cert.pem -days 365 -nodes -subj "/CN=localhost"
+      args:
+        creates: /etc/ssl/cert.pem   # Überspringen wenn schon da
+
+    # GUT: Variante 2 — stat + when
+    - name: App-Status prüfen
+      stat:
+        path: /opt/myapp/current
+      register: app_installed
+
+    - name: App nur installieren wenn noch nicht vorhanden
+      unarchive:
+        src: myapp-1.0.tar.gz
+        dest: /opt/myapp/
+      when: not app_installed.stat.exists
+
+    # GUT: Variante 3 — changed_when mit Vergleich
+    - name: Aktuelle Version prüfen
+      command: myapp --version
+      register: current_version
+      changed_when: current_version.stdout != "1.0.0"
+      failed_when: current_version.rc != 0 and current_version.rc != 127
+
+    # Kein changed bei Lese-Befehlen
+    - name: Systeminfo sammeln
+      command: uname -r
+      register: kernel_version
+      changed_when: false
+      failed_when: false
+
+    - name: Kernel-Version ausgeben
+      debug:
+        msg: "Kernel: {{ kernel_version.stdout }}"</code></pre></details>
+      <h3>Tags & Check-Mode</h3>
+      <details class="code-spoiler"><summary>Code anzeigen</summary><pre><code>---
+- name: Playbook mit Tags
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Pakete installieren
+      apt:
+        name: [nginx, curl, git]
+        state: present
+      tags:
+        - install
+        - packages
+        - never   # nur mit --tags never ausführen
+
+    - name: Konfiguration deployen
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      tags: [config, nginx]
+      notify: nginx reload
+
+    - name: Service starten
+      service:
+        name: nginx
+        state: started
+      tags: [service, nginx]
+
+    - name: Debug-Info (nur explizit)
+      debug:
+        var: ansible_facts
+      tags: [debug, never]
+
+# Nutzung:
+# ansible-playbook site.yml --tags install
+# ansible-playbook site.yml --tags nginx
+# ansible-playbook site.yml --skip-tags debug
+# ansible-playbook site.yml --list-tags
+
+# Check-Mode (Dry-run) — keine echten Änderungen
+# ansible-playbook site.yml --check
+# ansible-playbook site.yml --check --diff    # Zeigt Datei-Diffs
+
+# Task nur im Check-Mode:
+# check_mode: false  # Immer ausführen, auch in --check
+# check_mode: true   # Nur im Check-Mode ausführen</code></pre></details>
+      <blockquote><p>tag: never ist speziell — dieser Task läuft niemals automatisch, nur wenn explizit mit --tags never oder dem Tag-Namen aufgerufen.</p></blockquote>
+    </div>
+    <div class="lab-section" id="aufgabe"><div class="sec-heading">Aufgabe</div><p>Auditiere ein bestehendes Playbook auf Idempotenz: identifiziere nicht-idempotente Tasks und mache sie idempotent. Füge ein vollständiges Tag-System hinzu.</p></div>
+    <div class="lab-section" id="anforderungen"><div class="sec-heading">Anforderungen</div><ol>
+        <li class="task"><span class="chk"></span>command/shell ohne creates/when als nicht-idempotent identifiziert</li>
+        <li class="task"><span class="chk"></span>stat + when als Lösung für mindestens 2 Tasks</li>
+        <li class="task"><span class="chk"></span>changed_when: false bei allen Lese-Tasks</li>
+        <li class="task"><span class="chk"></span>failed_when mit differenzierter Bedingung</li>
+        <li class="task"><span class="chk"></span>Tags: install, config, service, debug, never</li>
+        <li class="task"><span class="chk"></span>--check --diff Ausführung ohne Fehler dokumentiert</li>
+    </ol></div>
+    <div class="lab-section" id="akzeptanz"><div class="sec-heading">Akzeptanzkriterien</div><ul>
+        <li class="task"><span class="chk"></span>Playbook läuft 3x ohne Änderungen (idempotent)</li>
+        <li class="task"><span class="chk"></span>Tags funktionieren selektiv</li>
+        <li class="task"><span class="chk"></span>--check meldet keine false positives</li>
+    </ul></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-card"><div class="sidebar-lbl">Inhalt</div>
+      <a href="#lernziele"     class="toc-lnk">Lernziele</a>
+      <a href="#hintergrund"   class="toc-lnk">Hintergrund</a>
+      <a href="#konzepte"      class="toc-lnk">Schlüsselkonzepte</a>
+      <a href="#aufgabe"       class="toc-lnk">Aufgabe</a>
+      <a href="#anforderungen" class="toc-lnk">Anforderungen</a>
+      <a href="#akzeptanz"     class="toc-lnk">Akzeptanzkriterien</a>
+    </div>
+    <div class="sidebar-card"><div class="sidebar-lbl">Navigation</div>
+      <a href="../catalog.html" class="nav-mod-link">&#8593; Alle Module</a>
+      <a href="modul-06.html" class="nav-mod-link">&#8592; Modul 06</a>
+      <a href="modul-08.html" class="nav-mod-link next">Modul 08</a>
+    </div>
+  </div>
+</div>
+</body></html>
